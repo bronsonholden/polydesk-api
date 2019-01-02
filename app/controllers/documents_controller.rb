@@ -5,6 +5,7 @@ class DocumentsController < ApplicationController
   def new
   end
 
+  # POST /:identifier/documents
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       @document = Document.create(document_params)
@@ -16,6 +17,7 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # POST /:identifier/documents/:id
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       @document = Document.find(params[:id])
@@ -23,6 +25,7 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # GET /:identifier/documents
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       @documents = Document.all
