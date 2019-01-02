@@ -8,7 +8,8 @@ class DocumentsController < ApplicationController
   # POST /:identifier/documents
   def create
     Apartment::Tenant.switch(params[:identifier]) do
-      @document = Document.create(document_params)
+      @document = Document.new(document_params)
+      authorize @document
       if @document.save
         render json: @document, status: :ok
       else
@@ -21,6 +22,7 @@ class DocumentsController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       @document = Document.find(params[:id])
+      authorize @document
       render json: @document, status: :ok
     end
   end
