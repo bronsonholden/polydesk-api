@@ -13,5 +13,8 @@ Rails.application.routes.draw do
     get '/account', to: 'accounts#show'
     patch '/account', to: 'accounts#update'
     put '/account', to: 'accounts#update'
+
+    get '/users/:id/permissions', to: 'permissions#index'
+    post '/users/:id/permissions', to: 'permissions#create'
   end
 end
