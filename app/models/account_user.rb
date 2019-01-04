@@ -3,5 +3,5 @@ class AccountUser < ApplicationRecord
   validates :account_id, presence: true
   belongs_to :user
   belongs_to :account
-  has_many :permissions
+  has_many :permissions, dependent: :destroy
 end
