@@ -18,8 +18,12 @@ class UsersController < ApplicationController
 
   # DELETE /:identifier/users/:id
   def destroy
-    @account = Account.where(identifier: params[:identifier]).first
-    AccountUser.find_by!(user_id: params[:id], account_id: @account.id).destroy
+    # Delete while in the tenant schema so associated records can be destroyed
+    Apartment::Tenant.switch(params[:identifier]) do
+      @account = Account.where(identifier: params[:identifier]).first
+      AccountUser.find_by!(user_id: params[:id], account_id: @account.id).destroy
+    end
+
     render json: {}, status: :ok
   end
 
