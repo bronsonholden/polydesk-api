@@ -1,8 +1,8 @@
 class ApplicationPolicy
   attr_reader :user, :record
 
-  def initialize(user, record)
-    @user = user
+  def initialize(auth, record)
+    @account_user = AccountUser.find_by! user_id: auth.user.id, account_id: auth.account.id
     @record = record
   end
 

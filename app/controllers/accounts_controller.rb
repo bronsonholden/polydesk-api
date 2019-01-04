@@ -24,23 +24,27 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
-    ActiveRecord::Base.transaction do
-      # Create account and default user
-      account = Account.create(account_create_params)
-      user = User.create(user_params)
-      account_user = AccountUser.create(account: account, user: user)
+    # All records created successfully, create the tenant
+    Apartment::Tenant.create(params[:account_identifier])
 
-      # Validate records, stop and return any errors
-      [account, user, account_user].each { |record|
-        unless record.valid?
-          render json: record.errors, status: :unprocessable_entity
-          return false
-        end
-      }
+    Apartment::Tenant.switch(params[:account_identifier]) do
+      ActiveRecord::Base.transaction do
+        # Create account and default user
+        account = Account.new(account_create_params)
+        user = User.new(user_params)
 
-      # All records created successfully, create the tenant
-      Apartment::Tenant.create(account.identifier)
-      render json: account, status: :created, location: account
+        # Validate records, stop and return any errors
+        [account, user].each { |record|
+          unless record.save
+            render json: record.errors, status: :unprocessable_entity
+            return false
+          end
+        }
+
+        account_user = AccountUser.create(account_id: account.id, user_id: user.id)
+
+        render json: account, status: :created, location: account
+      end
     end
   end
 

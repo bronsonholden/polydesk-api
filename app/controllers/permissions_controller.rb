@@ -7,10 +7,8 @@ class PermissionsController < ApplicationController
 
   # POST /:identifier/users/:id/permissions
   def create
-    p = permission_params
-
     Apartment::Tenant.switch(params[:identifier]) do
-      @permission = Permission.new(p)
+      @permission = Permission.new(permission_params)
       #authorize @permission
       if @permission.save
         render json: @permission, status: :ok
@@ -35,7 +33,6 @@ class PermissionsController < ApplicationController
       account_user = AccountUser.find_by account_id: account.id, user_id: params[:id]
       p = params.require(:permission).permit(:code)
       p[:account_user_id] = account_user.id
-      puts p
       return p
     end
 end
