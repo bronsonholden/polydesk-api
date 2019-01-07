@@ -1,5 +1,5 @@
 class FoldersController < ApplicationController
-  # GET /folders
+  # GET /:identifier/folders
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       @folders = Folder.all
@@ -8,7 +8,7 @@ class FoldersController < ApplicationController
     end
   end
 
-  # GET /folders/1
+  # GET /:identifier/folders/:id
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
@@ -16,7 +16,7 @@ class FoldersController < ApplicationController
     end
   end
 
-  # POST /folders
+  # POST /:identifier/folders
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       @folder = Folder.new(folder_params)
@@ -29,7 +29,7 @@ class FoldersController < ApplicationController
     end
   end
 
-  # PATCH/PUT /folders/1
+  # PATCH/PUT /:identifier/folders/:id
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
@@ -41,7 +41,7 @@ class FoldersController < ApplicationController
     end
   end
 
-  # DELETE /folders/1
+  # DELETE /:identifier/folders/:id
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
@@ -50,13 +50,12 @@ class FoldersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_folder
       @folder = Folder.find(params[:id])
     end
 
     # Only allow a trusted parameter "white list" through.
     def folder_params
-      params.fetch(:folder, {})
+      params.permit(:name)
     end
 end
