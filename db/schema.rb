@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_07_020145) do
+ActiveRecord::Schema.define(version: 2019_01_07_064150) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,15 @@ ActiveRecord::Schema.define(version: 2019_01_07_020145) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "content"
+  end
+
+  create_table "folder_documents", force: :cascade do |t|
+    t.bigint "folder_id", null: false
+    t.bigint "document_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["document_id"], name: "index_folder_documents_on_document_id", unique: true
+    t.index ["folder_id"], name: "index_folder_documents_on_folder_id"
   end
 
   create_table "folders", force: :cascade do |t|
@@ -86,4 +95,6 @@ ActiveRecord::Schema.define(version: 2019_01_07_020145) do
 
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
+  add_foreign_key "folder_documents", "documents"
+  add_foreign_key "folder_documents", "folders"
 end
