@@ -10,14 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_07_064150) do
+ActiveRecord::Schema.define(version: 2019_01_07_070919) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "account_users", force: :cascade do |t|
-    t.bigint "user_id"
-    t.bigint "account_id"
+    t.bigint "user_id", null: false
+    t.bigint "account_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["account_id"], name: "index_account_users_on_account_id"
