@@ -8,6 +8,7 @@ Rails.application.routes.draw do
 
   scope '/:identifier' do
     resources :documents
+    resources :folders
     resources :users
 
     get '/account', to: 'accounts#show'
