@@ -22,7 +22,7 @@ class FoldersController < ApplicationController
       @folder = Folder.new(folder_params)
 
       if @folder.save
-        render json: @folder, status: :created, location: @folder
+        render json: @folder, status: :created
       else
         render json: @folder.errors, status: :unprocessable_entity
       end
@@ -56,6 +56,6 @@ class FoldersController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def folder_params
-      params.permit(:name)
+      params.permit(:name, :parent_folder)
     end
 end
