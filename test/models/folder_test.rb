@@ -40,4 +40,9 @@ class FolderTest < ActiveSupport::TestCase
     folder = Folder.new(name: '?:/\\~`')
     assert_not folder.valid?
   end
+
+  test 'allows valid name: "A Folder. Name"' do
+    folder = Folder.new(name: 'A Folder. Name')
+    assert folder.valid?
+  end
 end
