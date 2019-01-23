@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(version: 2019_01_20_213236) do
 
   create_table "folders", force: :cascade do |t|
     t.string "name", null: false
-    t.bigint "parent_id", null: false
+    t.bigint "parent_id", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["parent_id", "name"], name: "index_folders_on_parent_id_and_name", unique: true
