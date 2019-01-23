@@ -24,6 +24,13 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
+    # Don't proceed to tenant creation if
+    if params[:account_identifier].nil?
+      render json: { errors: { account_identifier: ['must not be empty']}},
+             status: :unprocessable_entity
+      return
+    end
+
     # All records created successfully, create the tenant
     Apartment::Tenant.create(params[:account_identifier])
 

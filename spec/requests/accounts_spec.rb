@@ -11,5 +11,10 @@ RSpec.describe "Accounts", type: :request do
                                     password_confirmation: 'password' }
       expect(response).to have_http_status(201)
     end
+
+    it 'rejects bad account creation request' do
+      post accounts_path
+      expect(response).to have_http_status(422)
+    end
   end
 end
