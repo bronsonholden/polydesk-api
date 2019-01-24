@@ -1,20 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe "Accounts", type: :request do
-  describe 'POST /accounts' do
-    it 'creates test account' do
-      post accounts_path, params: { account_name: 'Controller Test',
-                                    account_identifier: 'controller',
-                                    user_name: 'Controller User',
-                                    user_email: 'controller@polydesk.io',
-                                    password: 'password',
-                                    password_confirmation: 'password' }
-      expect(response).to have_http_status(201)
-    end
+  before(:each) do
+    @account = Account.find_by_identifier 'rspec'
+  end
 
-    it 'rejects bad account creation request' do
-      post accounts_path
-      expect(response).to have_http_status(422)
+  describe 'GET /rspec/account' do
+    it 'retrieves account information' do
+      get '/rspec/account', headers: account_login('rspec', 'rspec@polydesk.io', 'password')
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe 'GET /acme/account' do
+    it 'blocks restricted account information retrieval' do
+      get '/acme/account', headers: account_login('rspec', 'rspec@polydesk.io', 'password')
+      expect(response).to have_http_status(403)
     end
   end
 end

@@ -43,6 +43,7 @@ end
 
 group :test do
   gem 'sqlite3', '~> 1.3', '>= 1.3.11'
+  gem 'database_cleaner'
 end
 
 gem 'carrierwave', '~> 0.11.2'

@@ -7,6 +7,8 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 
+Dir[Rails.root.join('spec/helpers/*.rb')].each { |f| require f }
+
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
 # run as spec files by default. This means that files in spec/support that end
@@ -58,4 +60,28 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  config.before(:suite) do
+    # Database cleanup
+    DatabaseCleaner.clean_with :truncation
+    DatabaseCleaner.strategy = :transaction
+    # Tenant cleanup
+    Apartment::Tenant.drop('rspec') rescue nil
+    Apartment::Tenant.create('rspec') rescue nil
+    # Account & user creation
+    account = Account.create(name: 'RSpec', identifier: 'rspec')
+    account.users.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password')
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+    Apartment::Tenant.switch! 'rspec'
+  end
+
+  config.after(:each) do
+    Apartment::Tenant.reset
+    DatabaseCleaner.clean
+  end
+
+  config.include SessionHelper, :type => :request
 end
