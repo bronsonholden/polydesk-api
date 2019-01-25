@@ -18,4 +18,18 @@ RSpec.describe 'Accounts', type: :request do
       expect(response).to have_http_status(403)
     end
   end
+
+  describe 'GET /accounts' do
+    it 'retrieves all available accounts' do
+      get '/accounts', headers: account_login('rspec', 'rspec@polydesk.io', 'password')
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe 'GET /rspec/users' do
+    it 'retrieves all account users' do
+      get '/rspec/users', headers: account_login('rspec', 'rspec@polydesk.io', 'password')
+      expect(response).to have_http_status(200)
+    end
+  end
 end
