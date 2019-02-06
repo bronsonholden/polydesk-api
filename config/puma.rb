@@ -13,7 +13,8 @@ port ENV.fetch('PORT') { 3000 }
 
 # Specifies the `environment` that Puma will run in.
 #
-environment ENV.fetch('RAILS_ENV') { 'development' }
+env = ENV.fetch('RAILS_ENV') { 'development' }
+environment env
 
 # Specifies the number of `workers` to boot in clustered mode.
 # Workers are forked webserver processes. If using threads and workers together
@@ -33,5 +34,7 @@ environment ENV.fetch('RAILS_ENV') { 'development' }
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 
-daemonize true
-pidfile '/tmp/polydesk-api.pid'
+if env == 'production'
+  daemonize true
+  pidfile '/tmp/polydesk-api.pid'
+end
