@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  mount_devise_token_auth_for 'User', at: 'auth'
+  mount_devise_token_auth_for 'User', at: 'auth', controllers: {
+    sessions:  'overrides/sessions'
+  }
+
   resources :accounts, only: [:create, :index]
 
   if Rails.env.development? || Rails.env.test?

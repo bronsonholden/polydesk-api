@@ -11,7 +11,7 @@ class DocumentsController < ApplicationController
       @document = Document.new(document_params)
       authorize @document
       if @document.save
-        render json: @document, status: :ok
+        render json: DocumentSerializer.new(@document).serialized_json, status: :ok
       else
         render json: @document.errors, status: :unprocessable_entity
       end
@@ -23,7 +23,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @document = Document.find(params[:id])
       authorize @document
-      render json: @document, status: :ok
+      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
 
@@ -31,7 +31,7 @@ class DocumentsController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       @documents = Document.all
-      render json: @documents, status: :ok
+      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
 

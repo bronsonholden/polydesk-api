@@ -8,7 +8,7 @@ class AccountsController < ApplicationController
   # Returns only accounts the current user has access to
   def index
     accounts = current_user.accounts
-    render json: accounts
+    render json: AccountSerializer.new(accounts).serialized_json
   end
 
   # GET /:identifier/account
@@ -16,7 +16,7 @@ class AccountsController < ApplicationController
     identifier = params[:identifier]
     account = current_user.accounts.where(identifier: identifier)
     if account.length == 1
-      render json: account
+      render json: AccountSerializer.new(account).serialized_json
     else
       render json: {errors: {user: ["does not have access to #{identifier}"]}}, status: :forbidden
     end
@@ -50,7 +50,7 @@ class AccountsController < ApplicationController
 
         account_user = AccountUser.create(account_id: account.id, user_id: user.id)
 
-        render json: account, status: :created, location: account
+        render json: AccountSerializer.new(account).serialized_json, status: :created, location: account
       end
     end
   end
@@ -58,7 +58,7 @@ class AccountsController < ApplicationController
   # PATCH/PUT /:identifier/account
   def update
     if @account.update(account_params)
-      render json: @account
+      render json: AccountSerializer.new(@account).serialized_json
     else
       render json: @account.errors, status: :unprocessable_entity
     end

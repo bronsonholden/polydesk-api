@@ -14,7 +14,7 @@ class PermissionsController < ApplicationController
       @permission = Permission.new(permission_params)
       #authorize @permission
       if @permission.save
-        render json: @permission, status: :ok
+        render json: PermissionSerializer.new(@permission).serialized_json, status: :ok
       else
         render json: @permission.errors, status: :unprocessable_entity
       end
@@ -26,7 +26,7 @@ class PermissionsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @permissions = Permissions.where(user_id: params[:id])
       #authorize @permissions
-      render json: @permissions, status: :ok
+      render json: PermissionSerializer.new(@permissions).serialized_json, status: :ok
     end
   end
 

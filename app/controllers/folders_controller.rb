@@ -4,7 +4,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @folders = Folder.all
 
-      render json: @folders
+      render json: FolderSerializer.new(@folders).serialized_json
     end
   end
 
@@ -12,7 +12,7 @@ class FoldersController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      render json: @folder
+      render json: FolderSerializer.new(@folder).serialized_json
     end
   end
 
@@ -22,7 +22,7 @@ class FoldersController < ApplicationController
       @folder = Folder.new(folder_params)
 
       if @folder.save
-        render json: @folder, status: :created
+        render json: FolderSerializer.new(@folder).serialized_json, status: :created
       else
         render json: @folder.errors, status: :unprocessable_entity
       end
