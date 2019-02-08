@@ -1,4 +1,6 @@
 class Account < ApplicationRecord
+  include Rails.application.routes.url_helpers
+
   alias_attribute :account_identifier, :identifier
   alias_attribute :account_name, :name
   attr_readonly :identifier
@@ -16,5 +18,9 @@ class Account < ApplicationRecord
   # Specify that we want to use identifier column when using URL helpers
   def to_param
     identifier
+  end
+
+  def related_users_url
+    users_url(self)
   end
 end

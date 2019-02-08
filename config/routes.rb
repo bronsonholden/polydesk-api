@@ -5,10 +5,6 @@ Rails.application.routes.draw do
 
   resources :accounts, only: [:create, :index]
 
-  if Rails.env.development? || Rails.env.test?
-    get '/users', to: 'accounts#show_all'
-  end
-
   scope '/:identifier' do
     resources :documents
     resources :folders
