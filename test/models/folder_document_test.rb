@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class FolderDocumentTest < ActiveSupport::TestCase
-  test 'File and unfile document' do
+  test 'file and unfile document' do
     # Create sample document and folder
     folder = Folder.new(name: 'Folder')
     document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
@@ -19,7 +19,7 @@ class FolderDocumentTest < ActiveSupport::TestCase
     assert Document.where(id: document.id).first.folder.nil?
   end
 
-  test 'Disallow duplicate filings' do
+  test 'disallow duplicate filings' do
     # Create sample document and folder
     folder = Folder.new(name: 'Folder')
     document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })

@@ -2,47 +2,20 @@ require 'test_helper'
 
 class FolderTest < ActiveSupport::TestCase
   test 'invalid without name' do
-    folder = Folder.new
-    assert_not folder.valid?
+    assert_not Folder.new.save
   end
 
-  test 'disallows invalid name "."' do
-    folder = Folder.new(name: '.')
-    assert_not folder.valid?
+  test 'disallow invalid names' do
+    assert_not Folder.new(name: '.').save
+    assert_not Folder.new(name: ' ').save
+    assert_not Folder.new(name: ' A').save
+    assert_not Folder.new(name: 'A ').save
+    assert_not Folder.new(name: 'A?').save
+    assert_not Folder.new(name: '').save
+    assert_not Folder.new(name: '?:/\\~`').save
   end
 
-  test 'disallows invalid name: " "' do
-    folder = Folder.new(name: ' ')
-    assert_not folder.valid?
-  end
-
-  test 'disallows invalid name: " A"' do
-    folder = Folder.new(name: ' A')
-    assert_not folder.valid?
-  end
-
-  test 'disallows invalid name: "A "' do
-    folder = Folder.new(name: 'A ')
-    assert_not folder.valid?
-  end
-
-  test 'disallows invalid name: "A?"' do
-    folder = Folder.new(name: 'A?')
-    assert_not folder.valid?
-  end
-
-  test 'disallows invalid name: ""' do
-    folder = Folder.new(name: '')
-    assert_not folder.valid?
-  end
-
-  test 'disallows invalid name: "?:/\\~`"' do
-    folder = Folder.new(name: '?:/\\~`')
-    assert_not folder.valid?
-  end
-
-  test 'allows valid name: "A Folder. Name"' do
-    folder = Folder.new(name: 'A Folder. Name')
-    assert folder.valid?
+  test 'allow valid names' do
+    assert Folder.new(name: 'A Folder. Name').save
   end
 end
