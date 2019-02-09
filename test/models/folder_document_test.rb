@@ -31,4 +31,27 @@ class FolderDocumentTest < ActiveSupport::TestCase
     duplicate = FolderDocument.new({ folder: folder, document: document })
     assert_not duplicate.save
   end
+
+  test 'delete folder retain document' do
+    folder = Folder.new(name: 'Folder')
+    document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
+    assert folder.save
+    assert document.save
+    document.folder = folder
+    folder.destroy
+    assert_not Folder.find_by_id(folder.id)
+    assert Document.find_by_id(document.id).folder.nil?
+    assert Document.find_by_id(document.id)
+  end
+
+  test 'delete document retain folder' do
+    folder = Folder.new(name: 'Folder')
+    document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
+    assert folder.save
+    assert document.save
+    document.folder = folder
+    document.destroy
+    assert Folder.find_by_id(folder.id)
+    assert_not Document.find_by_id(document.id)
+  end
 end

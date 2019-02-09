@@ -4,6 +4,7 @@ class Folder < ApplicationRecord
   before_validation :default_parent
   has_many :children, class_name: 'Folder', foreign_key: 'parent_id'
   has_many :documents, through: :folder_documents
+  has_many :folder_documents, dependent: :destroy
   validates :name, presence: true, format: {
     # Allow alphanumerals, spaces, and _ . - ( ) [ ]
     # Spaces and . may not be the first or last character

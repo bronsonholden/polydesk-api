@@ -10,11 +10,32 @@ class NullStorage
   end
 
   def store!(_file)
-    true
+    NullFile.new
   end
 
   def retrieve!(_identifier)
-    true
+    NullFile.new
+  end
+
+  class NullFile
+    def delete
+    end
+
+    def content_type
+      'txt'
+    end
+
+    def size
+      7
+    end
+
+    def read
+      return 'Nothing'
+    end
+
+    def exists?
+      true
+    end
   end
 end
 
