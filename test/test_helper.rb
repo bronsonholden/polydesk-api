@@ -18,6 +18,7 @@ class ActiveSupport::TestCase
   fixtures :all
 
   setup do
-    @account = Account.create(name: 'Test Account', identifier: 'test')
+    @account = Account.new(name: 'Test Account', identifier: 'test')
+    @account.save
   end
 end

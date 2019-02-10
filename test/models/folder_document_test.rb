@@ -3,10 +3,10 @@ require 'test_helper'
 class FolderDocumentTest < ActiveSupport::TestCase
   test 'file and unfile document' do
     # Create sample document and folder
-    folder = Folder.new(name: 'Folder')
-    document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
-    assert folder.save
-    assert document.save
+    folder = Folder.create(name: 'Folder')
+    document = Document.create({ name: 'Document', content: StringFileIO.new('Nothing') })
+    assert folder.valid?
+    assert document.valid?
     # File the document
     document.folder = folder
     folder_document = FolderDocument.where(document_id: document.id, folder_id: folder.id).first
@@ -21,10 +21,10 @@ class FolderDocumentTest < ActiveSupport::TestCase
 
   test 'disallow duplicate filings' do
     # Create sample document and folder
-    folder = Folder.new(name: 'Folder')
-    document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
-    assert folder.save
-    assert document.save
+    folder = Folder.create(name: 'Folder')
+    document = Document.create({ name: 'Document', content: StringFileIO.new('Nothing') })
+    assert folder.valid?
+    assert document.valid?
     # File the document
     document.folder = folder
     # Ensure creating a second filing fails
@@ -33,10 +33,10 @@ class FolderDocumentTest < ActiveSupport::TestCase
   end
 
   test 'delete folder retain document' do
-    folder = Folder.new(name: 'Folder')
-    document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
-    assert folder.save
-    assert document.save
+    folder = Folder.create(name: 'Folder')
+    document = Document.create({ name: 'Document', content: StringFileIO.new('Nothing') })
+    assert folder.valid?
+    assert document.valid?
     document.folder = folder
     folder.destroy
     assert_not Folder.find_by_id(folder.id)
@@ -45,10 +45,10 @@ class FolderDocumentTest < ActiveSupport::TestCase
   end
 
   test 'delete document retain folder' do
-    folder = Folder.new(name: 'Folder')
-    document = Document.new({ name: 'Document', content: StringFileIO.new('Nothing') })
-    assert folder.save
-    assert document.save
+    folder = Folder.create(name: 'Folder')
+    document = Document.create({ name: 'Document', content: StringFileIO.new('Nothing') })
+    assert folder.valid?
+    assert document.valid?
     document.folder = folder
     document.destroy
     assert Folder.find_by_id(folder.id)
