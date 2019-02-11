@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     resources :documents
     resources :folders
     resources :users
+    resources :reports
 
     get '/account', to: 'accounts#show'
     patch '/account', to: 'accounts#update'
