@@ -81,5 +81,3 @@ test:
 production:
   <<: *default
   database: polydesk_production
-  username: polydesk
-  password: <%= ENV['POLYDESK_DATABASE_PASSWORD'] %>
