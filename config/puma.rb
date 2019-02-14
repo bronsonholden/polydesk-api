@@ -34,7 +34,8 @@ environment env
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 
-if env == 'production' || ENV.fetch('RAILS_DAEMONIZE')
+if env == 'production' || ENV.fetch('RAILS_DAEMONIZE') { false }
   daemonize true
-  pidfile '/tmp/polydesk-api.pid'
 end
+
+pidfile '/tmp/polydesk-api.pid'
