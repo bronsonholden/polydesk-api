@@ -2,7 +2,7 @@ require 'test_helper'
 
 class AccountUserPermissionTest < ActiveSupport::TestCase
   test 'add permission' do
-    user = @account.users.create(name: 'Test User', email: 'test@polydesk.io', password: 'password')
+    user = @account.users.create(name: 'Test User', email: 'test@polydesk.io', password: 'password', default_account: @account)
     assert user
     account_user = AccountUser.where(account_id: @account.id, user_id: user.id).first
     assert_not account_user.nil?

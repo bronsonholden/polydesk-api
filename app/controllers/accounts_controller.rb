@@ -38,15 +38,17 @@ class AccountsController < ApplicationController
       ActiveRecord::Base.transaction do
         # Create account and default user
         account = Account.new(account_create_params)
-        user = User.new(user_params)
+        unless account.save
+          render json: account.errors, status: :unprocessable_entity
+          return false
+        end
 
-        # Validate records, stop and return any errors
-        [account, user].each { |record|
-          unless record.save
-            render json: record.errors, status: :unprocessable_entity
-            return false
-          end
-        }
+        user = User.new(user_params)
+        user.default_account = account
+        unless user.save
+          render json: user.errors, status: :unprocessable_entity
+          return false
+        end
 
         account_user = AccountUser.create(account_id: account.id, user_id: user.id)
 

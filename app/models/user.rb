@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
   validates :email, presence: true, uniqueness: true
   has_many :account_users
   has_many :accounts, through: :account_users, dependent: :destroy
+  belongs_to :default_account, class_name: 'Account'
 
   def token_validation_response
     UserSerializer.new(self).serialized_json
