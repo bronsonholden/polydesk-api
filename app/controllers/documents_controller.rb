@@ -11,7 +11,7 @@ class DocumentsController < ApplicationController
       @document = Document.new(document_params)
       authorize @document
       if @document.save
-        render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+        render json: DocumentSerializer.new(@document).serialized_json, status: :created
       else
         render json: @document.errors, status: :unprocessable_entity
       end
