@@ -17,5 +17,7 @@ Rails.application.routes.draw do
 
     get '/users/:id/permissions', to: 'permissions#index'
     post '/users/:id/permissions', to: 'permissions#create'
+
+    get '/folders/:id/folders', to: 'folders#children'
   end
 end

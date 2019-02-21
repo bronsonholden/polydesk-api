@@ -49,6 +49,14 @@ class FoldersController < ApplicationController
     end
   end
 
+  # GET /:identifier/folders/:id/folders
+  def children
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_folder
+      render json: FolderSerializer.new(@folder.children).serialized_json
+    end
+  end
+
   private
     def set_folder
       @folder = Folder.find(params[:id])
