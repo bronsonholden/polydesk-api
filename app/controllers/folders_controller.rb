@@ -2,7 +2,11 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders
   def index
     Apartment::Tenant.switch(params[:identifier]) do
-      @folders = Folder.all
+      if params.key?(:root) && params[:root] == 'true' then
+        @folders = Folder.where(parent_id: 0)
+      else
+        @folders = Folder.all
+      end
 
       render json: FolderSerializer.new(@folders).serialized_json
     end
