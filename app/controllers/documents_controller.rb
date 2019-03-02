@@ -31,7 +31,7 @@ class DocumentsController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       @documents = Document.all
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      render json: DocumentSerializer.new(@documents).serialized_json, status: :ok
     end
   end
 
