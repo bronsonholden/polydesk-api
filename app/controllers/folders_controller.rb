@@ -61,6 +61,26 @@ class FoldersController < ApplicationController
     end
   end
 
+  # GET /:identifier/folders/:id/documents
+  def documents
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_folder
+      render json: FolderSerializer.new(@folder.documents).serialized_json
+    end
+  end
+
+  def add_document
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_folder
+      document = @folder.documents.create(params.permit(:content))
+      if document.save
+        render json: DocumentSerializer.new(document).serialized_json, status: :created
+      else
+        render json: document.errors, status: :unprocessable_entity
+      end
+    end
+  end
+
   private
     def set_folder
       @folder = Folder.find(params[:id])
