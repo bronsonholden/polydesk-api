@@ -65,7 +65,7 @@ class FoldersController < ApplicationController
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      render json: FolderSerializer.new(@folder.documents).serialized_json
+      render json: DocumentSerializer.new(@folder.documents).serialized_json
     end
   end
 
