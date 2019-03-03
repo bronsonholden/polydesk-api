@@ -30,7 +30,14 @@ class DocumentsController < ApplicationController
   # GET /:identifier/documents
   def index
     Apartment::Tenant.switch(params[:identifier]) do
-      @documents = Document.all
+      if params.key?(:root) && params[:root] == 'true' then
+        @documents = Document.left_outer_joins(:folder)
+                             .where(folders: { id: nil })
+                             .references(:folders)
+      else
+        @documents = Document.all
+      end
+
       render json: DocumentSerializer.new(@documents).serialized_json, status: :ok
     end
   end
