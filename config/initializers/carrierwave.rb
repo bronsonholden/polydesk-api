@@ -6,7 +6,7 @@ class NullStorage
   end
 
   def identifier
-    uploader.filename
+    @uploader.filename
   end
 
   def store!(_file)
