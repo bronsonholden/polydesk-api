@@ -69,6 +69,7 @@ class FoldersController < ApplicationController
     end
   end
 
+  # POST /:identifier/folders/:id/documents
   def add_document
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
