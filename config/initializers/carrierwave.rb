@@ -10,7 +10,7 @@ class NullStorage
   end
 
   def store!(_file)
-    NullFile.new
+    NullFile.new()
   end
 
   def retrieve!(_identifier)
@@ -31,6 +31,10 @@ class NullStorage
 
     def read
       return 'Nothing'
+    end
+
+    def path
+      'not/a/file.txt'
     end
 
     def exists?
