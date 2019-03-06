@@ -61,6 +61,20 @@ class FoldersController < ApplicationController
     end
   end
 
+  # POST /:identifier/folders/:id/folders
+  def add_folder
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_folder
+      # For this path, disallow parent_folder param
+      new_folder = @folder.children.create(params.permit(:name))
+      if new_folder.save
+        render json: FolderSerializer.new(new_folder).serialized_json, status: :created
+      else
+        render json: new_folder.errors, status: :unprocessable_entity
+      end
+    end
+  end
+
   # GET /:identifier/folders/:id/documents
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
