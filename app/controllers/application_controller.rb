@@ -10,6 +10,6 @@ class ApplicationController < ActionController::API
 
   private
     def user_not_authorized
-      render json: {errors: ['You are not authorized to perform this action']}, status: :forbidden
+      render json: ErrorSerializer.new({ user: [ 'is not authorized to perform this action' ] }).serialized_json, status: :forbidden
     end
 end

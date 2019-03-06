@@ -28,7 +28,7 @@ class FoldersController < ApplicationController
       if @folder.save
         render json: FolderSerializer.new(@folder).serialized_json, status: :created
       else
-        render json: @folder.errors, status: :unprocessable_entity
+        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end
@@ -40,7 +40,7 @@ class FoldersController < ApplicationController
       if @folder.update(folder_params)
         render json: FolderSerializer.new(@folder).serialized_json
       else
-        render json: @folder.errors, status: :unprocessable_entity
+        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end
@@ -70,7 +70,7 @@ class FoldersController < ApplicationController
       if new_folder.save
         render json: FolderSerializer.new(new_folder).serialized_json, status: :created
       else
-        render json: new_folder.errors, status: :unprocessable_entity
+        render json: ErrorSerializer.new(new_folder.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end
@@ -91,7 +91,7 @@ class FoldersController < ApplicationController
       if document.save
         render json: DocumentSerializer.new(document).serialized_json, status: :created
       else
-        render json: document.errors, status: :unprocessable_entity
+        render json: ErrorSerializer.new(document.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end

@@ -13,20 +13,32 @@ class AccountsController < ApplicationController
 
   # GET /:identifier/account
   def show
-    identifier = params[:identifier]
-    account = current_user.accounts.where(identifier: identifier)
-    if account.length == 1
-      render json: AccountSerializer.new(account).serialized_json
-    else
-      render json: {errors: {user: ["does not have access to #{identifier}"]}}, status: :forbidden
+    set_account
+
+    if @account
+      user_account = current_user.accounts.where(identifier: @account.identifier)
+
+      if user_account.length == 1
+        render json: AccountSerializer.new(@account).serialized_json
+        return
+      end
     end
+
+    # If no account object, create it to serialize errors
+    @account ||= Account.new(identifier: params[:identifier])
+    # Only error we want to return is no access
+    @account.errors.add('user', "does not have access to #{@account.identifier}")
+
+    render json: ErrorSerializer.new(@account.errors).serialized_json, status: :forbidden
   end
 
   # POST /accounts
   def create
     # Don't proceed to tenant creation if
     if params[:account_identifier].nil?
-      render json: { errors: { account_identifier: ['must not be empty']}},
+      @account = Account.new
+      @account.errors.add('account_identifier', 'is required')
+      render json: ErrorSerializer.new(@account.errors).serialized_json,
              status: :unprocessable_entity
       return
     end
@@ -39,14 +51,14 @@ class AccountsController < ApplicationController
         # Create account and default user
         account = Account.new(account_create_params)
         unless account.save
-          render json: account.errors, status: :unprocessable_entity
+          render json: ErrorSerializer.new(account.errors).serialized_json, status: :unprocessable_entity
           return false
         end
 
         user = User.new(user_params)
         user.default_account = account
         unless user.save
-          render json: user.errors, status: :unprocessable_entity
+          render json: ErrorSerializer.new(user.errors).serialized_json, status: :unprocessable_entity
           return false
         end
 
@@ -62,7 +74,7 @@ class AccountsController < ApplicationController
     if @account.update(account_params)
       render json: AccountSerializer.new(@account).serialized_json
     else
-      render json: @account.errors, status: :unprocessable_entity
+      render json: ErrorSerializer.new(@account.errors).serialized_json, status: :unprocessable_entity
     end
   end
 

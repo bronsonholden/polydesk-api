@@ -20,7 +20,7 @@ class ReportsController < ApplicationController
     if @report.save
       render json: @report, status: :created, location: @report
     else
-      render json: @report.errors, status: :unprocessable_entity
+      render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
     end
   end
 
@@ -29,7 +29,7 @@ class ReportsController < ApplicationController
     if @report.update(report_params)
       render json: @report
     else
-      render json: @report.errors, status: :unprocessable_entity
+      render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
     end
   end
 

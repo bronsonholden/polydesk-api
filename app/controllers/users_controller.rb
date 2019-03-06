@@ -10,7 +10,8 @@ class UsersController < ApplicationController
     @user = User.find_by! id: params[:id]
 
     if AccountUser.where(account_id: @account.id, user: @user.id).empty?
-      render json: {errors: {user: ["does not exist in #{params[:identifier]}"]}}, status: :unprocessable_entity
+      @user.errors.add('user', "does have access to #{params[:identifier]}")
+      render json: ErrorSerializer.new(@user.errors).serialized_json, status: :unprocessable_entity
     else
       render json: UserSerializer.new(@user).serialized_json, status: :ok
     end

@@ -13,7 +13,7 @@ class DocumentsController < ApplicationController
       if @document.save
         render json: DocumentSerializer.new(@document).serialized_json, status: :created
       else
-        render json: @document.errors, status: :unprocessable_entity
+        render json: ErrorSerializer.new(@document.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end
