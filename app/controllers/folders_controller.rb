@@ -93,7 +93,8 @@ class FoldersController < ApplicationController
   def add_document
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      document = @folder.documents.create(params.permit(:content))
+      document = @folder.documents.new(params.permit(:content))
+      authorize document, :create?, policy_class: DocumentPolicy
       if document.save
         render json: DocumentSerializer.new(document).serialized_json, status: :created
       else
