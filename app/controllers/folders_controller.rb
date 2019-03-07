@@ -21,7 +21,7 @@ class FoldersController < ApplicationController
       else
         @folder = Folder.new
         @folder.errors.add('folder', 'does not exist')
-        render json: ErrorSerializer.new(@folder.errors).serialized_json
+        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :not_found
       end
     end
   end
