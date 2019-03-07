@@ -8,7 +8,7 @@ class FoldersController < ApplicationController
         @folders = Folder.all
       end
 
-      render json: FolderSerializer.new(@folders).serialized_json
+      render json: FolderSerializer.new(@folders).serialized_json, status: :ok
     end
   end
 
@@ -17,7 +17,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @folder = Folder.find_by_id(params[:id])
       if @folder
-        render json: FolderSerializer.new(@folder).serialized_json
+        render json: FolderSerializer.new(@folder).serialized_json, status: :ok
       else
         @folder = Folder.new
         @folder.errors.add('folder', 'does not exist')
@@ -44,7 +44,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
       if @folder.update(folder_params)
-        render json: FolderSerializer.new(@folder).serialized_json
+        render json: FolderSerializer.new(@folder).serialized_json, status: :ok
       else
         render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :unprocessable_entity
       end
@@ -63,7 +63,7 @@ class FoldersController < ApplicationController
   def children
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      render json: FolderSerializer.new(@folder.children).serialized_json
+      render json: FolderSerializer.new(@folder.children).serialized_json, status: :ok
     end
   end
 
@@ -85,7 +85,7 @@ class FoldersController < ApplicationController
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      render json: DocumentSerializer.new(@folder.documents).serialized_json
+      render json: DocumentSerializer.new(@folder.documents).serialized_json, status: :ok
     end
   end
 
