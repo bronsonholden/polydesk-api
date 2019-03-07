@@ -24,4 +24,12 @@ RSpec.describe 'Folders', type: :request do
       expect(response).to have_http_status(200)
     end
   end
+
+  describe 'DELETE /rspec/folders/:folder' do
+    let(:folder) { create :folder }
+    it 'deletes folder' do
+      delete "/rspec/folders/#{folder.id}", headers: account_login('rspec', 'rspec@polydesk.io', 'password')
+      expect(response).to have_http_status(204)
+    end
+  end
 end

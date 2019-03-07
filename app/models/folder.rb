@@ -2,7 +2,7 @@ class Folder < ApplicationRecord
   alias_attribute :parent_folder, :parent_id
   belongs_to :parent, class_name: 'Folder', optional: true
   before_validation :default_parent
-  has_many :children, class_name: 'Folder', foreign_key: 'parent_id'
+  has_many :children, class_name: 'Folder', foreign_key: 'parent_id', dependent: :destroy
   has_many :folder_documents, dependent: :destroy
   has_many :documents, through: :folder_documents
   validates :name, presence: true, format: {
