@@ -15,8 +15,14 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id
   def show
     Apartment::Tenant.switch(params[:identifier]) do
-      set_folder
-      render json: FolderSerializer.new(@folder).serialized_json
+      @folder = Folder.find_by_id(params[:id])
+      if @folder
+        render json: FolderSerializer.new(@folder).serialized_json
+      else
+        @folder = Folder.new
+        @folder.errors.add('folder', 'does not exist')
+        render json: ErrorSerializer.new(@folder.errors).serialized_json
+      end
     end
   end
 
