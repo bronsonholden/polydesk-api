@@ -21,9 +21,15 @@ class DocumentsController < ApplicationController
   # POST /:identifier/documents/:id
   def show
     Apartment::Tenant.switch(params[:identifier]) do
-      @document = Document.find(params[:id])
-      authorize @document
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      @document = Document.find_by_id(params[:id])
+      if @document
+        authorize @document
+        render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      else
+        @document = Document.new
+        @document.errors.add('document', 'does not exist')
+        render json: ErrorSerializer.new(@document.errors).serialized_json, status: :not_found
+      end
     end
   end
 
