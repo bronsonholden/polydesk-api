@@ -8,6 +8,11 @@ class ApplicationController < ActionController::API
     Polydesk::AuthContext.new(current_user, params[:identifier])
   end
 
+  # GET /
+  def show
+    render json: {}, status: :ok
+  end
+
   private
     def user_not_authorized
       @user = User.new

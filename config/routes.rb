@@ -5,6 +5,8 @@ Rails.application.routes.draw do
 
   resources :accounts, only: [:create, :index]
 
+  get '/', to: 'application#show'
+
   scope '/:identifier' do
     resources :documents
     resources :folders
