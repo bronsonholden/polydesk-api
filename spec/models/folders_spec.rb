@@ -8,4 +8,12 @@ describe Folder do
       expect { folder.parent.destroy }.to change(Folder, :count).by(-2)
     end
   end
+
+  describe 'delete with document' do
+    let(:document) { create :subdocument }
+    it 'deletes folder and document' do
+      document
+      expect { document.folder.destroy }.to change(Document, :count).by(-1)
+    end
+  end
 end
