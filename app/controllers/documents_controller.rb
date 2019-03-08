@@ -48,6 +48,21 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # GET /:identifier/documents/:id/folder
+  def folder
+    Apartment::Tenant.switch(params[:identifier]) do
+      @document = Document.find_by_id(params[:id])
+      if @document
+        authorize @document
+        render json: FolderSerializer.new(@document.folder).serialized_json, status: :ok
+      else
+        @document = Document.new
+        @document.errors.add('document', 'does not exist')
+        render json: ErrorSerializer.new(@document.errors).serialized_json, status: :not_found
+      end
+    end
+  end
+
   private
     def document_params
       params.permit(:content)
