@@ -9,4 +9,11 @@ class Document < ApplicationRecord
   def related_folder_url
     document_folder_url(id: self.id, identifier: Apartment::Tenant.current)
   end
+
+  before_save :save_content_attributes
+
+  def save_content_attributes
+    self.content_type = content.content_type if content.content_type
+    self.file_size = content.size
+  end
 end
