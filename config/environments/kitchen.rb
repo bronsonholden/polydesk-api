@@ -52,6 +52,6 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
-  Rails.application.routes.default_url_options[:host] = 'api.local.polydesk.io'
+  Rails.application.routes.default_url_options[:host] = 'apilocal.polydesk.io'
   Rails.application.routes.default_url_options[:protocol] = 'https'
 end
