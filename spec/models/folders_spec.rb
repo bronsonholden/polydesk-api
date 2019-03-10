@@ -9,6 +9,14 @@ describe Folder do
     end
   end
 
+  describe 'delete with parent' do
+    let(:folder) { create :subfolder }
+    it 'retains parent folder' do
+      folder
+      expect { folder.destroy }.to change(Folder, :count).by(-1)
+    end
+  end
+
   describe 'delete with document' do
     let(:document) { create :subdocument }
     it 'deletes folder and document' do
