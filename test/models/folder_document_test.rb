@@ -12,8 +12,8 @@ class FolderDocumentTest < ActiveSupport::TestCase
     folder_document = FolderDocument.where(document_id: document.id, folder_id: folder.id).first
     assert folder_document.valid?
     assert_not Document.where(id: document.id).first.folder.nil?
-    # Now destroy association (unfile document)
-    folder_document.destroy
+    # Now delete association (unfile document)
+    folder_document.delete
     assert FolderDocument.where(document_id: document.id, folder_id: folder.id).empty?
     assert Document.where(id: document.id).first.valid?
     assert Document.where(id: document.id).first.folder.nil?
@@ -32,7 +32,7 @@ class FolderDocumentTest < ActiveSupport::TestCase
     assert_not duplicate.save
   end
 
-  test 'delete folder retain document' do
+  test 'delete folder and document' do
     folder = Folder.create(name: 'Folder')
     document = Document.create({ name: 'Document', content: StringFileIO.new('Nothing') })
     assert folder.valid?
@@ -40,8 +40,7 @@ class FolderDocumentTest < ActiveSupport::TestCase
     document.folder = folder
     folder.destroy
     assert_not Folder.find_by_id(folder.id)
-    assert Document.find_by_id(document.id).folder.nil?
-    assert Document.find_by_id(document.id)
+    assert_not Document.find_by_id(document.id)
   end
 
   test 'delete document retain folder' do
