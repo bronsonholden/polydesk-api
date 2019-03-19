@@ -33,7 +33,6 @@ class FormsController < ApplicationController
   # PATCH/PUT /:identifier/forms/1
   def update
     Apartment::Tenant.switch(params['identifier']) do
-      set_form
       if @form.update(form_params)
         render json: FormSerializer.new(@form).serialized_json, status: :ok
       else
