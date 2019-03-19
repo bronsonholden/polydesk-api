@@ -1,47 +1,60 @@
 class FormsController < ApplicationController
   before_action :set_form, only: [:show, :update, :destroy]
 
-  # GET /forms
+  # GET /:identifier/forms
   def index
-    @forms = Form.all
+    Apartment::Tenant.switch(params['identifier']) do
+      @forms = Form.all
 
-    render json: @forms
+      render json: FormSerializer.new(@forms).serialized_json, status: :ok
+    end
   end
 
-  # GET /forms/1
+  # GET /:identifier/forms/1
   def show
-    render json: @form
+    Apartment::Tenant.switch(params['identifier']) do
+      render json: FormSerializer.new(@forms).serialized_json, status: :ok
+    end
   end
 
-  # POST /forms
+  # POST /:identifier/forms
   def create
-    @form = Form.new(form_params)
+    Apartment::Tenant.switch(params['identifier']) do
+      @form = Form.new(form_params)
 
-    if @form.save
-      render json: @form, status: :created, location: @form
-    else
-      render json: @form.errors, status: :unprocessable_entity
+      if @form.save
+        render json: FormSerializer.new(@form).serialized_json, status: :created
+      else
+        render json: @form.errors, status: :unprocessable_entity
+      end
     end
   end
 
-  # PATCH/PUT /forms/1
+  # PATCH/PUT /:identifier/forms/1
   def update
-    if @form.update(form_params)
-      render json: @form
-    else
-      render json: @form.errors, status: :unprocessable_entity
+    Apartment::Tenant.switch(params['identifier']) do
+      set_form
+      if @form.update(form_params)
+        render json: FormSerializer.new(@form).serialized_json, status: :ok
+      else
+        render json: @form.errors, status: :unprocessable_entity
+      end
     end
   end
 
-  # DELETE /forms/1
+  # DELETE /:identifier/forms/1
   def destroy
-    @form.destroy
+    Apartment::Tenant.switch(params['identifier']) do
+      @form.destroy
+    end
   end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_form
-      @form = Form.find(params[:id])
+      Apartment::Tenant.switch(params['identifier']) do
+        @form = Form.find(params[:id])
+      end
     end
 
     # Only allow a trusted parameter "white list" through.
