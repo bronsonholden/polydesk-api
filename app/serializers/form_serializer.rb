@@ -3,6 +3,6 @@ class FormSerializer
   attributes :name
 
   attribute :schema do |form|
-    form.schema || ''
+    form.schema || {}
   end
 end
