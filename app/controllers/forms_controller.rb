@@ -10,7 +10,7 @@ class FormsController < ApplicationController
     end
   end
 
-  # GET /:identifier/forms/1
+  # GET /:identifier/forms/:id
   def show
     Apartment::Tenant.switch(params['identifier']) do
       render json: FormSerializer.new(@forms).serialized_json, status: :ok
@@ -30,7 +30,7 @@ class FormsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /:identifier/forms/1
+  # PATCH/PUT /:identifier/forms/:id
   def update
     Apartment::Tenant.switch(params['identifier']) do
       if @form.update(form_params)
@@ -41,7 +41,7 @@ class FormsController < ApplicationController
     end
   end
 
-  # DELETE /:identifier/forms/1
+  # DELETE /:identifier/forms/:id
   def destroy
     Apartment::Tenant.switch(params['identifier']) do
       @form.destroy
