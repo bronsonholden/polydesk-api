@@ -1,19 +1,19 @@
 class ReportsController < ApplicationController
   before_action :set_report, only: [:show, :update, :destroy]
 
-  # GET /reports
+  # GET /:identifier/reports
   def index
     @reports = Report.all
 
     render json: @reports
   end
 
-  # GET /reports/1
+  # GET /:identifier/reports/:id
   def show
     render json: @report
   end
 
-  # POST /reports
+  # POST /:identifier/reports
   def create
     @report = Report.new(report_params)
 
@@ -24,7 +24,7 @@ class ReportsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /reports/1
+  # PATCH/PUT /:identifier/reports/:id
   def update
     if @report.update(report_params)
       render json: @report
@@ -33,7 +33,7 @@ class ReportsController < ApplicationController
     end
   end
 
-  # DELETE /reports/1
+  # DELETE /:identifier/reports/:id
   def destroy
     @report.destroy
   end
