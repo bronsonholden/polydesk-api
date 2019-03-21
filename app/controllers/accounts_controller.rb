@@ -64,7 +64,7 @@ class AccountsController < ApplicationController
 
         account_user = AccountUser.create(account_id: account.id, user_id: user.id)
 
-        render json: AccountSerializer.new(account).serialized_json, status: :created, location: account
+        render json: AccountSerializer.new(account).serialized_json, status: :created
       end
     end
   end
