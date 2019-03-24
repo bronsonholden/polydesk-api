@@ -44,6 +44,8 @@ class DocumentsController < ApplicationController
         @documents = Document.all
       end
 
+      authorize @documents
+
       render json: DocumentSerializer.new(@documents).serialized_json, status: :ok
     end
   end

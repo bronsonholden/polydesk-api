@@ -2,20 +2,21 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(auth, record)
-    @account_user = AccountUser.find_by! user_id: auth.user.id, account_id: auth.account.id
+    @account_user = AccountUser.find_by user_id: auth.user.id, account_id: auth.account.id
+    raise Pundit::NotAuthorizedError unless @account_user
     @record = record
   end
 
   def index?
-    false
+    false if @account_user.nil?
   end
 
   def show?
-    false
+    false if @account_user.nil?
   end
 
   def create?
-    false
+    false if @account_user.nil?
   end
 
   def new?
@@ -23,7 +24,7 @@ class ApplicationPolicy
   end
 
   def update?
-    false
+    false if @account_user.nil?
   end
 
   def edit?
@@ -31,7 +32,7 @@ class ApplicationPolicy
   end
 
   def destroy?
-    false
+    false if @account_user.nil?
   end
 
   class Scope

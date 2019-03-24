@@ -7,17 +7,20 @@ class DocumentPolicy < ApplicationPolicy
   end
 
   def create?
-    return true if super
+    allowed = super
+    return allowed unless allowed.nil?
     @account_user.permissions.find_by code: :document_create
   end
 
   def show?
-    return true if super
+    allowed = super
+    return allowed unless allowed.nil?
     @account_user.permissions.find_by code: :document_show
   end
 
   def index?
-    return true if super
+    allowed = super
+    return allowed unless allowed.nil?
     @account_user.permissions.find_by code: :document_index
   end
 end
