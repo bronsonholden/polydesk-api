@@ -23,9 +23,9 @@ Rails.application.routes.draw do
 
     get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
 
-    get '/folders/:id/folders', to: 'folders#children'
+    get '/folders/:id/folders', to: 'folders#children', as: :folder_folders
     post '/folders/:id/folders', to: 'folders#add_folder'
-    get '/folders/:id/documents', to: 'folders#documents'
+    get '/folders/:id/documents', to: 'folders#documents', as: :folder_documents
     post '/folders/:id/documents', to: 'folders#add_document'
   end
 end

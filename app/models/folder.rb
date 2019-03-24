@@ -1,4 +1,6 @@
 class Folder < ApplicationRecord
+  include Rails.application.routes.url_helpers
+
   alias_attribute :parent_folder, :parent_id
   belongs_to :parent, class_name: 'Folder', optional: true
   before_validation :default_parent
@@ -18,5 +20,13 @@ class Folder < ApplicationRecord
 
   def default_parent
     self.parent_id ||= 0
+  end
+
+  def related_documents_url
+    folder_documents_url(id: self.id, identifier: Apartment::Tenant.current)
+  end
+
+  def related_folders_url
+    folder_folders_url(id: self.id, identifier: Apartment::Tenant.current)
   end
 end
