@@ -1,4 +1,4 @@
 class PermissionSerializer
   include FastJsonapi::ObjectSerializer
-  attributes 
+  attributes :created_at, :updated_at
 end
