@@ -5,12 +5,12 @@ class ReportsController < ApplicationController
   def index
     @reports = Report.all
 
-    render json: @reports
+    render json: ReportSerializer.new(@reports).serialized_json, status: :ok
   end
 
   # GET /:identifier/reports/:id
   def show
-    render json: @report
+    render json: ReportSerializer.new(@report).serialized_json, status: :ok
   end
 
   # POST /:identifier/reports
@@ -18,7 +18,7 @@ class ReportsController < ApplicationController
     @report = Report.new(report_params)
 
     if @report.save
-      render json: @report, status: :created, location: @report
+      render json: ReportSerializer.new(@report).serialized_json, status: :created
     else
       render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
     end
@@ -27,7 +27,7 @@ class ReportsController < ApplicationController
   # PATCH/PUT /:identifier/reports/:id
   def update
     if @report.update(report_params)
-      render json: @report
+      render json: ReportSerializer.new(@report).serialized_json, status: :ok
     else
       render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
     end
