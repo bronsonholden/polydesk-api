@@ -16,4 +16,8 @@ class Document < ApplicationRecord
     self.content_type = content.content_type if content.content_type
     self.file_size = content.size
   end
+
+  def url
+    document_url(id: self.id, identifier: Apartment::Tenant.current)
+  end
 end

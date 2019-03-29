@@ -12,4 +12,8 @@ class DocumentSerializer
       document.related_folder_url
     }
   }
+
+  link :self, -> (document) {
+    document.url
+  }
 end
