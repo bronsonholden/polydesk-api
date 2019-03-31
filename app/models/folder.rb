@@ -22,6 +22,10 @@ class Folder < ApplicationRecord
     self.parent_id ||= 0
   end
 
+  def url
+    folder_url(id: self.id, identifier: Apartment::Tenant.current)
+  end
+
   def related_documents_url
     folder_documents_url(id: self.id, identifier: Apartment::Tenant.current)
   end

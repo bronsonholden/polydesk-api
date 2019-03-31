@@ -13,4 +13,8 @@ class FolderSerializer
       folder.related_folders_url
     }
   }
+
+  link :self, -> (folder) {
+    folder.url
+  }
 end
