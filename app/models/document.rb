@@ -11,6 +11,11 @@ class Document < ApplicationRecord
   end
 
   before_save :save_content_attributes
+  before_create :set_document_name
+
+  def set_document_name
+    self.name = File.basename(self.content.path) if name.blank? || name.nil?
+  end
 
   def save_content_attributes
     self.content_type = content.content_type if content.content_type
