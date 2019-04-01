@@ -65,6 +65,16 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # POST /:identifier/documents/search
+  def search
+    Apartment::Tenant.switch(params[:identifier]) do
+      result = Document.search('*pdf*')
+      puts result.size
+      @documents = result.records
+      render json: DocumentSerializer.new(@documents).serialized_json, status: :ok
+    end
+  end
+
   private
     def document_params
       params.permit(:content)

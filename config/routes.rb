@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     post '/users/:id/permissions', to: 'permissions#create'
 
     get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
+    post '/documents/search', to: 'documents#search', as: :document_search
 
     get '/folders/:id/folders', to: 'folders#children', as: :folder_folders
     post '/folders/:id/folders', to: 'folders#add_folder'

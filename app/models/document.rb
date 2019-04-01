@@ -1,5 +1,17 @@
+require 'elasticsearch/model'
+
 class Document < ApplicationRecord
   include Rails.application.routes.url_helpers
+  include Elasticsearch::Model
+  include Elasticsearch::Model::Callbacks
+
+  index_name { "documents-#{Apartment::Tenant.current || 'public'}-#{Rails.env}" }
+
+  settings do
+    mappings dynamic: false do
+      indexes :name, type: :text, analyzer: :english, index_options: :offsets
+    end
+  end
 
   mount_uploader :content, DocumentUploader
   validates :content, presence: true
