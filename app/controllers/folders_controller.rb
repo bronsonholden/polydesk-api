@@ -8,7 +8,10 @@ class FoldersController < ApplicationController
         @folders = Folder.all
       end
 
-      render json: FolderSerializer.new(@folders).serialized_json, status: :ok
+      @folders = @folders.page(current_page).per(per_page)
+      options = PaginationGenerator.new(request: request, paginated: @folders).generate
+
+      render json: FolderSerializer.new(@folders, options).serialized_json, status: :ok
     end
   end
 
@@ -63,7 +66,9 @@ class FoldersController < ApplicationController
   def children
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      render json: FolderSerializer.new(@folder.children).serialized_json, status: :ok
+      children = @folder.children.page(current_page).per(per_page)
+      options = PaginationGenerator.new(request: request, paginated: children).generate
+      render json: FolderSerializer.new(children, options).serialized_json, status: :ok
     end
   end
 
@@ -85,7 +90,9 @@ class FoldersController < ApplicationController
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      render json: DocumentSerializer.new(@folder.documents).serialized_json, status: :ok
+      documents = @folder.documents.page(current_page).per(per_page)
+      options = PaginationGenerator.new(request: request, paginated: documents).generate
+      render json: DocumentSerializer.new(documents, options).serialized_json, status: :ok
     end
   end
 

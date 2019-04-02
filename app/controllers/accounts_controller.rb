@@ -7,8 +7,9 @@ class AccountsController < ApplicationController
   # GET /accounts
   # Returns only accounts the current user has access to
   def index
-    accounts = current_user.accounts
-    render json: AccountSerializer.new(accounts).serialized_json
+    accounts = current_user.accounts.page(current_page).per(per_page)
+    options = PaginationGenerator.new(request: request, paginated: accounts).generate
+    render json: AccountSerializer.new(accounts, options).serialized_json
   end
 
   # GET /:identifier/account

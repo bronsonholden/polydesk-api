@@ -3,9 +3,10 @@ class ReportsController < ApplicationController
 
   # GET /:identifier/reports
   def index
-    @reports = Report.all
+    @reports = Report.all.page(current_page).per(per_page)
+    options = PaginationGenerator.new(request: request, paginated: @reports).generate
 
-    render json: ReportSerializer.new(@reports).serialized_json, status: :ok
+    render json: ReportSerializer.new(@reports, options).serialized_json, status: :ok
   end
 
   # GET /:identifier/reports/:id
