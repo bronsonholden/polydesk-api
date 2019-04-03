@@ -46,7 +46,7 @@ class DocumentsController < ApplicationController
 
       authorize @documents
 
-      @documents = @documents.page(current_page).per(per_page)
+      @documents = @documents.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @documents).generate
 
       render json: DocumentSerializer.new(@documents, options).serialized_json, status: :ok

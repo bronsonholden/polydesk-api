@@ -4,7 +4,7 @@ class FormsController < ApplicationController
   # GET /:identifier/forms
   def index
     Apartment::Tenant.switch(params['identifier']) do
-      @forms = Form.all.page(current_page).per(per_page)
+      @forms = Form.all.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @forms).generate
 
       render json: FormSerializer.new(@forms, options).serialized_json, status: :ok

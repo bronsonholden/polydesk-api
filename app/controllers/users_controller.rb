@@ -2,7 +2,7 @@ class UsersController < ApplicationController
   # GET /:identifier/users
   def index
     @account = Account.where(identifier: params[:identifier]).first
-    users = @account.users.page(current_page).per(per_page)
+    users = @account.users.order('id').page(current_page).per(per_page)
     options = PaginationGenerator.new(request: request, paginated: users).generate
     render json: UserSerializer.new(users, options).serialized_json
   end
