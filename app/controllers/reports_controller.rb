@@ -1,42 +1,55 @@
 class ReportsController < ApplicationController
-  before_action :set_report, only: [:show, :update, :destroy]
-
   # GET /:identifier/reports
   def index
-    @reports = Report.all.order('id').page(current_page).per(per_page)
-    options = PaginationGenerator.new(request: request, paginated: @reports).generate
+    Apartment::Tenant.switch(params[:identifier]) do
+      @reports = Report.all.order('id').page(current_page).per(per_page)
+      options = PaginationGenerator.new(request: request, paginated: @reports).generate
 
-    render json: ReportSerializer.new(@reports, options).serialized_json, status: :ok
+      render json: ReportSerializer.new(@reports, options).serialized_json, status: :ok
+    end
   end
 
   # GET /:identifier/reports/:id
   def show
-    render json: ReportSerializer.new(@report).serialized_json, status: :ok
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_report
+      render json: ReportSerializer.new(@report).serialized_json, status: :ok
+    end
   end
 
   # POST /:identifier/reports
   def create
-    @report = Report.new(report_params)
+    Apartment::Tenant.switch(params[:identifier]) do
+      @report = Report.new(report_params)
 
-    if @report.save
-      render json: ReportSerializer.new(@report).serialized_json, status: :created
-    else
-      render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
+      if @report.save
+        render json: ReportSerializer.new(@report).serialized_json, status: :created
+      else
+        render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
+      end
     end
   end
 
   # PATCH/PUT /:identifier/reports/:id
   def update
-    if @report.update(report_params)
-      render json: ReportSerializer.new(@report).serialized_json, status: :ok
-    else
-      render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_report
+      if @report.update(report_params)
+        render json: ReportSerializer.new(@report).serialized_json, status: :ok
+      else
+        render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
+      end
     end
   end
 
   # DELETE /:identifier/reports/:id
   def destroy
-    @report.destroy
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_report
+      @report.destroy
+
+      render json: {}, status: :ok
+    end
   end
 
   private

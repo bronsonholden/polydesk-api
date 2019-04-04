@@ -59,6 +59,8 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
       @folder.destroy
+
+      render json: {}, status: :ok
     end
   end
 

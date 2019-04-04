@@ -82,6 +82,8 @@ class AccountsController < ApplicationController
   # DELETE /:identifier/account
   def destroy
     @account.destroy
+
+    render json: {}, status: :ok
   end
 
   private

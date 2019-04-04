@@ -46,6 +46,8 @@ class FormsController < ApplicationController
   def destroy
     Apartment::Tenant.switch(params['identifier']) do
       @form.destroy
+
+      render json: {}, status: :ok
     end
   end
 
