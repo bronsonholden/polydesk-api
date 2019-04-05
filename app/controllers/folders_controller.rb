@@ -34,10 +34,8 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @folder = Folder.new(folder_params)
 
-      if @folder.save
+      if @folder.save!
         render json: FolderSerializer.new(@folder).serialized_json, status: :created
-      else
-        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end

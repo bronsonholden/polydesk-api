@@ -1,8 +1,12 @@
 class ApplicationController < ActionController::API
   include DeviseTokenAuth::Concerns::SetUserByToken
   include Pundit
+  include Polydesk
 
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
+  rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, params[:identifier])
@@ -22,9 +26,23 @@ class ApplicationController < ActionController::API
   end
 
   private
-    def user_not_authorized
-      @user = User.new
-      @user.errors.add('user', 'is not authorized to perform this action')
-      render json: ErrorSerializer.new(@user.errors).serialized_json, status: :forbidden
+    def user_not_authorized(exception)
+      current_user.errors.add('user', 'is not authorized to perform this action')
+      render_exception_for current_user
+    end
+
+    def invalid_exception(exception)
+      render_exception_for exception.record
+    end
+
+    def not_found_exception(exception)
+      model = exception.model.underscore
+      record = exception.model.singularize.classify.constantize.new
+      record.errors.add(model, 'does not exist')
+      render_exception_for record
+    end
+
+    def render_exception_for(record)
+      render json: ErrorSerializer.new(record.errors).serialized_json, status: :unprocessable_entity
     end
 end

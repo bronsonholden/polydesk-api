@@ -10,4 +10,10 @@ class AccountUser < ApplicationRecord
   before_destroy { |record|
     record.permissions.destroy_all
   }
+
+  # TODO: Bind to attribute
+  # Useful for testing, at least
+  def disabled?
+    false
+  end
 end
