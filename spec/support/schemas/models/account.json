@@ -4,13 +4,13 @@
     "id": { "type": "string" },
     "type": {
       "type": "string",
-      "enum": [ "document" ]
+      "enum": [ "account" ]
     },
     "attributes": {
       "type": "object",
       "properties": {
-        "content_type": { "type": "string" },
-        "file_size": { "type": "number" },
+        "name": { "type": "string" },
+        "identifier": { "type": "string" },
         "created_at": { "type": "string" },
         "updated_at": { "type": "string" }
       }
@@ -18,7 +18,7 @@
     "relationships": {
       "type": "object",
       "properties": {
-        "folder": {
+        "users": {
           "type": "object",
           "properties": {
             "links": {

@@ -10,6 +10,7 @@ RSpec.describe 'Accounts', type: :request do
                                   password: 'password',
                                   password_confirmation: 'password' }
       expect(response).to have_http_status(201)
+      expect(json).to be_an('account')
     end
   end
 
@@ -17,6 +18,7 @@ RSpec.describe 'Accounts', type: :request do
     it 'retrieves account information' do
       get '/rspec/account', headers: rspec_session
       expect(response).to have_http_status(200)
+      expect(json).to be_an('account')
     end
   end
 
@@ -31,6 +33,7 @@ RSpec.describe 'Accounts', type: :request do
     it 'retrieves all available accounts' do
       get '/accounts', headers: rspec_session
       expect(response).to have_http_status(200)
+      expect(json).to be_array_of('account')
     end
   end
 
@@ -38,6 +41,7 @@ RSpec.describe 'Accounts', type: :request do
     it 'retrieves all account users' do
       get '/rspec/users', headers: rspec_session
       expect(response).to have_http_status(200)
+      expect(json).to be_array_of('user')
     end
   end
 end

@@ -16,6 +16,8 @@ RSpec::Matchers.define :be_a do |schema|
   end
 end
 
+RSpec::Matchers.alias_matcher :be_an, :be_a
+
 RSpec::Matchers.define :be_paginated do
   match do |json|
     [ 'links', 'pages_meta' ].each do |schema|

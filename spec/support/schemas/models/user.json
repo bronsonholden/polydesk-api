@@ -1,0 +1,28 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [ "user" ]
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "default_account": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "accounts": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
