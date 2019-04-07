@@ -5,6 +5,7 @@ RSpec.describe 'Folders', type: :request do
     it 'retrieves all folders' do
       get '/rspec/folders', headers: rspec_session
       expect(response).to have_http_status(200)
+      expect(json).to be_array_of('folder')
     end
   end
 
@@ -14,6 +15,7 @@ RSpec.describe 'Folders', type: :request do
                              params: { name: 'RSpec Test' }.to_json
 
       expect(response).to have_http_status(201)
+      expect(json).to be_a('folder')
     end
   end
 
@@ -25,6 +27,7 @@ RSpec.describe 'Folders', type: :request do
       post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
                                params: { content: file }
       expect(response).to have_http_status(201)
+      expect(json).to be_a('document')
     end
   end
 
@@ -33,6 +36,7 @@ RSpec.describe 'Folders', type: :request do
     it 'retrieves subfolders' do
       get "/rspec/folders/#{folder.id}/folders", headers: rspec_session
       expect(response).to have_http_status(200)
+      expect(json).to be_array_of('folder')
     end
   end
 

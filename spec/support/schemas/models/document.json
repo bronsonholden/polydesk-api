@@ -1,0 +1,35 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [ "document" ]
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "content_type": { "type": "string" },
+        "file_size": { "type": "number" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "folder": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

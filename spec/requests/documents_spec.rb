@@ -7,6 +7,8 @@ RSpec.describe 'Documents', type: :request do
       it 'retrieves all documents' do
         get '/rspec/documents', headers: rspec_session
         expect(response).to have_http_status(200)
+        expect(json).to be_array_of('document')
+        expect(json).to be_paginated
       end
     end
   end
@@ -19,6 +21,7 @@ RSpec.describe 'Documents', type: :request do
         post '/rspec/documents', headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(201)
+        expect(json).to be_a('document')
       end
     end
   end

@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "links": {
+      "type": "object",
+      "anyOf": [
+        {
+          "self": { "type": "string" }
+        },
+        {
+          "self": { "type": "string" },
+          "next": { "type": "string" },
+          "last": { "type": "string" }
+        },
+        {
+          "first": { "type": "string" },
+          "prev": { "type": "string" },
+          "self": { "type": "string" },
+          "next": { "type": "string" },
+          "last": { "type": "string" }
+        },
+        {
+          "first": { "type": "string" },
+          "prev": { "type": "string" },
+          "self": { "type": "string" }
+        }
+      ]
+    }
+  }
+}
