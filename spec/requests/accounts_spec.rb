@@ -26,6 +26,7 @@ RSpec.describe 'Accounts', type: :request do
     it 'blocks restricted account information retrieval' do
       get '/acme/account', headers: rspec_session
       expect(response).to have_http_status(403)
+      expect(json).to have_errors
     end
   end
 

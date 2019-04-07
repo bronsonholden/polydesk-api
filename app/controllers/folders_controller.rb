@@ -89,6 +89,7 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id/documents
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :index?
       set_folder
       documents = @folder.documents.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: documents).generate

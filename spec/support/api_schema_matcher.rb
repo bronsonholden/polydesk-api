@@ -26,3 +26,10 @@ RSpec::Matchers.define :be_paginated do
     end
   end
 end
+
+RSpec::Matchers.define :have_errors do
+  match do |json|
+    schema_path = "#{Dir.pwd}/spec/support/schemas/error.json"
+    JSON::Validator.validate!(schema_path, json)
+  end
+end

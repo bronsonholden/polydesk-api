@@ -11,6 +11,24 @@ RSpec.describe 'Documents', type: :request do
         expect(json).to be_paginated
       end
     end
+
+    context 'without permission' do
+      it 'returns authorization error' do
+        get '/rspec/documents', headers: rspec_session
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+  end
+
+  describe 'GET /rspec/documents/1' do
+    let!(:document) { create :document }
+    let!(:permission) { create :permission, code: 'document_show', account_user: AccountUser.last }
+    it 'retrieves document' do
+      get "/rspec/documents/#{document.id}", headers: rspec_session
+      expect(response).to have_http_status(200)
+      expect(json).to be_a('document')
+    end
   end
 
   describe 'POST /rspec/documents' do
@@ -22,6 +40,16 @@ RSpec.describe 'Documents', type: :request do
                                  params: { content: file }
         expect(response).to have_http_status(201)
         expect(json).to be_a('document')
+      end
+    end
+
+    context 'without permission' do
+      it 'returns authorization error' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
+        post '/rspec/documents', headers: rspec_session,
+                                 params: { content: file }
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
       end
     end
   end
