@@ -14,4 +14,8 @@ module SessionHelper
     post '/auth/sign_in', params: { email: email, password: password }
     return set_request_headers(response.headers)
   end
+
+  def rspec_session
+    account_login('rspec', 'rspec@polydesk.io', 'password')
+  end
 end

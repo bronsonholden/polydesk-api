@@ -1,0 +1,38 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [ "account" ]
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "identifier": { "type": "string" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "relationships": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "object",
+          "properties": {
+            "links": {
+              "type": "object",
+              "properties": {
+                "related": {
+                  "type": "string",
+                  "format": "uri"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

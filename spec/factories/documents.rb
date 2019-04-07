@@ -1,7 +1,12 @@
 FactoryBot.define do
-  factory :subdocument, class: Document do
-    association :folder, factory: :folder
+  factory :document do
     content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
-    name { 'RSPec Subfolder' }
+    name { 'RSpec Document' }
+  end
+
+  factory :subdocument, class: Document do
+    association :folder, factory: :folder, name: 'RSpec Subdocument Folder'
+    content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
+    name { 'RSpec Subdocument' }
   end
 end

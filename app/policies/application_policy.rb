@@ -8,15 +8,15 @@ class ApplicationPolicy
   end
 
   def index?
-    false if @account_user.nil?
+    false if @account_user.nil? || @account_user.disabled?
   end
 
   def show?
-    false if @account_user.nil?
+    false if @account_user.nil? || @account_user.disabled?
   end
 
   def create?
-    false if @account_user.nil?
+    false if @account_user.nil? || @account_user.disabled?
   end
 
   def new?
@@ -24,7 +24,7 @@ class ApplicationPolicy
   end
 
   def update?
-    false if @account_user.nil?
+    false if @account_user.nil? || @account_user.disabled?
   end
 
   def edit?
@@ -32,7 +32,7 @@ class ApplicationPolicy
   end
 
   def destroy?
-    false if @account_user.nil?
+    false if @account_user.nil? || @account_user.disabled?
   end
 
   class Scope

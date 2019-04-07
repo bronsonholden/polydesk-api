@@ -34,10 +34,8 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @folder = Folder.new(folder_params)
 
-      if @folder.save
+      if @folder.save!
         render json: FolderSerializer.new(@folder).serialized_json, status: :created
-      else
-        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :unprocessable_entity
       end
     end
   end
@@ -91,6 +89,7 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id/documents
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :index?
       set_folder
       documents = @folder.documents.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: documents).generate

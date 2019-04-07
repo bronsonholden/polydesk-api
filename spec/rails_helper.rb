@@ -47,4 +47,5 @@ RSpec.configure do |config|
   end
 
   config.include SessionHelper, :type => :request
+  config.include RequestHelper, :type => :request
 end
