@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Folder do
+describe Document do
   describe 'delete in folder' do
     let!(:document) { create :subdocument }
     it 'retains folder' do
