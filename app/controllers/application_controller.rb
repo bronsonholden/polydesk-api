@@ -28,21 +28,21 @@ class ApplicationController < ActionController::API
   private
     def user_not_authorized(exception)
       current_user.errors.add('user', 'is not authorized to perform this action')
-      render_exception_for current_user
+      render_exception_for current_user, status_code: :forbidden
     end
 
     def invalid_exception(exception)
-      render_exception_for exception.record
+      render_exception_for exception.record, status_code: :unprocessable_entity
     end
 
     def not_found_exception(exception)
       model = exception.model.underscore
       record = exception.model.singularize.classify.constantize.new
       record.errors.add(model, 'does not exist')
-      render_exception_for record
+      render_exception_for record, status_code: :not_found
     end
 
-    def render_exception_for(record)
-      render json: ErrorSerializer.new(record.errors).serialized_json, status: :unprocessable_entity
+    def render_exception_for(record, status_code:)
+      render json: ErrorSerializer.new(record.errors).serialized_json, status: status_code || :unprocessable_entity
     end
 end
