@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Folders', type: :request do
   describe 'GET /rspec/folders' do
+    let!(:folder) { create :folder }
     it 'retrieves all folders' do
       get '/rspec/folders', headers: rspec_session
       expect(response).to have_http_status(200)

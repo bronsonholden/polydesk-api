@@ -37,7 +37,7 @@
             "links": {
               "type": "object",
               "properties": {
-                "related": { "type": "object" }
+                "related": { "type": "string" }
               }
             }
           }

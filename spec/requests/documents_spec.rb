@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Documents', type: :request do
   describe 'GET /rspec/documents' do
     context 'with permission' do
+      let!(:document) { create :document }
       let!(:permission) { create :permission, code: 'document_index', account_user: AccountUser.last }
       it 'retrieves all documents' do
         get '/rspec/documents', headers: rspec_session
@@ -13,6 +14,7 @@ RSpec.describe 'Documents', type: :request do
     end
 
     context 'without permission' do
+      let!(:document) { create :document }
       it 'returns authorization error' do
         get '/rspec/documents', headers: rspec_session
         expect(response).to have_http_status(403)
