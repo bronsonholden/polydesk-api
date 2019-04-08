@@ -7,7 +7,6 @@ RSpec.describe 'Forms', type: :request do
       get '/rspec/forms', headers: rspec_session
       expect(response).to have_http_status(200)
       expect(json).to be_array_of('form')
-      expect(json).to be_paginated
     end
   end
 

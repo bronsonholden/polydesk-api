@@ -9,10 +9,17 @@
     "attributes": {
       "type": "object",
       "properties": {
+        "name": { "type": "string" },
         "content_type": { "type": "string" },
         "file_size": { "type": "number" },
         "created_at": { "type": "string" },
         "updated_at": { "type": "string" }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": { "type": "string" }
       }
     },
     "relationships": {

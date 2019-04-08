@@ -7,7 +7,6 @@ RSpec.describe 'Reports', type: :request do
       get '/rspec/reports', headers: rspec_session
       expect(response).to have_http_status(200)
       expect(json).to be_array_of('report')
-      expect(json).to be_paginated
     end
   end
 
