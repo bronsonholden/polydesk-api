@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "properties": {
+    "id": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": [ "form" ]
+    },
+    "attributes": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "schema": { "type": "object" },
+        "layout": { "type": "object" },
+        "created_at": { "type": "string" },
+        "updated_at": { "type": "string" }
+      }
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

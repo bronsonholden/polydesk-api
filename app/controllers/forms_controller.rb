@@ -61,6 +61,6 @@ class FormsController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def form_params
-      params.permit(:name)
+      params.permit(:name, schema: {}, layout: {})
     end
 end
