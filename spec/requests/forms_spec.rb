@@ -2,6 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Forms', type: :request do
   describe 'GET /rspec/forms' do
+    let!(:form) { create :form }
     it 'retrieves all forms' do
       get '/rspec/forms', headers: rspec_session
       expect(response).to have_http_status(200)

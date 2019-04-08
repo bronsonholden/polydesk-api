@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory :form do
-    name { 'Test form ' }
+    name { 'Test form' }
   end
 end
