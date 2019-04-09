@@ -13,6 +13,7 @@ Rails.application.routes.draw do
     resources :users
     resources :reports
     resources :forms
+    resources :options
 
     get '/account', to: 'accounts#show'
     patch '/account', to: 'accounts#update'

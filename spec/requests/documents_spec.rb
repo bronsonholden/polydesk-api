@@ -53,5 +53,17 @@ RSpec.describe 'Documents', type: :request do
         expect(json).to have_errors
       end
     end
+
+    context 'exceeding storage limit' do
+      let!(:permission) { create :permission, code: :document_create, account_user: AccountUser.last }
+      let!(:option) { create :option, name: :document_storage_limit, value: '1' }
+      it 'returns unprocessable error' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
+        post '/rspec/documents', headers: rspec_session,
+                                 params: { content: file }
+        expect(response).to have_http_status(422)
+        expect(json).to have_errors
+      end
+    end
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_01_025411) do
+ActiveRecord::Schema.define(version: 2019_04_09_035019) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,6 +66,14 @@ ActiveRecord::Schema.define(version: 2019_04_01_025411) do
     t.jsonb "schema", default: {}, null: false
     t.jsonb "layout", default: {}, null: false
     t.index ["name"], name: "index_forms_on_name", unique: true
+  end
+
+  create_table "options", force: :cascade do |t|
+    t.integer "name", null: false
+    t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_options_on_name", unique: true
   end
 
   create_table "permissions", force: :cascade do |t|
