@@ -7,6 +7,10 @@ module Polydesk
         'FolderException::NoThankYou' => Proc.new { |record|
           record.errors.add('no', 'thank you')
           :unprocessable_entity
+        },
+        'DocumentException::StorageLimitReached' => Proc.new { |record|
+          record.errors.add('document', 'storage limit reached')
+          :unprocessable_entity
         }
       }
 

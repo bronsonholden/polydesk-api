@@ -1,5 +1,6 @@
 class Document < ApplicationRecord
   include Rails.application.routes.url_helpers
+  include Polydesk::VerifyDocument
 
   mount_uploader :content, DocumentUploader
   validates :content, presence: true
@@ -10,7 +11,7 @@ class Document < ApplicationRecord
     document_folder_url(id: self.id, identifier: Apartment::Tenant.current)
   end
 
-  before_save :save_content_attributes
+  before_save :save_content_attributes, :within_storage_limit
   before_create :set_document_name
 
   def set_document_name

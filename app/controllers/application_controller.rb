@@ -7,6 +7,7 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, params[:identifier])
