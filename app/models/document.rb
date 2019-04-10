@@ -16,6 +16,11 @@ class Document < ApplicationRecord
   before_save :save_content_attributes, :within_storage_limit
   before_create :set_document_name
 
+  # Destroy this record's associated versions
+  before_destroy do
+    self.versions.destroy_all
+  end
+
   def set_document_name
     self.name = File.basename(self.content.path) if name.blank? || name.nil?
   end
