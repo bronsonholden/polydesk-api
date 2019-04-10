@@ -1,4 +1,6 @@
 class Document < ApplicationRecord
+  has_paper_trail
+
   include Rails.application.routes.url_helpers
   include Polydesk::VerifyDocument
 

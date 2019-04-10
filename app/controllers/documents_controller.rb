@@ -1,3 +1,5 @@
+require 'json'
+
 class DocumentsController < ApplicationController
   # User must be authenticated before they can interact with documents
   before_action :authenticate_user!
@@ -12,6 +14,15 @@ class DocumentsController < ApplicationController
       authorize @document
       @document.save!
       render json: DocumentSerializer.new(@document).serialized_json, status: :created
+    end
+  end
+
+  # PATCH/PUT /:identifier/documents/:id
+  def update
+    Apartment::Tenant.switch(params[:identifier]) do
+      @document = Document.find(params[:id])
+      @document.update(document_params)
+      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
 
@@ -61,8 +72,29 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # GET /:identifier/documents/:id/versions
+  def versions
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :index?
+      @document = Document.find(params[:id])
+      # TODO: VersionSerializer
+      render json: @document.versions, status: :ok
+    end
+  end
+
+  # PUT /:identifier/documents/:id/versions/:version
+  def reify
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :index?
+      @document = Document.find(params[:id])
+      @document = @document.versions.find(params[:version]).reify
+      @document.save
+      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+    end
+  end
+
   private
     def document_params
-      params.permit(:content)
+      params.permit(:content, :name)
     end
 end
