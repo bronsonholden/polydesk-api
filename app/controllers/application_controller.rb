@@ -6,6 +6,7 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from Polydesk::ApiExceptions::NotVersionableException, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
 

@@ -4,6 +4,10 @@ module Polydesk
       attr_accessor :record, :status
 
       ERROR_DETAILS = {
+        'NotVersionableException' => Proc.new { |record|
+          record.errors.add(record.class.name.underscore, 'is not versionable')
+          :unprocessable_entity
+        },
         'FolderException::NoThankYou' => Proc.new { |record|
           record.errors.add('no', 'thank you')
           :unprocessable_entity
