@@ -51,9 +51,10 @@ class VersionsController < ApplicationController
       @object = @model.find(params[:id])
 
       # If the model is valid, but not something that has versions, raise
-      # a NotVersionableException
-      raise Polydesk::ApiExceptions::NotVersionableException.new(@object) unless [
-        'document'
-      ].include? @model_name.underscore
+      # a NotVersionableException. The paper_trail instance method is
+      # included by any class that defines has_paper_trail
+      if !@model.instance_methods(true).include?(:paper_trail)
+        raise Polydesk::ApiExceptions::NotVersionableException.new(@object)
+      end
     end
 end
