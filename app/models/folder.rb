@@ -1,6 +1,8 @@
 class Folder < ApplicationRecord
   include Rails.application.routes.url_helpers
 
+  has_paper_trail
+
   alias_attribute :parent_folder, :parent_id
   belongs_to :parent, class_name: 'Folder', optional: true
   before_validation :default_parent

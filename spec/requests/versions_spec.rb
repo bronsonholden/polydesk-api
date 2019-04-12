@@ -11,4 +11,14 @@ RSpec.describe 'Versions', type: :request do
       expect(response).to have_http_status(200)
     end
   end
+
+  describe 'GET /rspec/folders/:id/versions' do
+    let!(:folder) { create :folder }
+    it 'retrieves all folder versions' do
+      folder.name = 'New folder name'
+      folder.save!
+      get "/rspec/folders/#{folder.id}/versions", headers: rspec_session
+      expect(response).to have_http_status(200)
+    end
+  end
 end
