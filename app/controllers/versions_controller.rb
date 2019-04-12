@@ -3,7 +3,7 @@ class VersionsController < ApplicationController
   def index
     Apartment::Tenant.switch(params['identifier']) do
       set_data
-      render json: @object.versions, status: :ok
+      render json: VersionSerializer.new(@object.versions).serialized_json, status: :ok
     end
   end
 
@@ -12,7 +12,7 @@ class VersionsController < ApplicationController
     Apartment::Tenant.switch(params['identifier']) do
       set_data
       set_version
-      render json: @version, status: :ok
+      render json: VersionSerializer.new(@version).serialized_json, status: :ok
     end
   end
 
