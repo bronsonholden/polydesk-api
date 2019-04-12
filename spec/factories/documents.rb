@@ -9,4 +9,11 @@ FactoryBot.define do
     content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
     name { 'RSpec Subdocument' }
   end
+
+  factory :versioned_document, parent: :document do
+    after(:create) do |document, evaluator|
+      document.name = 'RSpec Versioned Document'
+      document.save!
+    end
+  end
 end

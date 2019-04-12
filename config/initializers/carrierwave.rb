@@ -60,4 +60,6 @@ CarrierWave.configure do |config|
       region: Rails.application.credentials[Rails.env.to_sym][:aws][:region]
     }
   end
+
+  config.remove_previously_stored_files_after_update = false
 end

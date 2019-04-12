@@ -28,5 +28,9 @@ Rails.application.routes.draw do
     post '/folders/:id/folders', to: 'folders#add_folder'
     get '/folders/:id/documents', to: 'folders#documents', as: :folder_documents
     post '/folders/:id/documents', to: 'folders#add_document'
+
+    get '/:model/:id/versions', to: 'versions#index', as: :versions
+    get '/:model/:id/versions/:version', to: 'versions#show', as: :version
+    put '/:model/:id/versions/:version', to: 'versions#reify', as: :version_reify
   end
 end
