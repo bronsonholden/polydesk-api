@@ -7,4 +7,11 @@ FactoryBot.define do
     association :parent, factory: :folder
     name { 'RSPec Subfolder' }
   end
+
+  factory :versioned_folder, parent: :folder do
+    after(:create) do |folder, evaluator|
+      folder.name = 'RSpec Versioned Folder'
+      folder.save!
+    end
+  end
 end
