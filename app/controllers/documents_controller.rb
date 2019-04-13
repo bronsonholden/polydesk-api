@@ -55,6 +55,26 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # DELETE /:identifier/documents/:id
+  def destroy
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :destroy?
+
+      @document = Document.find(params[:id])
+      @document.discard
+    end
+  end
+
+  # PUT /:identifier/documents/:id/restore
+  def restore
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :update?
+
+      @document = Document.find(params[:id])
+      @document.undiscard
+    end
+  end
+
   # GET /:identifier/documents/:id/folder
   def folder
     Apartment::Tenant.switch(params[:identifier]) do
@@ -69,27 +89,6 @@ class DocumentsController < ApplicationController
       end
 
       render json: folder_json, status: :ok
-    end
-  end
-
-  # GET /:identifier/documents/:id/versions
-  def versions
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Document, :index?
-      @document = Document.find(params[:id])
-      # TODO: VersionSerializer
-      render json: @document.versions, status: :ok
-    end
-  end
-
-  # PUT /:identifier/documents/:id/versions/:version
-  def reify
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Document, :index?
-      @document = Document.find(params[:id])
-      @document = @document.versions.find(params[:version]).reify
-      @document.save
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
 

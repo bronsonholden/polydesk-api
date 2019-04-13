@@ -23,4 +23,16 @@ class DocumentPolicy < ApplicationPolicy
     return allowed unless allowed.nil?
     @account_user.permissions.find_by code: :document_index
   end
+
+  def update?
+    allowed = super
+    return allowed unless allowed.nil?
+    @account_user.permissions.find_by code: :document_update
+  end
+
+  def destroy?
+    allowed = super
+    return allowed unless allowed.nil?
+    @account_user.permissions.find_by code: :document_destroy
+  end
 end

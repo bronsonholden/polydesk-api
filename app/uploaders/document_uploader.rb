@@ -44,8 +44,16 @@ class DocumentUploader < CarrierWave::Uploader::Base
 
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
+  # def filename
+  #   "#{model.versions.size}.#{file.extension}"
+  # end
   def filename
-    Time.now
+    "#{secure_token}.#{file.extension}" if original_filename.present?
   end
 
+  protected
+    def secure_token(length=64)
+      var = :"@#{mounted_as}_secure_token"
+      model.instance_variable_get(var) or model.instance_variable_set(var, SecureRandom.hex(length / 2))
+    end
 end

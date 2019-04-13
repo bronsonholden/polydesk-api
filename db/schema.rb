@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_10_005504) do
+ActiveRecord::Schema.define(version: 2019_04_13_035738) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,8 @@ ActiveRecord::Schema.define(version: 2019_04_10_005504) do
     t.string "content"
     t.integer "file_size"
     t.string "content_type"
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_documents_on_discarded_at"
   end
 
   create_table "folder_documents", force: :cascade do |t|

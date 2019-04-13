@@ -1,8 +1,9 @@
 class Document < ApplicationRecord
-  has_paper_trail
+  has_paper_trail ignore: [:discarded_at]
 
   include Rails.application.routes.url_helpers
   include Polydesk::VerifyDocument
+  include Discard::Model
 
   mount_uploader :content, DocumentUploader
   validates :content, presence: true
@@ -26,8 +27,10 @@ class Document < ApplicationRecord
   end
 
   def save_content_attributes
-    self.content_type = content.content_type if content.content_type
-    self.file_size = content.size
+    if content
+      self.content_type = content.content_type
+      self.file_size = content.size
+    end
   end
 
   def url

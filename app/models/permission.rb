@@ -2,7 +2,9 @@ class Permission < ApplicationRecord
   enum code: [
     :document_create,
     :document_show,
-    :document_index
+    :document_index,
+    :document_update,
+    :document_destroy
   ]
 
   validates :code, presence: true, uniqueness: { scope: :account_user_id }
