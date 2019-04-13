@@ -7,6 +7,7 @@ class VersionSerializer
     end
 
     @versions = versions.map { |version|
+      # TODO: Serialize create versions properly
       serializer = (version.item_type + 'Serializer').classify.constantize
       model = version.item_type.classify.constantize
       object_type = version.item_type.underscore

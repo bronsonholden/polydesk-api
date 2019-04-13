@@ -13,7 +13,8 @@
         "content_type": { "type": "string" },
         "file_size": { "type": "number" },
         "created_at": { "type": "string" },
-        "updated_at": { "type": "string" }
+        "updated_at": { "type": "string" },
+        "discarded_at": { "type": "string" }
       }
     },
     "links": {

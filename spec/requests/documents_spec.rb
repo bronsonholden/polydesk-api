@@ -32,6 +32,17 @@ RSpec.describe 'Documents', type: :request do
     end
   end
 
+  describe 'DELETE /rspec/documents/1' do
+    let!(:document) { create :document }
+    let!(:permission) { create :permission, code: 'document_destroy', account_user: AccountUser.last }
+    it 'deletes document' do
+      delete "/rspec/documents/#{document.id}", headers: rspec_session
+      expect(response).to have_http_status(204)
+      document.reload
+      expect(document.discarded_at).not_to be_nil
+    end
+  end
+
   describe 'POST /rspec/documents' do
     context 'with permission' do
       let!(:permission) { create :permission, code: 'document_create', account_user: AccountUser.last }

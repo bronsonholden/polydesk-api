@@ -40,6 +40,10 @@ class NullStorage
     def exists?
       true
     end
+
+    def extension
+      'txt'
+    end
   end
 end
 
