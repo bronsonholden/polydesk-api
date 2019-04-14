@@ -6,8 +6,7 @@ class VersionSerializer
       versions = [ versions ]
     end
 
-    @versions = versions.map { |version|
-      # TODO: Serialize create versions properly
+    @versions = versions.select { |v| v.event == 'update' }.map { |version|
       serializer = (version.item_type + 'Serializer').classify.constantize
       model = version.item_type.classify.constantize
       object_type = version.item_type.underscore
