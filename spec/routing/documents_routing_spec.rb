@@ -25,5 +25,13 @@ RSpec.describe DocumentsController, type: :routing do
     it 'routes to #folder' do
       expect(get: '/rspec/documents/1/folder').to route_to('documents#folder', id: '1', identifier: 'rspec')
     end
+
+    it 'routes to #download' do
+      expect(get: '/rspec/documents/1/download').to route_to('documents#download', id: '1', identifier: 'rspec')
+    end
+
+    it 'routes to #download_version' do
+      expect(get: '/rspec/documents/1/versions/1/download').to route_to('documents#download_version', id: '1', identifier: 'rspec', version: '1')
+    end
   end
 end
