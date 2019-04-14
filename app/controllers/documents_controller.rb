@@ -92,6 +92,25 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # GET /:identifier/documents/:id/download
+  def download
+    Apartment::Tenant.switch(params[:identifier]) do
+      # authorize Document, :download?
+      @document = Document.find(params[:id])
+      redirect_to @document.content.file.authenticated_url
+    end
+  end
+
+  # GET /:identifier/documents/:id/versions/:version/download
+  def download_version
+    Apartment::Tenant.switch(params[:identifier]) do
+      # authorize Document, :download?
+      @document = Document.find(params[:id])
+      @version = @document.versions.find(params[:version])
+      redirect_to @version.reify.content.file.authenticated_url
+    end
+  end
+
   private
     def document_params
       params.permit(:content, :name)

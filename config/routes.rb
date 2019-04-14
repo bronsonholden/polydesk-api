@@ -23,6 +23,8 @@ Rails.application.routes.draw do
     post '/users/:id/permissions', to: 'permissions#create'
 
     get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
+    get '/documents/:id/download', to: 'documents#download', as: :document_download
+    get '/documents/:id/versions/:version/download', to: 'documents#download_version', as: :document_download_version
     put '/documents/:id/restore', to: 'documents#restore', as: :document_restore
 
     get '/folders/:id/folders', to: 'folders#children', as: :folder_folders

@@ -16,6 +16,14 @@ class DocumentUploader < CarrierWave::Uploader::Base
     "uploads/#{Apartment::Tenant.current}/#{model.class.to_s.underscore}/#{mounted_as}/#{model.id}"
   end
 
+  def fog_public
+    false
+  end
+
+  def fog_authenticated_url_expiration
+    5.minutes
+  end
+
   # Provide a default URL as a default if there hasn't been a file uploaded:
   # def default_url
   #   # For Rails 3.1+ asset pipeline compatibility:
