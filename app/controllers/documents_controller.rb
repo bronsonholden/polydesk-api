@@ -97,6 +97,8 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])
+      # TODO: Put this in a helper class/function, configure at launch
+      #       instead of evaluating env each execution
       redirect_to @document.content.file.authenticated_url if Rails.env != 'test'
       send_file @document.content.file.path if Rails.env == 'test'
     end
@@ -108,6 +110,8 @@ class DocumentsController < ApplicationController
       authorize Document, :show?
       @document = Document.find(params[:id])
       @version = @document.versions.find(params[:version])
+      # TODO: Put this in a helper class/function, configure at launch
+      #       instead of evaluating env each execution
       redirect_to @version.reify.content.file.authenticated_url if Rails.env != 'test'
       send_file @version.reify.content.file.path if Rails.env == 'test'
     end
