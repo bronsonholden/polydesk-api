@@ -95,19 +95,21 @@ class DocumentsController < ApplicationController
   # GET /:identifier/documents/:id/download
   def download
     Apartment::Tenant.switch(params[:identifier]) do
-      # authorize Document, :download?
+      authorize Document, :show?
       @document = Document.find(params[:id])
-      redirect_to @document.content.file.authenticated_url
+      redirect_to @document.content.file.authenticated_url if Rails.env != 'test'
+      send_file @document.content.file.path if Rails.env == 'test'
     end
   end
 
   # GET /:identifier/documents/:id/versions/:version/download
   def download_version
     Apartment::Tenant.switch(params[:identifier]) do
-      # authorize Document, :download?
+      authorize Document, :show?
       @document = Document.find(params[:id])
       @version = @document.versions.find(params[:version])
-      redirect_to @version.reify.content.file.authenticated_url
+      redirect_to @version.reify.content.file.authenticated_url if Rails.env != 'test'
+      send_file @version.reify.content.file.path if Rails.env == 'test'
     end
   end
 

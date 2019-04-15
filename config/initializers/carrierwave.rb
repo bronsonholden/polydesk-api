@@ -10,14 +10,18 @@ class NullStorage
   end
 
   def store!(_file)
-    NullFile.new()
+    NullFile.new(_file)
   end
 
   def retrieve!(_identifier)
-    NullFile.new
+    NullFile.new(_identifier)
   end
 
   class NullFile
+    def initialize(_file)
+      @file = _file
+    end
+
     def delete
     end
 
@@ -30,7 +34,7 @@ class NullStorage
     end
 
     def read
-      return 'Nothing'
+      return @filename
     end
 
     def path
@@ -49,7 +53,7 @@ end
 
 CarrierWave.configure do |config|
   if Rails.env.test?
-    config.storage NullStorage
+    config.storage = :file
   end
 
   if Rails.env.development? || Rails.env.production?
