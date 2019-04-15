@@ -46,18 +46,41 @@ RSpec.describe 'Documents', type: :request do
   describe 'GET /rspec/documents/1/download' do
     context 'with permission' do
       let!(:permission) { create :permission, code: 'document_show', account_user: AccountUser.last }
-      let!(:document) { create :document, content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')) }
+      let!(:document) { create :versioned_document }
       it 'downloads current version' do
         get "/rspec/documents/#{document.id}/download", headers: rspec_session
+        expect(response).to have_http_status(200)
+        expect(response.body).to include('Lazy dog')
+      end
+    end
+
+    context 'without permission' do
+      let!(:document) { create :versioned_document }
+      it 'returns authorization error' do
+        get "/rspec/documents/#{document.id}/download", headers: rspec_session
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+  end
+
+  describe 'GET /rspec/documents/1/versions/1/download' do
+    context 'with permission' do
+      let!(:permission) { create :permission, code: 'document_show', account_user: AccountUser.last }
+      let!(:document) { create :versioned_document }
+      it 'downloads previous version' do
+        version = document.versions.last
+        get "/rspec/documents/#{document.id}/versions/#{version.id}/download", headers: rspec_session
         expect(response).to have_http_status(200)
         expect(response.body).to include('Quick brown fox')
       end
     end
 
     context 'without permission' do
-      let!(:document) { create :document, content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')) }
+      let!(:document) { create :versioned_document }
       it 'returns authorization error' do
-        get "/rspec/documents/#{document.id}/download", headers: rspec_session
+        version = document.versions.last
+        get "/rspec/documents/#{document.id}/versions/#{version.id}/download", headers: rspec_session
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end

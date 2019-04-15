@@ -55,8 +55,18 @@ class DocumentUploader < CarrierWave::Uploader::Base
   # def filename
   #   "#{model.versions.size}.#{file.extension}"
   # end
+
   def filename
-    "#{secure_token}.#{file.extension}" if original_filename.present?
+    # For some reason, using randomly generated tokens for file names with
+    # any sort of file storage doesn't properly create new uploaders/files
+    # when an update occurs. Since we'll only use file storage in test runs,
+    # we can stpulate that updated files will have different names so we
+    # retain previous versions.
+    if Rails.env == 'test' # TODO: Also check that we're using file storage
+      original_filename if original_filename.present?
+    else
+      "#{secure_token}.#{file.extension}" if original_filename.present?
+    end
   end
 
   protected

@@ -10,9 +10,12 @@ FactoryBot.define do
     name { 'RSpec Subdocument' }
   end
 
-  factory :versioned_document, parent: :document do
+  factory :versioned_document, class: Document do
+    content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')) }
+    name { 'RSpec Fox' }
     after(:create) do |document, evaluator|
-      document.name = 'RSpec Versioned Document'
+      document.content = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt'))
+      document.name = 'RSpec Dog'
       document.save!
     end
   end
