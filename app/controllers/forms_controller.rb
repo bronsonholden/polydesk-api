@@ -22,8 +22,7 @@ class FormsController < ApplicationController
   def create
     Apartment::Tenant.switch(params['identifier']) do
       authorize Form, :create?
-      @form = Form.new(form_params)
-      @form.save!
+      @form = Form.create!(form_params)
       render json: FormSerializer.new(@form).serialized_json, status: :created
     end
   end

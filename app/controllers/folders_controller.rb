@@ -20,14 +20,8 @@ class FoldersController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :show?
-      @folder = Folder.find_by_id(params[:id])
-      if @folder
-        render json: FolderSerializer.new(@folder).serialized_json, status: :ok
-      else
-        @folder = Folder.new
-        @folder.errors.add('folder', 'does not exist')
-        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :not_found
-      end
+      @folder = Folder.find(params[:id])
+      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end
 
@@ -35,11 +29,8 @@ class FoldersController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
-      @folder = Folder.new(folder_params)
-
-      if @folder.save!
-        render json: FolderSerializer.new(@folder).serialized_json, status: :created
-      end
+      @folder = Folder.create!(folder_params)
+      render json: FolderSerializer.new(@folder).serialized_json, status: :created
     end
   end
 
@@ -48,11 +39,8 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :update?
       set_folder
-      if @folder.update(folder_params)
-        render json: FolderSerializer.new(@folder).serialized_json, status: :ok
-      else
-        render json: ErrorSerializer.new(@folder.errors).serialized_json, status: :unprocessable_entity
-      end
+      @folder.update!(folder_params)
+      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end
 
@@ -62,8 +50,6 @@ class FoldersController < ApplicationController
       authorize Folder, :destroy?
       set_folder
       @folder.destroy
-
-      render json: {}, status: :ok
     end
   end
 
@@ -85,12 +71,8 @@ class FoldersController < ApplicationController
       authorize Folder, :add_folder?
       set_folder
       # For this path, disallow parent_folder param
-      new_folder = @folder.children.create(params.permit(:name))
-      if new_folder.save
-        render json: FolderSerializer.new(new_folder).serialized_json, status: :created
-      else
-        render json: ErrorSerializer.new(new_folder.errors).serialized_json, status: :unprocessable_entity
-      end
+      new_folder = @folder.children.create!(params.permit(:name))
+      render json: FolderSerializer.new(new_folder).serialized_json, status: :created
     end
   end
 
@@ -112,13 +94,8 @@ class FoldersController < ApplicationController
       authorize Document, :create?
       authorize Folder, :add_document?
       set_folder
-      document = @folder.documents.new(params.permit(:content))
-      authorize document, :create?, policy_class: DocumentPolicy
-      if document.save
-        render json: DocumentSerializer.new(document).serialized_json, status: :created
-      else
-        render json: ErrorSerializer.new(document.errors).serialized_json, status: :unprocessable_entity
-      end
+      document = @folder.documents.create!(params.permit(:content))
+      render json: DocumentSerializer.new(document).serialized_json, status: :created
     end
   end
 

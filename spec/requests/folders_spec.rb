@@ -162,7 +162,7 @@ RSpec.describe 'Folders', type: :request do
       let!(:permission) { create :permission, code: :folder_destroy, account_user: AccountUser.last }
       it 'deletes folder' do
         delete "/rspec/folders/#{folder.id}", headers: rspec_session
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(204)
       end
     end
 
