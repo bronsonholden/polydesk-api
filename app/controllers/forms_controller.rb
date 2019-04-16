@@ -23,11 +23,8 @@ class FormsController < ApplicationController
     Apartment::Tenant.switch(params['identifier']) do
       authorize Form, :create?
       @form = Form.new(form_params)
-      if @form.save
-        render json: FormSerializer.new(@form).serialized_json, status: :created
-      else
-        render json: @form.errors, status: :unprocessable_entity
-      end
+      @form.save!
+      render json: FormSerializer.new(@form).serialized_json, status: :created
     end
   end
 
@@ -36,11 +33,9 @@ class FormsController < ApplicationController
     Apartment::Tenant.switch(params['identifier']) do
       authorize Form, :update?
       set_form
-      if @form.update(form_params)
-        render json: FormSerializer.new(@form).serialized_json, status: :ok
-      else
-        render json: @form.errors, status: :unprocessable_entity
-      end
+      @form.update!(form_params)
+      @form.reload
+      render json: FormSerializer.new(@form).serialized_json, status: :ok
     end
   end
 
