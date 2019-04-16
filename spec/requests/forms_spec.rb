@@ -50,4 +50,24 @@ RSpec.describe 'Forms', type: :request do
       end
     end
   end
+
+  describe 'DELETE /rspec/forms/1' do
+    context 'with permission' do
+      let!(:form) { create :form }
+      let!(:permission) { create :permission, code: :form_destroy, account_user: AccountUser.last }
+      it 'destroys the form' do
+        delete "/rspec/forms/#{form.id}", headers: rspec_session
+        expect(response).to have_http_status(204)
+      end
+    end
+
+    context 'without permission' do
+      let!(:form) { create :form }
+      it 'returns authorization error' do
+        delete "/rspec/forms/#{form.id}", headers: rspec_session
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+  end
 end
