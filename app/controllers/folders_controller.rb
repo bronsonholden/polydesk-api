@@ -97,6 +97,7 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id/documents
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :index?
       authorize Folder, :documents?
       set_folder
       documents = @folder.documents.order('id').page(current_page).per(per_page)
