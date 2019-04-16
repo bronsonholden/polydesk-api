@@ -13,7 +13,12 @@ class Permission < ApplicationRecord
     :folder_folders,
     :folder_documents,
     :folder_add_folder,
-    :folder_add_document
+    :folder_add_document,
+    :form_create,
+    :form_show,
+    :form_index,
+    :form_update,
+    :form_destroy
   ]
 
   validates :code, presence: true, uniqueness: { scope: :account_user_id }

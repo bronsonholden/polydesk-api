@@ -4,6 +4,7 @@ class FormsController < ApplicationController
   # GET /:identifier/forms
   def index
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Form, :index?
       @forms = Form.all.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @forms).generate
 
@@ -14,6 +15,7 @@ class FormsController < ApplicationController
   # GET /:identifier/forms/:id
   def show
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Form, :show?
       render json: FormSerializer.new(@forms).serialized_json, status: :ok
     end
   end
@@ -21,6 +23,8 @@ class FormsController < ApplicationController
   # POST /:identifier/forms
   def create
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Form, :create?
+
       @form = Form.new(form_params)
 
       if @form.save
@@ -34,6 +38,7 @@ class FormsController < ApplicationController
   # PATCH/PUT /:identifier/forms/:id
   def update
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Form, :update?
       if @form.update(form_params)
         render json: FormSerializer.new(@form).serialized_json, status: :ok
       else
@@ -45,6 +50,7 @@ class FormsController < ApplicationController
   # DELETE /:identifier/forms/:id
   def destroy
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Form, :destroy?
       @form.destroy
 
       render json: {}, status: :ok
