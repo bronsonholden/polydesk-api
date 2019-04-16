@@ -2,6 +2,7 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders
   def index
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :index?
       if params.key?(:root) && params[:root] == 'true' then
         @folders = Folder.where(parent_id: 0)
       else
@@ -18,6 +19,7 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id
   def show
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :show?
       @folder = Folder.find_by_id(params[:id])
       if @folder
         render json: FolderSerializer.new(@folder).serialized_json, status: :ok
@@ -32,6 +34,7 @@ class FoldersController < ApplicationController
   # POST /:identifier/folders
   def create
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :create?
       @folder = Folder.new(folder_params)
 
       if @folder.save!
@@ -43,6 +46,7 @@ class FoldersController < ApplicationController
   # PATCH/PUT /:identifier/folders/:id
   def update
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :update?
       set_folder
       if @folder.update(folder_params)
         render json: FolderSerializer.new(@folder).serialized_json, status: :ok
@@ -55,6 +59,7 @@ class FoldersController < ApplicationController
   # DELETE /:identifier/folders/:id
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :destroy?
       set_folder
       @folder.destroy
 
@@ -63,18 +68,21 @@ class FoldersController < ApplicationController
   end
 
   # GET /:identifier/folders/:id/folders
-  def children
+  def folders
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :folders?
       set_folder
-      children = @folder.children.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: children).generate
-      render json: FolderSerializer.new(children, options).serialized_json, status: :ok
+      folders = @folder.children.order('id').page(current_page).per(per_page)
+      options = PaginationGenerator.new(request: request, paginated: folders).generate
+      render json: FolderSerializer.new(folders, options).serialized_json, status: :ok
     end
   end
 
   # POST /:identifier/folders/:id/folders
   def add_folder
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Folder, :create?
+      authorize Folder, :add_folder?
       set_folder
       # For this path, disallow parent_folder param
       new_folder = @folder.children.create(params.permit(:name))
@@ -89,7 +97,7 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id/documents
   def documents
     Apartment::Tenant.switch(params[:identifier]) do
-      authorize Document, :index?
+      authorize Folder, :documents?
       set_folder
       documents = @folder.documents.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: documents).generate
@@ -100,6 +108,8 @@ class FoldersController < ApplicationController
   # POST /:identifier/folders/:id/documents
   def add_document
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :create?
+      authorize Folder, :add_document?
       set_folder
       document = @folder.documents.new(params.permit(:content))
       authorize document, :create?, policy_class: DocumentPolicy

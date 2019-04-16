@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     get '/documents/:id/versions/:version/download', to: 'documents#download_version', as: :document_download_version
     put '/documents/:id/restore', to: 'documents#restore', as: :document_restore
 
-    get '/folders/:id/folders', to: 'folders#children', as: :folder_folders
+    get '/folders/:id/folders', to: 'folders#folders', as: :folder_folders
     post '/folders/:id/folders', to: 'folders#add_folder'
     get '/folders/:id/documents', to: 'folders#documents', as: :folder_documents
     post '/folders/:id/documents', to: 'folders#add_document'

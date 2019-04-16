@@ -4,7 +4,16 @@ class Permission < ApplicationRecord
     :document_show,
     :document_index,
     :document_update,
-    :document_destroy
+    :document_destroy,
+    :folder_create,
+    :folder_show,
+    :folder_index,
+    :folder_update,
+    :folder_destroy,
+    :folder_folders,
+    :folder_documents,
+    :folder_add_folder,
+    :folder_add_document
   ]
 
   validates :code, presence: true, uniqueness: { scope: :account_user_id }

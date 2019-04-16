@@ -26,8 +26,8 @@ RSpec.describe FormsController, type: :routing do
       expect(delete: '/rspec/folders/1').to route_to('folders#destroy', id: '1', identifier: 'rspec')
     end
 
-    it 'routes to #children' do
-      expect(get: '/rspec/folders/1/folders').to route_to('folders#children', id: '1', identifier: 'rspec')
+    it 'routes to #folders' do
+      expect(get: '/rspec/folders/1/folders').to route_to('folders#folders', id: '1', identifier: 'rspec')
     end
 
     it 'routes to #documents' do

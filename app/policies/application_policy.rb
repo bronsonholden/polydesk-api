@@ -47,4 +47,9 @@ class ApplicationPolicy
       scope.all
     end
   end
+
+  protected
+    def has_permission(code)
+      !!@account_user.permissions.find_by(code: code)
+    end
 end
