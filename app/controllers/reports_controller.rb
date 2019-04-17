@@ -2,6 +2,7 @@ class ReportsController < ApplicationController
   # GET /:identifier/reports
   def index
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Report, :index?
       @reports = Report.all.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @reports).generate
 
@@ -12,6 +13,7 @@ class ReportsController < ApplicationController
   # GET /:identifier/reports/:id
   def show
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Report, :show?
       set_report
       render json: ReportSerializer.new(@report).serialized_json, status: :ok
     end
@@ -20,35 +22,28 @@ class ReportsController < ApplicationController
   # POST /:identifier/reports
   def create
     Apartment::Tenant.switch(params[:identifier]) do
-      @report = Report.new(report_params)
-
-      if @report.save
-        render json: ReportSerializer.new(@report).serialized_json, status: :created
-      else
-        render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
-      end
+      authorize Report, :create?
+      @report = Report.create!(report_params)
+      render json: ReportSerializer.new(@report).serialized_json, status: :created
     end
   end
 
   # PATCH/PUT /:identifier/reports/:id
   def update
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Report, :update?
       set_report
-      if @report.update(report_params)
-        render json: ReportSerializer.new(@report).serialized_json, status: :ok
-      else
-        render json: ErrorSerializer.new(@report.errors).serialized_json, status: :unprocessable_entity
-      end
+      @report.update!(report_params)
+      render json: ReportSerializer.new(@report).serialized_json, status: :ok
     end
   end
 
   # DELETE /:identifier/reports/:id
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Report, :destroy?
       set_report
       @report.destroy
-
-      render json: {}, status: :ok
     end
   end
 
