@@ -24,3 +24,21 @@ RSpec::Matchers.define :have_errors do
     JSON::Validator.validate!(schema_path, json, strict: true)
   end
 end
+
+RSpec::Matchers.define :have_attribute do |hash|
+  match do |json|
+    attributes = json.fetch('data', {}).fetch('attributes', {})
+    hash.each { |k, v|
+      if attributes[k.to_s] != v
+        return false
+      end
+    }
+    true
+  end
+end
+
+RSpec::Matchers.define :have_changed_attributes do
+  match do |record|
+    return record.attributes != record.reload.attributes
+  end
+end
