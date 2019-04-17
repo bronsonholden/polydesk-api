@@ -2,6 +2,7 @@ class OptionsController < ApplicationController
   # GET /:identifier/options
   def index
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Option, :index?
       @options = Option.all.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @options).generate
 
@@ -12,6 +13,7 @@ class OptionsController < ApplicationController
   # GET /:identifier/options/:id
   def show
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Option, :show?
       set_option
       render json: OptionSerializer.new(@options).serialized_json, status: :ok
     end
@@ -20,6 +22,7 @@ class OptionsController < ApplicationController
   # POST /:identifier/options
   def create
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Option, :create?
       @option = Option.find_by_name params['name']
       if @option
         @option.update(option_params)
@@ -34,6 +37,7 @@ class OptionsController < ApplicationController
   # PATCH/PUT /:identifier/options/:id
   def update
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Option, :update?
       set_option
       if @option.update(option_params)
         render json: OptionSerializer.new(@option).serialized_json, status: :ok
@@ -46,6 +50,7 @@ class OptionsController < ApplicationController
   # DELETE /:identifier/options/:id
   def destroy
     Apartment::Tenant.switch(params['identifier']) do
+      authorize Option, :destroy?
       set_option
       @option.destroy
     end
