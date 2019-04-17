@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_13_035738) do
+ActiveRecord::Schema.define(version: 2019_04_17_043308) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,7 +57,10 @@ ActiveRecord::Schema.define(version: 2019_04_13_035738) do
     t.bigint "parent_id", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["parent_id", "name"], name: "index_folders_on_parent_id_and_name", unique: true
+    t.integer "unique_enforcer", limit: 2, default: 0
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_folders_on_discarded_at"
+    t.index ["parent_id", "name", "unique_enforcer"], name: "index_folders_on_parent_id_and_name_and_unique_enforcer", unique: true
     t.index ["parent_id"], name: "index_folders_on_parent_id"
   end
 

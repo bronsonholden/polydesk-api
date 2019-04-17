@@ -1,6 +1,10 @@
 class FolderSerializer
   include FastJsonapi::ObjectSerializer
-  attributes :name, :created_at, :updated_at
+  attributes :name, :created_at, :updated_at, :discarded_at
+
+  attribute :discarded_at do |folder|
+    folder.discarded_at || ''
+  end
 
   has_many :documents, lazy_load_data: true, links: {
     related: -> (folder) {
