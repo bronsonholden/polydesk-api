@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_04_18_030302) do
+ActiveRecord::Schema.define(version: 2019_04_18_031249) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -41,7 +41,9 @@ ActiveRecord::Schema.define(version: 2019_04_18_030302) do
     t.string "content_type"
     t.datetime "discarded_at"
     t.bigint "folder_id", default: 0, null: false
+    t.integer "unique_enforcer", limit: 2, default: 0
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
+    t.index ["folder_id", "name", "unique_enforcer"], name: "index_documents_on_folder_id_and_name_and_unique_enforcer", unique: true
   end
 
   create_table "folders", force: :cascade do |t|

@@ -7,15 +7,20 @@ class Document < ApplicationRecord
 
   mount_uploader :content, DocumentUploader
   validates :content, presence: true
+  validates :name, presence: true, format: {
+    # Allow alphanumerals, spaces, and _ . - ( ) [ ]
+    # The first character may not be a space, and the last must not be a space or period.
+    with: /\A[A-Za-z0-9\-\(\)\[\]'_\.][A-Za-z0-9 \-\(\)\[\]'_\.]*[A-Za-z0-9\-\(\)\[\]'_]\z/,
+    message: 'may only contain alphanumerals, spaces, or the following: _ . - ( ) [ ] and may not start with a space or end with either a space or .'
+  }, uniqueness: { scope: [:folder_id, :unique_enforcer] }
   belongs_to :folder, optional: true
 
   def related_folder_url
     document_folder_url(id: self.id, identifier: Apartment::Tenant.current)
   end
 
-  before_validation :default_folder
+  before_validation :default_folder, :set_document_name
   before_save :save_content_attributes, :within_storage_limit
-  before_create :set_document_name
 
   # Destroy this record's associated versions
   before_destroy do
