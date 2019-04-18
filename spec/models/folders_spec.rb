@@ -18,7 +18,7 @@ describe Folder do
   describe 'delete with document' do
     let!(:document) { create :subdocument }
     it 'deletes folder and document' do
-      expect { document.folder.destroy }.to change(Document, :count).by(-1)
+      expect { document.parent_folder.destroy }.to change(Document, :count).by(-1)
     end
   end
 end

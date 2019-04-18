@@ -82,9 +82,9 @@ class DocumentsController < ApplicationController
       # authorize Folder, :show?
 
       @document = Document.find(params[:id])
-      folder_json = FolderSerializer.new(@document.folder).serialized_json
+      folder_json = FolderSerializer.new(@document.parent_folder).serialized_json
 
-      if @document.folder.nil?
+      if @document.parent_folder.nil?
         folder_json = { data: [] }
       end
 
