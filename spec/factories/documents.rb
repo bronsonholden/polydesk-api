@@ -19,4 +19,10 @@ FactoryBot.define do
       document.save!
     end
   end
+
+  factory :discarded_document, parent: :document do
+    before(:create) do |document, evaluator|
+      document.discard!
+    end
+  end
 end

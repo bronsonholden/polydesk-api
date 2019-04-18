@@ -36,5 +36,20 @@ describe Folder do
         expect { Folder.create!(name: 'Folder') }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
+
+    context 'when discarded' do
+      let!(:discarded) { create :discarded_folder, name: 'Discarded Folder' }
+      let!(:undiscarded) { create :folder, name: 'Undiscarded Folder' }
+      # To undiscard later, to verify duplicate names not allowed on restore
+      let!(:to_undiscard) { create :discarded_folder, name: 'Undiscarded Folder' }
+
+      it 'allows duplicate name' do
+        expect { Folder.create!(name: 'Discarded Folder').discard! }.not_to raise_error
+      end
+
+      it 'disallows restoring with duplicate name' do
+        expect { to_undiscard.undiscard! }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
   end
 end

@@ -49,8 +49,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :destroy?
       set_folder
-      # Discard
-      @folder.update!(unique_enforcer: nil, discarded_at: Time.current)
+      @folder.discard!
     end
   end
 
@@ -58,8 +57,7 @@ class FoldersController < ApplicationController
   def restore
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      # Undiscard
-      @folder.update!(unique_enforcer: 0, discarded_at: nil)
+      @folder.undiscard!
       render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end

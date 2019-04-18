@@ -14,4 +14,10 @@ FactoryBot.define do
       folder.save!
     end
   end
+
+  factory :discarded_folder, parent: :folder do
+    before(:create) do |folder, evaluator|
+      folder.discard!
+    end
+  end
 end

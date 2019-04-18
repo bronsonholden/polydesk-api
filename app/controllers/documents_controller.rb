@@ -59,9 +59,8 @@ class DocumentsController < ApplicationController
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :destroy?
-
       @document = Document.find(params[:id])
-      @document.update!(discarded_at: Time.current)
+      @document.discard!
     end
   end
 
@@ -70,7 +69,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
       @document = Document.find(params[:id])
-      @document.update!(discarded_at: nil)
+      @document.undiscard!
       render json: DocumentSerializer.new(@document.reload).serialized_json, status: :ok
     end
   end

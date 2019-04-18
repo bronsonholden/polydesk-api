@@ -34,5 +34,21 @@ describe Document do
         expect { Document.create!(name: 'No Content') }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
+
+    context 'when discarded' do
+      let!(:discarded) { create :discarded_document, name: 'Discarded Document' }
+      let!(:undiscarded) { create :document, name: 'Undiscarded Document' }
+      # To undiscard later, to verify duplicate names not allowed on restore
+      let!(:to_undiscard) { create :discarded_document, name: 'Undiscarded Document' }
+
+      it 'allows duplicate name' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
+        expect { Document.create!(content: file, name: 'Discarded Document').discard! }.not_to raise_error
+      end
+
+      it 'disallows restoring with duplicate name' do
+        expect { to_undiscard.undiscard! }.to raise_error(ActiveRecord::RecordInvalid)
+      end
+    end
   end
 end
