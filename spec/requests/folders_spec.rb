@@ -139,7 +139,7 @@ RSpec.describe 'Folders', type: :request do
       let!(:document_permission) { create :permission, code: :document_index, account_user: AccountUser.last }
       let!(:folder_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
       it 'returns folder documents' do
-        get "/rspec/folders/#{document.parent_folder.id}/documents", headers: rspec_session
+        get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(200)
         expect(json).to be_array_of('document')
       end
@@ -149,7 +149,7 @@ RSpec.describe 'Folders', type: :request do
       let!(:document) { create :subdocument }
       let!(:folder_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
       it 'returns authorization error' do
-        get "/rspec/folders/#{document.parent_folder.id}/documents", headers: rspec_session
+        get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -159,7 +159,7 @@ RSpec.describe 'Folders', type: :request do
       let!(:document) { create :subdocument }
       let!(:document_permission) { create :permission, code: :document_index, account_user: AccountUser.last }
       it 'returns authorization error' do
-        get "/rspec/folders/#{document.parent_folder.id}/documents", headers: rspec_session
+        get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -168,7 +168,7 @@ RSpec.describe 'Folders', type: :request do
     context 'without any permission' do
       let!(:document) { create :subdocument }
       it 'returns authorization error' do
-        get "/rspec/folders/#{document.parent_folder.id}/documents", headers: rspec_session
+        get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end

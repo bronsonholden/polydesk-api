@@ -7,19 +7,23 @@ class Document < ApplicationRecord
 
   mount_uploader :content, DocumentUploader
   validates :content, presence: true
-  has_one :folder_document, dependent: :destroy
-  has_one :parent_folder, through: :folder_document, source: :folder
+  belongs_to :folder, optional: true
 
   def related_folder_url
     document_folder_url(id: self.id, identifier: Apartment::Tenant.current)
   end
 
+  before_validation :default_folder
   before_save :save_content_attributes, :within_storage_limit
   before_create :set_document_name
 
   # Destroy this record's associated versions
   before_destroy do
     self.versions.destroy_all
+  end
+
+  def default_folder
+    self.folder_id ||= 0
   end
 
   def set_document_name
