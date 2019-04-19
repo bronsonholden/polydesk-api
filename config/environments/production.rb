@@ -73,7 +73,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
     port: 587,
-    domain: 'holdensoftware.com',
+    domain: Rails.application.credentials[Rails.env.to_sym][:gmail][:domain],
     authentication: :login,
     enable_starttls_auto: true,
     user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:username],
@@ -92,6 +92,9 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+
+  config.polydesk_www = 'polydesk.io'
+  config.polydesk_headless = false
 
   Rails.application.routes.default_url_options[:host] = 'api.polydesk.io'
   Rails.application.routes.default_url_options[:protocol] = 'https'

@@ -47,7 +47,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
     address: 'smtp.gmail.com',
     port: 587,
-    domain: 'holdensoftware.com',
+    domain: Rails.application.credentials[Rails.env.to_sym][:gmail][:domain],
     authentication: :login,
     enable_starttls_auto: true,
     user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:username],
@@ -61,7 +61,10 @@ Rails.application.configure do
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
 
+  # Hostname for frontend
   config.polydesk_www = 'localhost:4200'
+  # When headless, Devise links will point directly to API server
+  # using default URL options (see Rails.application.routes)
   config.polydesk_headless = !!ENV['POLYDESK_HEADLESS']
 
   Rails.application.routes.default_url_options[:host] = 'localhost:3000'

@@ -9,7 +9,11 @@ module Overrides
     end
 
     def show
-      self.resource = resource_class.confirm_by_token(params[:confirmation_token])
+      @resource = resource_class.confirm_by_token(params[:confirmation_token])
+
+      if !@resource.errors.empty?
+        render json: ErrorSerializer.new(@resource.errors).serialized_json, status: :unprocessable_entity
+      end
     end
   end
 end
