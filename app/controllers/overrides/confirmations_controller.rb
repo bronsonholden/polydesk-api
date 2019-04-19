@@ -14,6 +14,8 @@ module Overrides
       if !@resource.errors.empty?
         render json: ErrorSerializer.new(@resource.errors).serialized_json, status: :unprocessable_entity
       end
+
+      @resource.link_account
     end
   end
 end

@@ -35,38 +35,11 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
-    # Don't proceed to tenant creation if
-    if params[:account_identifier].nil?
-      @account = Account.new
-      @account.errors.add('account_identifier', 'is required')
-      render json: ErrorSerializer.new(@account.errors).serialized_json,
-             status: :unprocessable_entity
-      return
-    end
-
-    # All records created successfully, create the tenant
-    Apartment::Tenant.create(params[:account_identifier])
-
-    Apartment::Tenant.switch(params[:account_identifier]) do
-      ActiveRecord::Base.transaction do
-        # Create account and default user
-        account = Account.new(account_create_params)
-        unless account.save
-          render json: ErrorSerializer.new(account.errors).serialized_json, status: :unprocessable_entity
-          return false
-        end
-
-        user = User.new(user_params)
-        user.default_account = account
-        unless user.save
-          render json: ErrorSerializer.new(user.errors).serialized_json, status: :unprocessable_entity
-          return false
-        end
-
-        account_user = AccountUser.create(account_id: account.id, user_id: user.id)
-
-        render json: AccountSerializer.new(account).serialized_json, status: :created
-      end
+    # Create account and user
+    ActiveRecord::Base.transaction do
+      account = Account.create!(account_create_params)
+      User.create!(user_params.merge({ default_account: account }))
+      render json: AccountSerializer.new(account).serialized_json, status: :created
     end
   end
 
