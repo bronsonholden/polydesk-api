@@ -33,7 +33,8 @@ RSpec.configure do |config|
     Apartment::Tenant.create('rspec') rescue nil
     # Account & user creation
     account = Account.create(name: 'RSpec', identifier: 'rspec')
-    account.users.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password', default_account: account)
+    user = account.users.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password', default_account: account)
+    user.confirm
   end
 
   config.before(:each) do

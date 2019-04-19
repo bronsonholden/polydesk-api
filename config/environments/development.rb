@@ -44,6 +44,15 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    domain: 'holdensoftware.com',
+    authentication: :login,
+    enable_starttls_auto: true,
+    user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:username],
+    password: Rails.application.credentials[Rails.env.to_sym][:gmail][:password]
+  }
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
@@ -51,6 +60,9 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   config.file_watcher = ActiveSupport::EventedFileUpdateChecker
+
+  config.polydesk_www = 'localhost:4200'
+  config.polydesk_headless = !!ENV['POLYDESK_HEADLESS']
 
   Rails.application.routes.default_url_options[:host] = 'localhost:3000'
   Rails.application.routes.default_url_options[:protocol] = 'http'
