@@ -1,4 +1,6 @@
 class OptionsController < ApplicationController
+  before_action :authenticate_user!
+
   # GET /:identifier/options
   def index
     Apartment::Tenant.switch(params['identifier']) do

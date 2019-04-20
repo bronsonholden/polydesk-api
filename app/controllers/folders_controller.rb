@@ -1,4 +1,6 @@
 class FoldersController < ApplicationController
+  before_action :authenticate_user!
+
   # GET /:identifier/folders
   def index
     Apartment::Tenant.switch(params[:identifier]) do

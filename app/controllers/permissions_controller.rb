@@ -5,9 +5,6 @@ class PermissionsController < ApplicationController
   before_action :set_user
   before_action :set_account_user
 
-  def new
-  end
-
   # POST /:identifier/users/:id/permissions
   def create
     Apartment::Tenant.switch(params[:identifier]) do

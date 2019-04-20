@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  before_action :authenticate_user!
+
   # GET /:identifier/users
   def index
     @account = Account.where(identifier: params[:identifier]).first

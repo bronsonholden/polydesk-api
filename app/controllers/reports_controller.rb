@@ -1,4 +1,6 @@
 class ReportsController < ApplicationController
+  before_action :authenticate_user!
+
   # GET /:identifier/reports
   def index
     Apartment::Tenant.switch(params[:identifier]) do

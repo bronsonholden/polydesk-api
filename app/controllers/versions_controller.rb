@@ -1,4 +1,6 @@
 class VersionsController < ApplicationController
+  before_action :authenticate_user!
+
   # GET /:identifier/:model/:id/versions
   def index
     Apartment::Tenant.switch(params['identifier']) do

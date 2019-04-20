@@ -1,4 +1,6 @@
 class FormsController < ApplicationController
+  before_action :authenticate_user!
+
   # GET /:identifier/forms
   def index
     Apartment::Tenant.switch(params['identifier']) do
