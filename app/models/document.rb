@@ -4,7 +4,6 @@ class Document < ApplicationRecord
   include Rails.application.routes.url_helpers
   include Polydesk::VerifyDocument
   include Discard::Model
-  include Discard::ModelWithUniqueEnforcer
 
   mount_uploader :content, DocumentUploader
   validates :content, presence: true
