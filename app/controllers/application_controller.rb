@@ -28,6 +28,12 @@ class ApplicationController < ActionController::API
     (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
   end
 
+  def render_authenticate_error
+    user = User.new
+    user.errors.add('user', 'must be logged in')
+    render json: ErrorSerializer.new(user.errors).serialized_json, status: :unauthorized
+  end
+
   private
     def user_not_authorized(exception)
       current_user.errors.add('user', 'is not authorized to perform this action')
