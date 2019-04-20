@@ -2,6 +2,16 @@
 # unique enforcer column. Perhaps create a second mixin?
 module Discard
   module Model
+    def discard!
+      update!(discarded_at: Time.current)
+    end
+
+    def undiscard!
+      update!(discarded_at: nil)
+    end
+  end
+
+  module ModelWithUniqueEnforcer
     def discard
       update(unique_enforcer: nil, discarded_at: Time.current)
     end

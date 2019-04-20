@@ -4,25 +4,24 @@ module Polydesk
       attr_accessor :record, :status
 
       ERROR_DETAILS = {
+        'AccountIsDisabled' => Proc.new { |record|
+          record.errors.add(record.class.name.underscore, 'is disabled')
+        },
         'NotVersionableException' => Proc.new { |record|
           record.errors.add(record.class.name.underscore, 'is not versionable')
-          :unprocessable_entity
         },
         'FolderException::NoThankYou' => Proc.new { |record|
           record.errors.add('no', 'thank you')
-          :unprocessable_entity
         },
         'DocumentException::StorageLimitReached' => Proc.new { |record|
           record.errors.add('document', 'storage limit reached')
-          :unprocessable_entity
         }
       }
 
       def initialize(record)
         @record = record
         error_type = self.class.name.scan(/Polydesk::ApiExceptions::(.*)/).flatten.first
-        @status = Polydesk::ApiExceptions::BaseException::ERROR_DETAILS.fetch(error_type).call(record)
-        @status ||= :unprocessable_entity
+        Polydesk::ApiExceptions::BaseException::ERROR_DETAILS.fetch(error_type).call(record)
       end
     end
   end

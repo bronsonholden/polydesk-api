@@ -1,6 +1,7 @@
 class Folder < ApplicationRecord
   include Rails.application.routes.url_helpers
   include Discard::Model
+  include Discard::ModelWithUniqueEnforcer
 
   has_paper_trail
 

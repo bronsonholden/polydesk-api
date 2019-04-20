@@ -24,6 +24,8 @@ Rails.application.routes.draw do
     get '/account', to: 'accounts#show'
     patch '/account', to: 'accounts#update'
     put '/account', to: 'accounts#update'
+    delete '/account', to: 'accounts#destroy', as: :account_destroy
+    put '/account/restore', to: 'accounts#restore', as: :account_restore
 
     get '/users/:id/permissions', to: 'permissions#index'
     post '/users/:id/permissions', to: 'permissions#create'

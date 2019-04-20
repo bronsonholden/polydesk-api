@@ -1,6 +1,6 @@
 class AccountsController < ApplicationController
   # Retrieve account resource by identifier parameter
-  before_action :set_account, only: [:show, :update, :destroy]
+  before_action :set_account, only: [:show, :update, :destroy, :restore]
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!, except: [:create]
 
@@ -54,7 +54,12 @@ class AccountsController < ApplicationController
 
   # DELETE /:identifier/account
   def destroy
-    @account.destroy
+    @account.discard!
+  end
+
+  def restore
+    @account.undiscard!
+    render json: AccountSerializer.new(@account).serialized_json, status: :ok
   end
 
   private
