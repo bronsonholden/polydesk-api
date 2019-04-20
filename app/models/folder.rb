@@ -2,7 +2,7 @@ class Folder < ApplicationRecord
   include Rails.application.routes.url_helpers
   include Discard::Model
 
-  has_paper_trail
+  has_paper_trail ignore: [:discarded_at]
 
   alias_attribute :parent_folder, :parent_id
   belongs_to :parent, class_name: 'Folder', optional: true
