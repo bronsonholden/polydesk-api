@@ -4,15 +4,11 @@ class DocumentsController < ApplicationController
   # User must be authenticated before they can interact with documents
   before_action :authenticate_user!
 
-  def new
-  end
-
   # POST /:identifier/documents
   def create
     Apartment::Tenant.switch(params[:identifier]) do
-      @document = Document.new(document_params)
-      authorize @document
-      @document.save!
+      authorize Document, :create?
+      @document = Document.create!(document_params)
       render json: DocumentSerializer.new(@document).serialized_json, status: :created
     end
   end
@@ -20,8 +16,9 @@ class DocumentsController < ApplicationController
   # PATCH/PUT /:identifier/documents/:id
   def update
     Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :update?
       @document = Document.find(params[:id])
-      @document.update(document_params)
+      @document.update!(document_params)
       render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
@@ -78,7 +75,7 @@ class DocumentsController < ApplicationController
   def folder
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
-      # authorize Folder, :show?
+      authorize Folder, :show?
 
       @document = Document.find(params[:id])
       folder_json = FolderSerializer.new(@document.folder).serialized_json
