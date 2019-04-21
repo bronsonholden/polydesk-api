@@ -13,7 +13,8 @@
         "email": { "type": "string" },
         "default_account": { "type": "string" },
         "created_at": { "type": "string" },
-        "updated_at": { "type": "string" }
+        "updated_at": { "type": "string" },
+        "confirmed_at": { "type": "string" }
       }
     },
     "relationships": {

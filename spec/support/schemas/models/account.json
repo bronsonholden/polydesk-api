@@ -12,7 +12,8 @@
         "name": { "type": "string" },
         "identifier": { "type": "string" },
         "created_at": { "type": "string" },
-        "updated_at": { "type": "string" }
+        "updated_at": { "type": "string" },
+        "discarded_at": { "type": "string" }
       }
     },
     "relationships": {

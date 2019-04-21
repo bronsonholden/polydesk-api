@@ -1,7 +1,13 @@
 Rails.application.routes.draw do
   mount_devise_token_auth_for 'User', at: 'auth', controllers: {
-    sessions:  'overrides/sessions'
-  }
+    sessions:  'overrides/sessions',
+    confirmations: 'overrides/confirmations'
+  }, skip: [:confirmations]
+
+  devise_scope :user do
+    get '/confirmations/new', to: 'overrides/confirmations#new', as: :new_user_confirmation
+    get '/confirmations/:confirmation_token', to: 'overrides/confirmations#show', as: :user_confirmation
+  end
 
   resources :accounts, only: [:create, :index]
 
@@ -18,6 +24,8 @@ Rails.application.routes.draw do
     get '/account', to: 'accounts#show'
     patch '/account', to: 'accounts#update'
     put '/account', to: 'accounts#update'
+    delete '/account', to: 'accounts#destroy', as: :account_destroy
+    put '/account/restore', to: 'accounts#restore', as: :account_restore
 
     get '/users/:id/permissions', to: 'permissions#index'
     post '/users/:id/permissions', to: 'permissions#create'

@@ -6,6 +6,7 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::NotVersionableException, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
@@ -25,6 +26,12 @@ class ApplicationController < ActionController::API
 
   def per_page
     (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
+  end
+
+  def render_authenticate_error
+    user = User.new
+    user.errors.add('user', 'must be logged in')
+    render json: ErrorSerializer.new(user.errors).serialized_json, status: :unauthorized
   end
 
   private

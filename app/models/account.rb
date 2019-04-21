@@ -1,5 +1,6 @@
 class Account < ApplicationRecord
   include Rails.application.routes.url_helpers
+  include Discard::Model
 
   alias_attribute :account_identifier, :identifier
   alias_attribute :account_name, :name
