@@ -8,13 +8,8 @@ class PermissionsController < ApplicationController
   # POST /:identifier/users/:id/permissions
   def create
     Apartment::Tenant.switch(params[:identifier]) do
-      @permission = Permission.new(permission_params)
-      #authorize @permission
-      if @permission.save
-        render json: PermissionSerializer.new(@permission).serialized_json, status: :ok
-      else
-        render json: ErrorSerializer.new(@permission.errors).serialized_json, status: :unprocessable_entity
-      end
+      @permission = Permission.create!(permission_params)
+      render json: PermissionSerializer.new(@permission).serialized_json, status: :ok
     end
   end
 
@@ -23,7 +18,6 @@ class PermissionsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       @permissions = Permissions.where(user_id: params[:id]).order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @permissions).generate
-      #authorize @permissions
       render json: PermissionSerializer.new(@permissions, options).serialized_json, status: :ok
     end
   end
