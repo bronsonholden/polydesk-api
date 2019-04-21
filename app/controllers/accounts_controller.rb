@@ -45,6 +45,7 @@ class AccountsController < ApplicationController
 
   # PATCH/PUT /:identifier/account
   def update
+    authorize Account, :update?
     if @account.update(account_params)
       render json: AccountSerializer.new(@account).serialized_json
     else
@@ -54,10 +55,12 @@ class AccountsController < ApplicationController
 
   # DELETE /:identifier/account
   def destroy
+    authorize Account, :destroy?
     @account.discard!
   end
 
   def restore
+    authorize Account, :restore?
     @account.undiscard!
     render json: AccountSerializer.new(@account).serialized_json, status: :ok
   end
