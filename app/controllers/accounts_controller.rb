@@ -1,6 +1,4 @@
 class AccountsController < ApplicationController
-  # Retrieve account resource by identifier parameter
-  before_action :set_account, only: [:show, :update, :destroy, :restore]
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!, except: [:create]
 
@@ -14,53 +12,36 @@ class AccountsController < ApplicationController
 
   # GET /:identifier/account
   def show
+    authorize Account, :show?
     set_account
-
-    if @account
-      user_account = current_user.accounts.where(identifier: @account.identifier)
-
-      if user_account.length == 1
-        render json: AccountSerializer.new(@account).serialized_json
-        return
-      end
-    end
-
-    # If no account object, create it to serialize errors
-    @account ||= Account.new(identifier: params[:identifier])
-    # Only error we want to return is no access
-    @account.errors.add('user', "does not have access to #{@account.identifier}")
-
-    render json: ErrorSerializer.new(@account.errors).serialized_json, status: :forbidden
+    render json: AccountSerializer.new(@account).serialized_json
   end
 
   # POST /accounts
   def create
-    # Create account and user
-    ActiveRecord::Base.transaction do
-      account = Account.create!(account_create_params)
-      User.create!(user_params.merge({ default_account: account }))
-      render json: AccountSerializer.new(account).serialized_json, status: :created
-    end
+    account = Account.create!(account_create_params)
+    User.create!(user_params.merge({ default_account: account }))
+    render json: AccountSerializer.new(account).serialized_json, status: :created
   end
 
   # PATCH/PUT /:identifier/account
   def update
     authorize Account, :update?
-    if @account.update(account_params)
-      render json: AccountSerializer.new(@account).serialized_json
-    else
-      render json: ErrorSerializer.new(@account.errors).serialized_json, status: :unprocessable_entity
-    end
+    set_account
+    @account.update!(account_params)
+    render json: AccountSerializer.new(@account).serialized_json
   end
 
   # DELETE /:identifier/account
   def destroy
     authorize Account, :destroy?
+    set_account
     @account.discard!
   end
 
   def restore
     authorize Account, :restore?
+    set_account
     @account.undiscard!
     render json: AccountSerializer.new(@account).serialized_json, status: :ok
   end
@@ -68,7 +49,7 @@ class AccountsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_account
-      @account = Account.find_by_identifier(params[:identifier])
+      @account = Account.find_by!(identifier: params[:identifier])
     end
 
     # Only allow a trusted parameter "white list" through.

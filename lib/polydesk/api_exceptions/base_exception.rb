@@ -15,6 +15,9 @@ module Polydesk
         },
         'DocumentException::StorageLimitReached' => Proc.new { |record|
           record.errors.add('document', 'storage limit reached')
+        },
+        'UserException::NoAccountAccess' => Proc.new { |record|
+          record.errors.add('user', 'does not have access to this account')
         }
       }
 

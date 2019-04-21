@@ -3,21 +3,25 @@ class ApplicationPolicy
 
   def initialize(auth, record)
     @account_user = AccountUser.find_by user_id: auth.user.id, account_id: auth.account.id
-    raise Pundit::NotAuthorizedError unless @account_user
+    raise Polydesk::ApiExceptions::UserException::NoAccountAccess.new(auth.user) unless @account_user
     raise Polydesk::ApiExceptions::AccountIsDisabled.new(auth.account) if auth.account.discarded?
     @record = record
   end
 
-  def index?
+  def default_policy
     false if @account_user.nil? || @account_user.disabled?
+  end
+
+  def index?
+    default_policy
   end
 
   def show?
-    false if @account_user.nil? || @account_user.disabled?
+    default_policy
   end
 
   def create?
-    false if @account_user.nil? || @account_user.disabled?
+    default_policy
   end
 
   def new?
@@ -25,7 +29,7 @@ class ApplicationPolicy
   end
 
   def update?
-    false if @account_user.nil? || @account_user.disabled?
+    default_policy
   end
 
   def edit?
@@ -33,7 +37,7 @@ class ApplicationPolicy
   end
 
   def destroy?
-    false if @account_user.nil? || @account_user.disabled?
+    default_policy
   end
 
   class Scope

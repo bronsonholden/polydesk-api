@@ -6,6 +6,10 @@ class AccountPolicy < ApplicationPolicy
     @account = account
   end
 
+  def show?
+    true
+  end
+
   def update?
     false
   end

@@ -10,6 +10,7 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::ApiExceptions::NotVersionableException, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, params[:identifier])
@@ -38,6 +39,10 @@ class ApplicationController < ActionController::API
     def user_not_authorized(exception)
       current_user.errors.add('user', 'is not authorized to perform this action')
       render_exception_for current_user, status_code: :forbidden
+    end
+
+    def forbidden_exception(exception)
+      render_exception_for exception.record, status_code: :forbidden
     end
 
     def invalid_exception(exception)
