@@ -43,6 +43,6 @@ Rails.application.routes.draw do
 
     get '/:model/:id/versions', to: 'versions#index', as: :versions
     get '/:model/:id/versions/:version', to: 'versions#show', as: :version
-    put '/:model/:id/versions/:version', to: 'versions#reify', as: :version_reify
+    put '/:model/:id/versions/:version', to: 'versions#restore', as: :version_restore
   end
 end

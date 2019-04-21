@@ -19,7 +19,7 @@ class VersionsController < ApplicationController
   end
 
   # PUT /:identifier/:model/:id/versions/:version
-  def reify
+  def restore
     Apartment::Tenant.switch(params['identifier']) do
       set_data
       set_version
