@@ -8,15 +8,23 @@ class PermissionsController < ApplicationController
   # POST /:identifier/users/:id/permissions
   def create
     Apartment::Tenant.switch(params[:identifier]) do
-      @permission = Permission.create!(permission_params)
-      render json: PermissionSerializer.new(@permission).serialized_json, status: :ok
+      @permission = Permission.find_by_code(params[:code]) || Permission.create!(permission_params)
+      render json: PermissionSerializer.new(@permission).serialized_json, status: :created
+    end
+  end
+
+  def destroy
+    Apartment::Tenant.switch(params[:identifier]) do
+      @permission = Permission.find_by_code(params[:code])
+      return if @permission.nil?
+      @permission.destroy
     end
   end
 
   # GET /:identifier/users/:id/permissions
   def index
     Apartment::Tenant.switch(params[:identifier]) do
-      @permissions = Permissions.where(user_id: params[:id]).order('id').page(current_page).per(per_page)
+      @permissions = Permission.where(account_user_id: @account_user.user_id).order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @permissions).generate
       render json: PermissionSerializer.new(@permissions, options).serialized_json, status: :ok
     end
@@ -57,7 +65,7 @@ class PermissionsController < ApplicationController
     end
 
     def permission_params
-      p = params.require(:permission).permit(:code)
+      p = params.permit(:code)
       p[:account_user_id] = @account_user.id
       return p
     end

@@ -29,6 +29,7 @@ Rails.application.routes.draw do
 
     get '/users/:id/permissions', to: 'permissions#index'
     post '/users/:id/permissions', to: 'permissions#create'
+    delete '/users/:id/permissions', to: 'permissions#destroy'
 
     get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
     get '/documents/:id/download', to: 'documents#download', as: :document_download
