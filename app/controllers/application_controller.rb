@@ -21,19 +21,20 @@ class ApplicationController < ActionController::API
     render json: {}, status: :ok
   end
 
-  def current_page
-    (params[:page] || PaginationGenerator::DEFAULT_PAGE).to_i
-  end
-
-  def per_page
-    (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
-  end
-
   def render_authenticate_error
     user = User.new
     user.errors.add('user', 'must be logged in')
     render json: ErrorSerializer.new(user.errors).serialized_json, status: :unauthorized
   end
+
+  protected
+    def current_page
+      (params[:page] || PaginationGenerator::DEFAULT_PAGE).to_i
+    end
+
+    def per_page
+      (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
+    end
 
   private
     def user_not_authorized(exception)
