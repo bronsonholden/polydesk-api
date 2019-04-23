@@ -9,6 +9,7 @@ class UsersController < ApplicationController
     render json: UserSerializer.new(users, options).serialized_json
   end
 
+  # GET /:identifier/users/:id
   def show
     @account = Account.find_by! identifier: params[:identifier]
     @user = User.find_by! id: params[:id]

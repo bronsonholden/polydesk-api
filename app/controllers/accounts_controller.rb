@@ -39,6 +39,7 @@ class AccountsController < ApplicationController
     @account.discard!
   end
 
+  # PUT /:identifier/account/restore
   def restore
     authorize Account, :restore?
     set_account
