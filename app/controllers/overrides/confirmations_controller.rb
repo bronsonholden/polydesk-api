@@ -8,14 +8,25 @@ module Overrides
       super
     end
 
-    def show
-      @resource = resource_class.confirm_by_token(params[:confirmation_token])
+    def select_password
+      p = confirmation_params
 
-      if !@resource.errors.empty?
-        render json: ErrorSerializer.new(@resource.errors).serialized_json, status: :unprocessable_entity
+      ActiveRecord::Base.transaction do
+        token = p[:confirmation_token]
+        @user = User.find_by_confirmation_token(token)
+        @user.update!(p) if !@user.has_password?
+        @resource = resource_class.confirm_by_token(token)
+        if !@resource.errors.empty?
+          render json: ErrorSerializer.new(@resource.errors).serialized_json, status: :unprocessable_entity
+        else
+          @user.link_account(p)
+        end
       end
-
-      @resource.link_account
     end
+
+    private
+      def confirmation_params
+        params.permit(:confirmation_token, :password, :password_confirmation)
+      end
   end
 end

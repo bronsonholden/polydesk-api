@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe 'Accounts', type: :request do
   describe 'POST /accounts' do
-    it 'creates new account' do
+    it 'creates new account with password' do
       post '/accounts', params: { account_identifier: 'rspec2',
                                   account_name: 'RSpec 2',
                                   user_name: 'RSpec User 2',
@@ -11,6 +11,17 @@ RSpec.describe 'Accounts', type: :request do
                                   password_confirmation: 'password' }
       expect(response).to have_http_status(201)
       expect(json).to be_an('account')
+      expect(User.last.valid_password?('password')).to be true
+    end
+
+    it 'creates new account without password' do
+      post '/accounts', params: { account_identifier: 'rspec3',
+                                  account_name: 'RSpec 3',
+                                  user_name: 'RSpec User 3',
+                                  user_email: 'rspec3@polydesk.io' }
+      expect(response).to have_http_status(201)
+      expect(json).to be_an('account')
+      expect(User.last.has_password?).to be false
     end
   end
 

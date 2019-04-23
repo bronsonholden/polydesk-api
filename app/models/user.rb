@@ -13,17 +13,28 @@ class User < ActiveRecord::Base
   alias_attribute :user_email, :email
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true
+  validates_confirmation_of :password
   has_many :account_users
   has_many :accounts, through: :account_users, dependent: :destroy
   belongs_to :default_account, class_name: 'Account'
 
   before_create :send_confirmation_email, if: -> {
-    !Rails.env.test? && User.devise_modules.include?(:confirmable)
+    #!Rails.env.test? &&
+    User.devise_modules.include?(:confirmable)
   }
 
   def token_validation_response
     UserSerializer.new(self).serialized_json
   end
+
+  def has_password?
+    !encrypted_password.empty?
+  end
+
+  protected
+    def password_required?
+      false
+    end
 
   private
     def send_confirmation_email

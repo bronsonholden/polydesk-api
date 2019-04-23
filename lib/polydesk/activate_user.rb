@@ -1,6 +1,6 @@
 module Polydesk
   module ActivateUser
-    def link_account
+    def link_account(params)
       account = Account.find(default_account.id)
       identifier = account.identifier
 
