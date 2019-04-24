@@ -6,6 +6,15 @@ class UserSerializer
     user.confirmed_at || ''
   end
 
+  attribute :confirmation_token do |user, params|
+    account_user = params[:account_user]
+    if account_user # check if is admin
+      user.confirmation_token || ''
+    else
+      ''
+    end
+  end
+
   # Only want to show default account identifier
   attribute :default_account do |user|
     user.default_account.identifier
