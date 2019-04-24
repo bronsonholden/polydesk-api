@@ -11,15 +11,9 @@ class UsersController < ApplicationController
 
   # GET /:identifier/users/:id
   def show
-    @account = Account.find_by! identifier: params[:identifier]
-    @user = User.find_by! id: params[:id]
-
-    if AccountUser.where(account_id: @account.id, user: @user.id).empty?
-      @user.errors.add('user', "does have access to #{params[:identifier]}")
-      render json: ErrorSerializer.new(@user.errors).serialized_json, status: :unprocessable_entity
-    else
-      render json: UserSerializer.new(@user).serialized_json, status: :ok
-    end
+    @account_user = AccountUser.find_by!(user_id: params[:id])
+    @user = User.find(params[:id])
+    render json: UserSerializer.new(@user).serialized_json, status: :ok
   end
 
   # DELETE /:identifier/users/:id
