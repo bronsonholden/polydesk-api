@@ -49,6 +49,10 @@ describe Document do
       it 'disallows restoring with duplicate name' do
         expect { to_undiscard.undiscard! }.to raise_error(ActiveRecord::RecordInvalid)
       end
+
+      it 'name validation still applies' do
+        expect { discarded.update!(name: ' Invalid') }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
   end
 end
