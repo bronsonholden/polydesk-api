@@ -15,9 +15,8 @@ module Overrides
         token = p[:confirmation_token]
         @user = User.find_by_confirmation_token(token)
         @user.update!(p) if !@user.has_password?
-        @resource = resource_class.confirm_by_token(token)
-        if !@resource.errors.empty?
-          render json: ErrorSerializer.new(@resource.errors).serialized_json, status: :unprocessable_entity
+        if !@user.confirm
+          render json: ErrorSerializer.new(@user.errors).serialized_json, status: :unprocessable_entity
         else
           @user.link_account(p)
         end
