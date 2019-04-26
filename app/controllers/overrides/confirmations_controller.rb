@@ -8,7 +8,14 @@ module Overrides
       super
     end
 
-    def select_password
+    def show
+      p = confirmation_params
+      @user = User.find_by_confirmation_token(p[:confirmation_token])
+      raise Polydesk::ApiExceptions::InvalidConfirmationToken.new(User.new) if @user.nil?
+      render json: ConfirmationSerializer.new(@user).serialized_json, status: :ok
+    end
+
+    def confirm
       p = confirmation_params
 
       ActiveRecord::Base.transaction do

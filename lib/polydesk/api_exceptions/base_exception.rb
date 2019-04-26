@@ -7,6 +7,9 @@ module Polydesk
         'AccountIsDisabled' => Proc.new { |record|
           record.errors.add(record.class.name.underscore, 'is disabled')
         },
+        'InvalidConfirmationToken' => Proc.new { |record|
+          record.errors.add('confirmation_token', 'is invalid')
+        },
         'NotVersionableException' => Proc.new { |record|
           record.errors.add(record.class.name.underscore, 'is not versionable')
         },

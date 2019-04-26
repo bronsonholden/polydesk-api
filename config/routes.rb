@@ -5,8 +5,9 @@ Rails.application.routes.draw do
   }, skip: [:confirmations]
 
   devise_scope :user do
-    get '/confirmations/new', to: 'overrides/confirmations#new', as: :new_user_confirmation
-    post '/confirmations/:confirmation_token', to: 'overrides/confirmations#select_password', as: :user_confirmation
+    get '/confirmations/new', to: 'overrides/confirmations#new'
+    get '/confirmations/:confirmation_token', to: 'overrides/confirmations#show', as: :user_confirmation
+    post '/confirmations/:confirmation_token', to: 'overrides/confirmations#confirm', as: :user_confirmation_confirm
   end
 
   resources :accounts, only: [:create, :index]

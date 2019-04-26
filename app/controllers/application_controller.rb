@@ -7,6 +7,7 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
   rescue_from Polydesk::ApiExceptions::NotVersionableException, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
@@ -37,6 +38,10 @@ class ApplicationController < ActionController::API
     end
 
   private
+    def invalid_confirmation_token_exception(exception)
+      render_exception_for exception.record, status_code: :not_found
+    end
+
     def user_not_authorized(exception)
       current_user.errors.add('user', 'is not authorized to perform this action')
       render_exception_for current_user, status_code: :forbidden
