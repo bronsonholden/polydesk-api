@@ -8,6 +8,7 @@ module Overrides
       super
     end
 
+    # GET /confirmations/:id
     def show
       p = confirmation_params
       @user = User.find_by_confirmation_token(p[:confirmation_token])
@@ -15,6 +16,7 @@ module Overrides
       render json: ConfirmationSerializer.new(@user).serialized_json, status: :ok
     end
 
+    # POST /confirmations/:id
     def confirm
       p = confirmation_params
 
