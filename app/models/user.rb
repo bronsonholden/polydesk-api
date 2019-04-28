@@ -24,7 +24,7 @@ class User < ActiveRecord::Base
   }
 
   def token_validation_response
-    UserSerializer.new(self).serialized_json
+    {}
   end
 
   def has_password?

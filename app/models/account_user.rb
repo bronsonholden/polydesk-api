@@ -5,6 +5,12 @@ class AccountUser < ApplicationRecord
   belongs_to :account
   has_many :permissions
 
+  enum role: [
+    :guest,
+    :user,
+    :administrator
+  ]
+
   # Destroy all associated tenant records on delete, since there is no
   # foreign key used to relate them to the public AccountUser record.
   before_destroy { |record|
