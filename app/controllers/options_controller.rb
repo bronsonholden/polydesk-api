@@ -7,7 +7,6 @@ class OptionsController < ApplicationController
       authorize Option, :index?
       @options = Option.all.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @options).generate
-
       render json: OptionSerializer.new(@options, options).serialized_json, status: :ok
     end
   end
@@ -41,11 +40,8 @@ class OptionsController < ApplicationController
     Apartment::Tenant.switch(params['identifier']) do
       authorize Option, :update?
       set_option
-      if @option.update(option_params)
-        render json: OptionSerializer.new(@option).serialized_json, status: :ok
-      else
-        render json: @option.errors, status: :unprocessable_entity
-      end
+      @option.update!(option_params)
+      render json: OptionSerializer.new(@option).serialized_json, status: :ok
     end
   end
 
