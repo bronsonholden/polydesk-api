@@ -24,7 +24,8 @@ class User < ActiveRecord::Base
   }
 
   def token_validation_response
-    {}
+    account_user = AccountUser.find_by!(account_id: default_account.id, user_id: id)
+    AccountUserSerializer.new(account_user).serialized_json
   end
 
   def has_password?
