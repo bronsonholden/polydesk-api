@@ -47,6 +47,10 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 
+  config.include Devise::Test::ControllerHelpers, :type => :controller
+  config.include ControllerHelper, :type => :controller
+  config.extend ControllerMacros, :type => :controller
   config.include SessionHelper, :type => :request
-  config.include RequestHelper, :type => :request
+  config.include ResponseHelper, :type => :controller
+  config.include ResponseHelper, :type => :request
 end
