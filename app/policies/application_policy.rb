@@ -9,7 +9,8 @@ class ApplicationPolicy
   end
 
   def default_policy
-    false if @account_user.nil? || @account_user.disabled?
+    return true if @account_user.role == :administrator
+    return false if @account_user.nil? || @account_user.disabled?
   end
 
   def index?
@@ -21,6 +22,7 @@ class ApplicationPolicy
   end
 
   def create?
+    return false if @account_user.role == :guest
     default_policy
   end
 
@@ -29,6 +31,7 @@ class ApplicationPolicy
   end
 
   def update?
+    return false if @account_user.role == :guest
     default_policy
   end
 
@@ -37,6 +40,7 @@ class ApplicationPolicy
   end
 
   def destroy?
+    return false if @account_user.role == :guest
     default_policy
   end
 
