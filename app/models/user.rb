@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :confirmable
   include DeviseTokenAuth::Concerns::User
-  include Polydesk::ActivateUser
+  include Polydesk::Activation
   alias_attribute :user_name, :name
   alias_attribute :user_email, :email
   validates :name, presence: true

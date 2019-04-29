@@ -27,7 +27,7 @@ module Overrides
         if !@user.confirm
           render json: ErrorSerializer.new(@user.errors).serialized_json, status: :unprocessable_entity
         else
-          @user.link_account(p)
+          @user.link_account
         end
       end
     end

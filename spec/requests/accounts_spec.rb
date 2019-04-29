@@ -11,7 +11,11 @@ RSpec.describe 'Accounts', type: :request do
                                   password_confirmation: 'password' }
       expect(response).to have_http_status(201)
       expect(json).to be_an('account')
-      expect(User.last.valid_password?('password')).to be true
+      user = User.find_by!(email: 'rspec2@polydesk.io')
+      user.link_account
+      account_user = AccountUser.find_by!(user_id: user.id)
+      expect(user.valid_password?('password')).to be true
+      expect(account_user.role).to eq('administrator')
     end
 
     it 'creates new account without password' do
