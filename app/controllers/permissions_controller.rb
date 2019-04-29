@@ -32,36 +32,16 @@ class PermissionsController < ApplicationController
 
   private
     def set_account
-      @account = Account.find_by! identifier: params[:identifier]
-    rescue ActiveRecord::RecordNotFound
-      # Probably want to return an error about user access to account
-      # instead of account existence
-      @account = Account.new
-      @account.errors.add('account', 'does not exist')
-      render json: ErrorSerializer.new(@account.errors).serialized_json,
-             status: :unprocessable_entity
-      return
+      @account = Account.find_by_identifier!(params[:identifier])
     end
 
     def set_user
-      @user = User.find_by! id: params[:id]
-    rescue ActiveRecord::RecordNotFound
-      @user = User.new
-      @user.errors.add('user', 'does not exist')
-      render json: ErrorSerializer.new(@user.errors).serialized_json,
-             status: :unprocessable_entity
-      return
+      @user = User.find(params[:id])
     end
 
     def set_account_user
-      @account_user = AccountUser.find_by! account_id: @account.id,
-                                           user_id: @user.id
-    rescue ActiveRecord::RecordNotFound
-      @account_user = AccountUser.new
-      @account_user.errors.add(user, 'does not have access to this account')
-      render json: ErrorSerializer.new(@account_user).serialized_json,
-             status: :unprocessable_entity
-      return
+      @account_user = AccountUser.find_by!(account_id: @account.id,
+                                           user_id: @user.id)
     end
 
     def permission_params
