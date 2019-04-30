@@ -10,7 +10,6 @@ module SessionHelper
   end
 
   def account_login(identifier, email, password)
-    #host! 'localhost'
     post '/auth/sign_in', params: { email: email, password: password }
     return set_request_headers(response.headers)
   end
