@@ -34,7 +34,8 @@ RSpec.configure do |config|
     account = Account.create(name: 'RSpec', identifier: 'rspec')
     user = User.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password', default_account: account)
     user.confirm
-    user.link_account
+    account_user = user.link_account
+    account_user.update!(role: 'user')
   end
 
   config.before(:each) do

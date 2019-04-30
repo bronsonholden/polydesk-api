@@ -3,8 +3,24 @@ require 'rails_helper'
 describe AccountUser do
   describe 'rspec user' do
     it 'correctly creates user' do
-      expect(AccountUser.last.role).to eq('administrator')
-      expect(User.last.has_password?).to be true
+      user = User.find_by_email('rspec@polydesk.io')
+      account_user = AccountUser.where(user_id: user.id).first
+      expect(account_user.role).to eq('user')
+      expect(user.has_password?).to be true
+    end
+  end
+
+  describe 'rspec admin' do
+    let!(:admin) { create :rspec_administrator }
+    it 'correctly creates admin' do
+      expect(admin.role).to eq('administrator')
+    end
+  end
+
+  describe 'rspec guest' do
+    let!(:guest) { create :rspec_guest }
+    it 'correctly creates guest' do
+      expect(guest.role).to eq('guest')
     end
   end
 
