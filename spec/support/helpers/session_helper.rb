@@ -14,7 +14,11 @@ module SessionHelper
     return set_request_headers(response.headers)
   end
 
-  def rspec_session
-    account_login('rspec', 'rspec@polydesk.io', 'password')
+  def rspec_session(account_user=nil)
+    if account_user
+      account_login('rspec', account_user.user.email, 'password')
+    else
+      account_login('rspec', 'rspec@polydesk.io', 'password')
+    end
   end
 end

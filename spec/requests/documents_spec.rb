@@ -12,6 +12,18 @@ RSpec.describe 'Documents', type: :request do
       end
     end
 
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:document_index] }
+      let!(:document) { create :document }
+      it 'retrieves all documents' do
+        h = rspec_session(guest)
+        #puts h.inspect
+        get '/rspec/documents', headers: h
+        expect(response).to have_http_status(200)
+        expect(json).to be_array_of('document')
+      end
+    end
+
     context 'without permission' do
       let!(:document) { create :document }
       it 'returns authorization error' do
