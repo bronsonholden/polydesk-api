@@ -16,9 +16,7 @@ RSpec.describe 'Documents', type: :request do
       let!(:guest) { create :rspec_guest, set_permissions: [:document_index] }
       let!(:document) { create :document }
       it 'retrieves all documents' do
-        h = rspec_session(guest)
-        #puts h.inspect
-        get '/rspec/documents', headers: h
+        get '/rspec/documents', headers: rspec_session(guest)
         expect(response).to have_http_status(200)
         expect(json).to be_array_of('document')
       end
