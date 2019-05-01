@@ -9,8 +9,8 @@ class ApplicationPolicy
   end
 
   def default_policy
-    return true if @account_user.role == 'administrator'
     return false if @account_user.nil? || @account_user.disabled?
+    return true if @account_user.role == 'administrator'
   end
 
   def index?
