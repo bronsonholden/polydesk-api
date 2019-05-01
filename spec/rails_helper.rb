@@ -45,7 +45,9 @@ RSpec.configure do |config|
 
   config.after(:each) do
     Apartment::Tenant.reset
-    Apartment::Tenant.drop('test') if Apartment.tenant_names.include?('test')
+    Apartment.tenant_names.each do |tenant|
+      Apartment::Tenant.drop(tenant) if tenant != 'rspec'
+    end
     DatabaseCleaner.clean
   end
 
