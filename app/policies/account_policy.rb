@@ -11,14 +11,14 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def update?
-    false
+    default_policy
   end
 
   def destroy?
-    false
+    default_policy
   end
 
   def restore?
-    false
+    default_policy
   end
 end
