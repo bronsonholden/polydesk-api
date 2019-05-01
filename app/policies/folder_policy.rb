@@ -37,18 +37,26 @@ class FolderPolicy < ApplicationPolicy
   end
 
   def folders?
+    allowed = default_policy
+    return allowed unless allowed.nil?
     has_permission(:folder_folders)
   end
 
   def documents?
+    allowed = default_policy
+    return allowed unless allowed.nil?
     has_permission(:folder_documents)
   end
 
   def add_document?
+    allowed = default_policy
+    return allowed unless allowed.nil?
     has_permission(:folder_add_document)
   end
 
   def add_folder?
+    allowed = default_policy
+    return allowed unless allowed.nil?
     has_permission(:folder_add_folder)
   end
 end

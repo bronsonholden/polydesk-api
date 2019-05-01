@@ -12,6 +12,16 @@ RSpec.describe 'Folders', type: :request do
       end
     end
 
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:folder) { create :folder }
+      it 'retrieves all folders' do
+        get '/rspec/folders', headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+        expect(json).to be_array_of('folder')
+      end
+    end
+
     context 'without permission' do
       let!(:folder) { create :folder }
       it 'returns authorization error' do
@@ -27,6 +37,26 @@ RSpec.describe 'Folders', type: :request do
       let!(:permission) { create :permission, code: :folder_create, account_user: AccountUser.last }
       it 'creates new folder' do
         post '/rspec/folders', headers: rspec_session,
+                               params: { name: 'RSpec Test' }.to_json
+        expect(response).to have_http_status(201)
+        expect(json).to be_a('folder')
+      end
+    end
+
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:folder_create] }
+      it 'creates new folder' do
+        post '/rspec/folders', headers: rspec_session(guest),
+                               params: { name: 'RSpec Test' }.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      it 'creates new folder' do
+        post '/rspec/folders', headers: rspec_session(admin),
                                params: { name: 'RSpec Test' }.to_json
         expect(response).to have_http_status(201)
         expect(json).to be_a('folder')
@@ -72,6 +102,28 @@ RSpec.describe 'Folders', type: :request do
       end
     end
 
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:folder_update] }
+      let!(:folder) { create :folder, name: 'Initial Name' }
+      it 'returns authorization error' do
+        patch "/rspec/folders/#{folder.id}", headers: rspec_session(guest),
+                                             params: { name: 'Updated Name' }.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:folder) { create :folder, name: 'Initial Name' }
+      it 'updates folder name' do
+        patch "/rspec/folders/#{folder.id}", headers: rspec_session(admin),
+                                             params: { name: 'Updated Name' }.to_json
+        expect(response).to have_http_status(200)
+        expect(folder).to have_changed_attributes
+      end
+    end
+
     context 'without permission' do
       let!(:folder) { create :folder, name: 'Initial Name' }
       it 'returns authorization error' do
@@ -91,6 +143,30 @@ RSpec.describe 'Folders', type: :request do
       it 'uploads a document to a folder' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
+                                 params: { content: file }
+        expect(response).to have_http_status(201)
+        expect(json).to be_a('document')
+      end
+    end
+
+    context 'guest with all permissions' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:document_create, :folder_add_document] }
+      let!(:folder) { create :folder }
+      it 'returns authorization error' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
+        post "/rspec/folders/#{folder.id}/documents", headers: rspec_session(guest),
+                                 params: { content: file }
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without any permissions' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:folder) { create :folder }
+      it 'uploads a document to a folder' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
+        post "/rspec/folders/#{folder.id}/documents", headers: rspec_session(admin),
                                  params: { content: file }
         expect(response).to have_http_status(201)
         expect(json).to be_a('document')
@@ -145,6 +221,16 @@ RSpec.describe 'Folders', type: :request do
       end
     end
 
+    context 'admin without any permissions' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:document) { create :subdocument }
+      it 'returns folder documents' do
+        get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+        expect(json).to be_array_of('document')
+      end
+    end
+
     context 'without document permission' do
       let!(:document) { create :subdocument }
       let!(:folder_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
@@ -186,6 +272,16 @@ RSpec.describe 'Folders', type: :request do
       end
     end
 
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:folder) { create :folder }
+      it 'retrieves subfolders' do
+        get "/rspec/folders/#{folder.id}/folders", headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+        expect(json).to be_array_of('folder')
+      end
+    end
+
     context 'without permission' do
       let!(:folder) { create :folder }
       it 'returns authorization error' do
@@ -202,6 +298,25 @@ RSpec.describe 'Folders', type: :request do
       let!(:permission) { create :permission, code: :folder_destroy, account_user: AccountUser.last }
       it 'deletes folder' do
         delete "/rspec/folders/#{folder.id}", headers: rspec_session
+        expect(response).to have_http_status(204)
+      end
+    end
+
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:folder_destroy] }
+      let!(:folder) { create :folder }
+      it 'returns authorization error' do
+        delete "/rspec/folders/#{folder.id}", headers: rspec_session(guest)
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:folder) { create :folder }
+      it 'deletes folder' do
+        delete "/rspec/folders/#{folder.id}", headers: rspec_session(admin)
         expect(response).to have_http_status(204)
       end
     end
