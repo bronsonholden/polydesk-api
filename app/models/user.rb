@@ -23,10 +23,6 @@ class User < ActiveRecord::Base
     User.devise_modules.include?(:confirmable)
   }
 
-  def token_validation_response
-    ''
-  end
-
   def has_password?
     !encrypted_password.empty?
   end

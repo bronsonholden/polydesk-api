@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :account_user do
-    user
+    association :user, factory: :rspec_user
     account { user.default_account }
     transient do
       set_permissions { [] }

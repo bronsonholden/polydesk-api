@@ -45,6 +45,7 @@ RSpec.configure do |config|
 
   config.after(:each) do
     Apartment::Tenant.reset
+    Apartment::Tenant.drop('test') if Apartment.tenant_names.include?('test')
     DatabaseCleaner.clean
   end
 
