@@ -50,7 +50,7 @@ end
 
 gem 'carrierwave', '~> 0.11.2'
 gem 'fog-aws'
-gem 'devise_token_auth'
+gem 'devise_token_auth', '~> 1.1.0'
 gem 'omniauth'
 gem 'apartment'
 gem 'pundit'
