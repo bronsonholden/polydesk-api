@@ -12,6 +12,16 @@ RSpec.describe 'Reports', type: :request do
       end
     end
 
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:report) { create :report }
+      it 'retrieves all reports' do
+        get '/rspec/reports', headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+        expect(json).to be_array_of('report')
+      end
+    end
+
     context 'without permission' do
       let!(:report) { create :report }
       it 'returns authorization error' do
@@ -30,6 +40,30 @@ RSpec.describe 'Reports', type: :request do
           name: 'RSpec Report'
         }
         post '/rspec/reports', headers: rspec_session, params: params.to_json
+        expect(response).to have_http_status(201)
+        expect(json).to be_a('report')
+      end
+    end
+
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:report_create] }
+      it 'returns authorization error' do
+        params = {
+          name: 'RSpec Report'
+        }
+        post '/rspec/reports', headers: rspec_session(guest), params: params.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      it 'creates new report' do
+        params = {
+          name: 'RSpec Report'
+        }
+        post '/rspec/reports', headers: rspec_session(admin), params: params.to_json
         expect(response).to have_http_status(201)
         expect(json).to be_a('report')
       end
