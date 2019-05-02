@@ -12,6 +12,16 @@ RSpec.describe 'Forms', type: :request do
       end
     end
 
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:form) { create :form }
+      it 'retrieves all forms' do
+        get '/rspec/forms', headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+        expect(json).to be_array_of('form')
+      end
+    end
+
     context 'without permission' do
       let!(:form) { create :form }
       it 'returns authorization error' do
@@ -32,6 +42,34 @@ RSpec.describe 'Forms', type: :request do
           layout: {}
         }
         post '/rspec/forms', headers: rspec_session, params: params.to_json
+        expect(response).to have_http_status(201)
+        expect(json).to be_a('form')
+      end
+    end
+
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:form_create] }
+      it 'returns authorization error' do
+        params = {
+          name: 'RSpec Form',
+          schema: {},
+          layout: {}
+        }
+        post '/rspec/forms', headers: rspec_session(guest), params: params.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      it 'creates new form' do
+        params = {
+          name: 'RSpec Form',
+          schema: {},
+          layout: {}
+        }
+        post '/rspec/forms', headers: rspec_session(admin), params: params.to_json
         expect(response).to have_http_status(201)
         expect(json).to be_a('form')
       end
@@ -81,6 +119,30 @@ RSpec.describe 'Forms', type: :request do
       end
     end
 
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:form_update] }
+      let!(:form) { create :form }
+      it 'returns authorization error' do
+        patch "/rspec/forms/#{form.id}", headers: rspec_session(guest),
+                                         params: { name: 'Updated Name' }.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:form) { create :form, name: 'Initial Name' }
+      it 'updates form name' do
+        patch "/rspec/forms/#{form.id}", headers: rspec_session(admin),
+                                         params: { name: 'Updated Name' }.to_json
+        expect(response).to have_http_status(200)
+        expect(form).to have_changed_attributes
+        expect(json).to be_a('form')
+        expect(json).to have_attribute({ name: 'Updated Name' })
+      end
+    end
+
     context 'without permission' do
       let!(:form) { create :form }
       it 'returns authorization error' do
@@ -98,6 +160,25 @@ RSpec.describe 'Forms', type: :request do
       let!(:permission) { create :permission, code: :form_destroy, account_user: AccountUser.last }
       it 'destroys the form' do
         delete "/rspec/forms/#{form.id}", headers: rspec_session
+        expect(response).to have_http_status(204)
+      end
+    end
+
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:form_destroy] }
+      let!(:form) { create :form }
+      it 'returns authorization error' do
+        delete "/rspec/forms/#{form.id}", headers: rspec_session(guest)
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:form) { create :form }
+      it 'destroys the form' do
+        delete "/rspec/forms/#{form.id}", headers: rspec_session(admin)
         expect(response).to have_http_status(204)
       end
     end
