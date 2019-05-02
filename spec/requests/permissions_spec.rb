@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'Permissions', type: :request do
   describe 'GET /rspec/user/:id/permissions' do
     let!(:permission) { create :permission, code: :document_show, account_user: AccountUser.last }
-    it 'retrieves all document versions' do
+    it 'retrieves all permissions' do
       account_user = AccountUser.last
       get "/rspec/users/#{account_user.id}/permissions", headers: rspec_session
       expect(response).to have_http_status(200)
