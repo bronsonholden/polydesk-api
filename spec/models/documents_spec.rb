@@ -8,6 +8,22 @@ describe Document do
     end
   end
 
+  describe 'upload' do
+    context 'immediately' do
+      let!(:document) { create :document }
+      it 'sets content' do
+        expect(document.content_tmp).to be_nil
+      end
+    end
+
+    context 'later' do
+      let!(:document) { create :document_upload_later }
+      it 'sets temp content' do
+        expect(document.content_tmp).not_to be_nil
+      end
+    end
+  end
+
   describe 'validations' do
     context 'with parent folder' do
       let!(:document) { create :subdocument, name: 'Subdocument' }

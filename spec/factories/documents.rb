@@ -1,10 +1,14 @@
 FactoryBot.define do
   factory :document do
+    upload_content_now { true }
     content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
     name { 'RSpec Document' }
-    before(:save) do |document, evaluator|
-      document.process_content_upload = true
-    end
+  end
+
+  factory :document_upload_later, class: Document do
+    upload_content_now { false }
+    content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
+    name { 'RSpec Document' }
   end
 
   factory :subdocument, parent: :document do
@@ -16,7 +20,6 @@ FactoryBot.define do
     name { 'RSpec Fox' }
     after(:create) do |document, evaluator|
       document.content = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt'))
-      document.process_content_upload = true
       document.name = 'RSpec Dog'
       document.save!
     end

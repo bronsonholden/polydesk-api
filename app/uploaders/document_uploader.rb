@@ -1,8 +1,6 @@
 # encoding: utf-8
 
 class DocumentUploader < CarrierWave::Uploader::Base
-  include ::CarrierWave::Backgrounder::Delay
-
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick

@@ -61,8 +61,6 @@ GEM
       json (>= 1.7)
       mime-types (>= 1.16)
       mimemagic (>= 0.3.0)
-    carrierwave_backgrounder (0.4.2)
-      carrierwave (~> 0.5)
     concurrent-ruby (1.1.4)
     crass (1.0.4)
     database_cleaner (1.7.0)
@@ -271,7 +269,6 @@ DEPENDENCIES
   bootsnap (>= 1.1.0)
   byebug
   carrierwave (~> 0.11.2)
-  carrierwave_backgrounder
   database_cleaner
   devise_token_auth (~> 1.1.0)
   discard (~> 1.0)
