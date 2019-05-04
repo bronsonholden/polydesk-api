@@ -49,6 +49,9 @@ group :test do
 end
 
 gem 'carrierwave', '~> 0.11.2'
+gem 'carrierwave_backgrounder'
+gem 'redis'
+gem 'resque', require: 'resque/server'
 gem 'fog-aws'
 gem 'devise_token_auth', '~> 1.1.0'
 gem 'omniauth'

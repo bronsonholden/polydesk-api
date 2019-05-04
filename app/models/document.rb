@@ -6,6 +6,7 @@ class Document < ApplicationRecord
   include Discard::Model
 
   mount_uploader :content, DocumentUploader
+  process_in_background :content
   validates :content, presence: true
   validates :name, presence: true, format: {
     # Allow alphanumerals, spaces, and _ . - ( ) [ ]
