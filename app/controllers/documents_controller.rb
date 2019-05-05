@@ -96,7 +96,7 @@ class DocumentsController < ApplicationController
       # TODO: Put this in a helper class/function, configure at launch
       #       instead of evaluating env each execution
       redirect_to @document.content.file.authenticated_url if Rails.env != 'test'
-      send_file @document.content.file.path if Rails.env == 'test'
+      send_file ['public', @document.content_url].join if Rails.env == 'test'
     end
   end
 
@@ -109,7 +109,7 @@ class DocumentsController < ApplicationController
       # TODO: Put this in a helper class/function, configure at launch
       #       instead of evaluating env each execution
       redirect_to @version.reify.content.file.authenticated_url if Rails.env != 'test'
-      send_file @version.reify.content.file.path if Rails.env == 'test'
+      send_file ['public', @version.reify.content_url].join if Rails.env == 'test'
     end
   end
 

@@ -15,7 +15,6 @@ FactoryBot.define do
     name { 'RSpec Fox' }
     after(:create) do |document, evaluator|
       document.content = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt'))
-      document.name = 'RSpec Dog'
       document.save!
     end
   end
