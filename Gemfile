@@ -48,6 +48,8 @@ group :test do
   gem 'database_cleaner'
 end
 
+gem 'redis'
+gem 'resque'
 gem 'shrine', '~> 2.0'
 gem 'aws-sdk-s3', '~> 1.2'
 gem 'devise_token_auth', '~> 1.1.0'

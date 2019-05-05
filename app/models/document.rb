@@ -26,6 +26,14 @@ class Document < ApplicationRecord
   before_validation :default_folder, :set_document_name
   before_save :save_content_attributes, :within_storage_limit
 
+  attr_accessor :skip_background_upload
+
+  after_create do
+    if self.skip_background_upload
+      self.content_attacher.promote
+    end
+  end
+
   # Destroy this record's associated versions
   before_destroy do
     self.versions.destroy_all

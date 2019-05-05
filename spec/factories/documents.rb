@@ -1,10 +1,12 @@
 FactoryBot.define do
   factory :document do
+    skip_background_upload { true }
     content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
     name { 'RSpec Document' }
   end
 
   factory :subdocument, class: Document do
+    skip_background_upload { true }
     association :folder, factory: :folder, name: 'RSpec Subdocument Folder'
     content { Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf')) }
     name { 'RSpec Subdocument' }
