@@ -1,17 +1,32 @@
 require 'rails_helper'
 
 describe Document do
-  describe 'with background upload' do
-    let!(:document) { create :document }
-    it 'succeeds' do
-      expect(document.reload.content.data['storage']).to eq('store')
+  describe 'storage lifecycle' do
+    context 'with background upload' do
+      let!(:document) { create :document }
+      it 'is correct' do
+        expect(document.reload.content.data['storage']).to eq('store')
+      end
     end
-  end
 
-  describe 'without background upload' do
-    let!(:document) { create :document, set_skip_background_upload: false }
-    it 'succeeds' do
-      expect(document.reload.content.data['storage']).to eq('cache')
+    context 'without background upload' do
+      let!(:document) { create :document, set_skip_background_upload: false }
+      it 'is correct' do
+        expect(document.reload.content.data['storage']).to eq('cache')
+      end
+    end
+
+    context 'during update' do
+      let!(:document) { create :document }
+      it 'is correct' do
+        expect(document.reload.content.data['storage']).to eq('store')
+        document.content = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
+        document.save!
+        expect(document.reload.content.data['storage']).to eq('cache')
+        document.content_attacher.promote
+        document.save!
+        expect(document.reload.content.data['storage']).to eq('store')
+      end
     end
   end
 

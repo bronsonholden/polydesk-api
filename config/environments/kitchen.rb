@@ -54,6 +54,7 @@ Rails.application.configure do
 
   config.polydesk_www = 'localhost:4200'
   config.polydesk_headless = true
+  config.polydesk_job_dispatcher = Polydesk::JobDispatcher::Null
 
   Rails.application.routes.default_url_options[:host] = 'apilocal.polydesk.io'
   Rails.application.routes.default_url_options[:protocol] = 'https'

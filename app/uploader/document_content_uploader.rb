@@ -7,7 +7,9 @@ class DocumentContentUploader < Shrine
   end
 
   Attacher.promote { |data|
+    # Store tenant so it can activate it before uploading to storage
     data[:tenant] = Apartment::Tenant.current
-    Resque.enqueue(DocumentContentBackgroundUploader, data)
+    dispatcher = Polydesk::JobDispatcher.get
+    dispatcher.new.dispatch(DocumentContentBackgroundUploader, data)
   }
 end

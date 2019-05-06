@@ -149,6 +149,21 @@ RSpec.describe 'Documents', type: :request do
     end
   end
 
+  describe 'PATCH /rspec/documents/1' do
+    context 'with permission' do
+      let!(:permission) { create :permission, code: :document_update, account_user: AccountUser.last }
+      let!(:document) { create :document, content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt')) }
+      it 'caches new file' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
+        patch "/rspec/documents/#{document.id}", headers: rspec_session,
+                                                 params: { content: file }
+        expect(response).to have_http_status(200)
+        expect(document.reload.content.data['storage']).to eq('cache')
+        expect(json).to be_a('document')
+      end
+    end
+  end
+
   describe 'POST /rspec/documents' do
     context 'with permission' do
       let!(:permission) { create :permission, code: 'document_create', account_user: AccountUser.last }
