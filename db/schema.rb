@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(version: 2019_05_05_010159) do
     t.datetime "discarded_at"
     t.bigint "folder_id", default: 0, null: false
     t.integer "unique_enforcer", limit: 2, default: 0
-    t.text "content_data"
+    t.jsonb "content_data"
     t.index ["discarded_at"], name: "index_documents_on_discarded_at"
     t.index ["folder_id", "name", "unique_enforcer"], name: "index_documents_on_folder_id_and_name_and_unique_enforcer", unique: true
   end

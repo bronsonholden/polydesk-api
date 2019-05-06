@@ -28,9 +28,11 @@ class Document < ApplicationRecord
 
   attr_accessor :skip_background_upload
 
-  after_create do
+  after_save do
     if self.skip_background_upload
+      self.skip_background_upload = false
       self.content_attacher.promote
+      self.save
     end
   end
 
