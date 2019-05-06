@@ -93,10 +93,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])
-      # TODO: Put this in a helper class/function, configure at launch
-      #       instead of evaluating env each execution
-      redirect_to @document.content.file.authenticated_url if Rails.env != 'test'
-      send_file @document.content.file.path if Rails.env == 'test'
+      serve_content(@document)
     end
   end
 
@@ -106,14 +103,22 @@ class DocumentsController < ApplicationController
       authorize Document, :show?
       @document = Document.find(params[:id])
       @version = @document.versions.find(params[:version])
-      # TODO: Put this in a helper class/function, configure at launch
-      #       instead of evaluating env each execution
-      redirect_to @version.reify.content.file.authenticated_url if Rails.env != 'test'
-      send_file @version.reify.content.file.path if Rails.env == 'test'
+      serve_content(@version.reify)
     end
   end
 
   private
+    def serve_content(document)
+      storage = document.content.storage
+      if storage.instance_of? Shrine::Storage::FileSystem
+        send_file ['storage', document.content_url].join
+      elsif storage.instance_of? Shrine::Storage::S3
+        redirect_to document.content_url
+      else
+        render nothing: true, status: :not_found
+      end
+    end
+
     def document_params
       params.permit(:content, :name)
     end

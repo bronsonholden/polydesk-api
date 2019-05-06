@@ -1,6 +1,20 @@
 require 'rails_helper'
 
 describe Document do
+  describe 'with background upload' do
+    let!(:document) { create :document }
+    it 'succeeds' do
+      expect(document.reload.content.data['storage']).to eq('store')
+    end
+  end
+
+  describe 'without background upload' do
+    let!(:document) { create :document, set_skip_background_upload: false }
+    it 'succeeds' do
+      expect(document.reload.content.data['storage']).to eq('cache')
+    end
+  end
+
   describe 'delete in folder' do
     let!(:document) { create :subdocument }
     it 'retains folder' do

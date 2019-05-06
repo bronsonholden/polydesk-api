@@ -1,11 +1,13 @@
 class Document < ApplicationRecord
-  has_paper_trail ignore: [:discarded_at]
+  # Ignore Shrine data column so versions aren't triggered when files move
+  # from cache.
+  has_paper_trail ignore: [:discarded_at, :content_data]
 
   include Rails.application.routes.url_helpers
   include Polydesk::VerifyDocument
   include Discard::Model
 
-  mount_uploader :content, DocumentUploader
+  include DocumentContentUploader::Attachment.new(:content)
   validates :content, presence: true
   validates :name, presence: true, format: {
     # Allow alphanumerals, spaces, and _ . - ( ) [ ]
@@ -24,6 +26,16 @@ class Document < ApplicationRecord
   before_validation :default_folder, :set_document_name
   before_save :save_content_attributes, :within_storage_limit
 
+  attr_accessor :skip_background_upload
+
+  after_save do
+    if self.skip_background_upload
+      self.skip_background_upload = false
+      self.content_attacher.promote
+      self.save
+    end
+  end
+
   # Destroy this record's associated versions
   before_destroy do
     self.versions.destroy_all
@@ -34,13 +46,15 @@ class Document < ApplicationRecord
   end
 
   def set_document_name
-    self.name = File.basename(self.content.path) if name.blank? || name.nil?
+    if self.content
+      self.name = self.content.metadata['filename'] if self.name.blank? || self.name.nil?
+    end
   end
 
   def save_content_attributes
     if content
-      self.content_type = content.content_type
-      self.file_size = content.size
+      self.content_type = content.metadata['mime_type']
+      self.file_size = content.metadata['size']
     end
   end
 
