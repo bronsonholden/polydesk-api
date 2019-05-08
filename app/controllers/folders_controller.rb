@@ -64,6 +64,16 @@ class FoldersController < ApplicationController
     end
   end
 
+  def content
+    Apartment::Tenant.switch(params[:identifier]) do
+      set_folder
+      content = @folder.children + @folder.documents
+      content = Kaminari.paginate_array(content).page(current_page).per(per_page)
+      options = PaginationGenerator.new(request: request, paginated: content).generate
+      render json: FolderContentSerializer.new(content, options).serialized_json, status: :ok
+    end
+  end
+
   # GET /:identifier/folders/:id/folders
   def folders
     Apartment::Tenant.switch(params[:identifier]) do
