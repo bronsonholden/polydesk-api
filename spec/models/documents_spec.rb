@@ -42,8 +42,10 @@ describe Document do
       let!(:document) { create :subdocument, name: 'Subdocument' }
 
       it 'prevents duplicate name' do
-        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
-        expect { document.folder.documents.create!(content: file, name: 'Subdocument') }.to raise_error(ActiveRecord::RecordInvalid)
+        first_dup = document.folder.documents.create!(content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')), name: 'Subdocument')
+        expect(first_dup.name).to eq('Subdocument (1)')
+        second_dup = document.folder.documents.create!(content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')), name: 'Subdocument')
+        expect(second_dup.name).to eq('Subdocument (2)')
       end
 
       it 'requires content' do
@@ -53,11 +55,6 @@ describe Document do
 
     context 'without parent folder' do
       let!(:original) { create :document, name: 'Document' }
-
-      it 'prevents duplicate name' do
-        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
-        expect { Document.create!(content: file, name: 'Document') }.to raise_error(ActiveRecord::RecordInvalid)
-      end
 
       it 'requires content' do
         expect { Document.create!(name: 'No Content') }.to raise_error(ActiveRecord::RecordInvalid)
@@ -73,10 +70,6 @@ describe Document do
       it 'allows duplicate name' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
         expect { Document.create!(content: file, name: 'Discarded Document').discard! }.not_to raise_error
-      end
-
-      it 'disallows restoring with duplicate name' do
-        expect { to_undiscard.undiscard! }.to raise_error(ActiveRecord::RecordInvalid)
       end
 
       it 'name validation still applies' do

@@ -23,7 +23,7 @@ class Document < ApplicationRecord
     document_folder_url(id: self.id, identifier: Apartment::Tenant.current)
   end
 
-  before_validation :default_folder, :set_document_name
+  before_validation :default_folder, :set_document_name, :enumerate_name
   before_save :save_content_attributes, :within_storage_limit
 
   attr_accessor :skip_background_upload
@@ -48,6 +48,54 @@ class Document < ApplicationRecord
   def set_document_name
     if self.content
       self.name = self.content.metadata['filename'] if self.name.blank? || self.name.nil?
+    end
+  end
+
+  # TODO: Better extension detection. Would be nice to handle "combination"
+  # extensions, e.g. .html.erb
+  # --------------------------------------------------------------------------
+  # Enumerate documents if there is one with an existing name
+  def enumerate_name
+    # Only enumerate if the name has changed
+    if self.name_changed?
+      ActiveRecord::Base.transaction do
+        desired_name = self.name
+        base_name = File.basename(desired_name)
+        ext_name = File.extname(desired_name)
+        existing = Document.kept.find_by(folder_id: self.folder_id, name: desired_name)
+        # Only enumerate if there's a naming conflict
+        if existing
+          # Look for any potential conflicts (but only undiscarded documents)
+          conflicts = Document.kept.where(folder_id: self.folder_id)
+                                   .where(['name LIKE ?', "#{base_name}%"])
+          if conflicts.empty?
+            # If no conflicts, only the exact duplicate name is a conflict,
+            # so just add (1) and call it done.
+            self.name = desired_name + ' (1)'
+          else
+            # Otherwise, there may be existing enumerated files
+            r = /#{base_name} \((\d+)\)#{ext_name}/
+            regexp = Regexp.new(r)
+            # Find any potential conflicts with the exact name, but enumerated
+            numbers = conflicts.map { |document|
+              match = regexp.match(document.name)
+              # If there's a match. get the enumeration value
+              match.captures.first.to_i unless match.nil?
+            }
+            # Filter out nils (the name wasn't an enumeration of the desired
+            # document name, but just a similar name)
+            numbers.reject! { |n| n.nil? }
+            # No enumerated names? Go with default of (1)
+            if numbers.empty?
+              self.name = desired_name + ' (1)'
+            else
+              # Get next value (no need to complicate it with filling gaps)
+              numbers.sort_by! { |n| -n }
+              self.name = desired_name + " (#{numbers.first + 1})"
+            end
+          end
+        end
+      end
     end
   end
 
