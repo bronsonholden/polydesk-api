@@ -1,6 +1,6 @@
 class FolderContentSerializer
   def initialize(content, options)
-    if !content.kind_of?(Array)
+    if !content.respond_to?(:map)
       content = [content]
     end
 

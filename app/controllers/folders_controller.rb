@@ -67,9 +67,30 @@ class FoldersController < ApplicationController
   def content
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
-      content = @folder.children + @folder.documents
-      content = Kaminari.paginate_array(content).page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: content).generate
+      folders = @folder.children
+      documents = @folder.documents
+      # Save counts so we don't repeat the SQL query later
+      folders_count = folders.count
+      documents_count = documents.count
+      total = folders_count + documents_count
+      # Index of first/last item in the combined collection
+      first_item = ((current_page - 1) * per_page)
+      last_item = first_item + per_page
+      content = []
+      if first_item >= folders_count
+        # If the page doesn't include any Folders
+        content = documents.order('id').offset(first_item - folders_count).limit(per_page)
+      elsif last_item < folders_count
+        # Likewise, if the page doesn't include any Documents...
+        content = folders.order('id').offset(first_item).limit(per_page)
+      else
+        # If the page includes both, get the trailing Folders and combine
+        # with as many Documents as needed to fill the page.
+        content = folders.order('id').offset(first_item) + documents.order('id').limit(last_item - folders_count)
+      end
+      # Create pseudo-paginated collection
+      pagination_props = PaginationProperties.new(current_page, (total.to_f / per_page).ceil, per_page)
+      options = PaginationGenerator.new(request: request, paginated: pagination_props).generate
       render json: FolderContentSerializer.new(content, options).serialized_json, status: :ok
     end
   end
