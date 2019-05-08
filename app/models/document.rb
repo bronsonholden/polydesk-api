@@ -60,8 +60,8 @@ class Document < ApplicationRecord
     if self.name_changed?
       ActiveRecord::Base.transaction do
         desired_name = self.name
-        base_name = File.basename(desired_name)
         ext_name = File.extname(desired_name)
+        base_name = File.basename(desired_name, ext_name)
         existing = Document.kept.find_by(folder_id: self.folder_id, name: desired_name)
         # Only enumerate if there's a naming conflict
         if existing
@@ -71,7 +71,7 @@ class Document < ApplicationRecord
           if conflicts.empty?
             # If no conflicts, only the exact duplicate name is a conflict,
             # so just add (1) and call it done.
-            self.name = desired_name + ' (1)'
+            self.name = "#{base_name} (1)#{ext_name}"
           else
             # Otherwise, there may be existing enumerated files
             r = /#{base_name} \((\d+)\)#{ext_name}/
@@ -87,11 +87,11 @@ class Document < ApplicationRecord
             numbers.reject! { |n| n.nil? }
             # No enumerated names? Go with default of (1)
             if numbers.empty?
-              self.name = desired_name + ' (1)'
+              self.name = "#{base_name} (1)#{ext_name}"
             else
               # Get next value (no need to complicate it with filling gaps)
               numbers.sort_by! { |n| -n }
-              self.name = desired_name + " (#{numbers.first + 1})"
+              self.name = "#{base_name} (#{numbers.first + 1})#{ext_name}"
             end
           end
         end
