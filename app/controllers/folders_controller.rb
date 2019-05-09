@@ -66,9 +66,8 @@ class FoldersController < ApplicationController
 
   def content
     Apartment::Tenant.switch(params[:identifier]) do
-      set_folder
-      folders = @folder.children
-      documents = @folder.documents
+      folders = Folder.where(parent_id: params[:id] || 0)
+      documents = Document.where(folder_id: params[:id] || 0)
       # Save counts so we don't repeat the SQL query later
       folders_count = folders.count
       documents_count = documents.count

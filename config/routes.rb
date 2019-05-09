@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     post '/folders/:id/documents', to: 'folders#add_document'
     put '/folders/:id/restore', to: 'folders#restore', as: :folder_restore
     get '/folders/:id/content', to: 'folders#content', as: :folder_content
+    get '/content', to: 'folders#content', as: :content
 
     get '/:model/:id/versions', to: 'versions#index', as: :versions
     get '/:model/:id/versions/:version', to: 'versions#show', as: :version
