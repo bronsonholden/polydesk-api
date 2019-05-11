@@ -32,6 +32,56 @@ RSpec.describe 'Folders', type: :request do
     end
   end
 
+  describe 'GET /rspec/content' do
+    context 'with full permissions' do
+      let!(:document) { create :subdocument }
+      let!(:document_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
+      let!(:folder_permission) { create :permission, code: :folder_folders, account_user: AccountUser.last }
+      it 'retrieves all content' do
+        get '/rspec/content', headers: rspec_session
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'admin without any permissions' do
+      let!(:admin) { create :rspec_administrator }
+      let!(:document) { create :subdocument }
+      it 'retrieves all content' do
+        get '/rspec/content', headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'without documents permissions' do
+      let!(:document) { create :subdocument }
+      let!(:folder_permission) { create :permission, code: :folder_folders, account_user: AccountUser.last }
+      it 'returns authorization error' do
+        get '/rspec/content', headers: rspec_session
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'without folders permissions' do
+      let!(:document) { create :subdocument }
+      let!(:document_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
+      it 'returns authorization error' do
+        get '/rspec/content', headers: rspec_session
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'without any permissions' do
+      let!(:document) { create :subdocument }
+      it 'returns authorization error' do
+        get '/rspec/content', headers: rspec_session
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+  end
+
   describe 'POST /rspec/folders' do
     context 'with permission' do
       let!(:permission) { create :permission, code: :folder_create, account_user: AccountUser.last }
