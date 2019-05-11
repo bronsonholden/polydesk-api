@@ -91,7 +91,7 @@ class FoldersController < ApplicationController
       end
       # Create pseudo-paginated collection
       pagination_props = PaginationProperties.new(current_page, (total.to_f / per_page).ceil, per_page)
-      options = PaginationGenerator.new(request: request, paginated: pagination_props).generate
+      options = PaginationGenerator.new(request: request, paginated: pagination_props, count: total).generate
       render json: FolderContentSerializer.new(content, options).serialized_json, status: :ok
     end
   end

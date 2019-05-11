@@ -5,7 +5,7 @@ class PaginationGenerator
   attr_accessor :url, :hash
   attr_reader :page, :total_pages, :per_page
 
-  def initialize(request:, paginated:)
+  def initialize(request:, paginated:, count:)
     @url = request.base_url + request.path
     @page = paginated.current_page
     @total_pages = paginated.total_pages
@@ -14,7 +14,8 @@ class PaginationGenerator
       links: {},
       meta: {
         current_page: paginated.current_page,
-        total_pages: paginated.total_pages
+        total_pages: paginated.total_pages,
+        count: count || paginated.count
       }
     }
   end
