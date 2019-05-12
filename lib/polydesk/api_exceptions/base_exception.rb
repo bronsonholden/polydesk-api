@@ -10,7 +10,7 @@ module Polydesk
         'InvalidConfirmationToken' => Proc.new { |record|
           record.errors.add('confirmation_token', 'is invalid')
         },
-        'NotVersionableException' => Proc.new { |record|
+        'NotVersionable' => Proc.new { |record|
           record.errors.add(record.class.name.underscore, 'is not versionable')
         },
         'FolderException::NoThankYou' => Proc.new { |record|
