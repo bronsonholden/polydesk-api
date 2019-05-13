@@ -95,7 +95,7 @@ Rails.application.configure do
 
   config.polydesk_www = 'polydesk.io'
   config.polydesk_headless = false
-  config.polydesk_job_dispatcher = Polydesk::JobDispatcher::Resque
+  config.polydesk_job_dispatcher = Polydesk::JobDispatcher::ActiveJob
 
   Rails.application.routes.default_url_options[:host] = 'api.polydesk.io'
   Rails.application.routes.default_url_options[:protocol] = 'https'

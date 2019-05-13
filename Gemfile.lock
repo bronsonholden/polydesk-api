@@ -49,6 +49,9 @@ GEM
       parallel (>= 0.7.1)
       public_suffix (>= 2)
       rack (>= 1.3.6)
+    apartment-activejob (0.0.1)
+      activesupport
+      apartment
     arel (9.0.0)
     aws-eventstream (1.0.3)
     aws-partitions (1.158.0)
@@ -260,6 +263,7 @@ PLATFORMS
 
 DEPENDENCIES
   apartment
+  apartment-activejob
   aws-sdk-s3 (~> 1.2)
   bootsnap (>= 1.1.0)
   byebug
