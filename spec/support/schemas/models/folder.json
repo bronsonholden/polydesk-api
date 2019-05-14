@@ -12,7 +12,8 @@
         "name": { "type": "string" },
         "created_at": { "type": "string" },
         "updated_at": { "type": "string" },
-        "discarded_at": { "type": "string" }
+        "discarded_at": { "type": "string" },
+        "parent_folder_id": { "type": "string" }
       }
     },
     "links": {
