@@ -6,6 +6,14 @@ class FolderSerializer
     folder.discarded_at || ''
   end
 
+  attribute :parent_folder_id do |folder|
+    if folder.parent_id == 0
+      ''
+    else
+      folder.parent_id.to_s
+    end
+  end
+
   has_many :documents, lazy_load_data: true, links: {
     related: -> (folder) {
       folder.related_documents_url
