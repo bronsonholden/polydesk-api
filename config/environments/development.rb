@@ -67,7 +67,7 @@ Rails.application.configure do
   # using default URL options (see Rails.application.routes)
   config.polydesk_headless = !!ENV['POLYDESK_HEADLESS']
   # Select how background jobs will be dispatched
-  config.polydesk_job_dispatcher = Polydesk::JobDispatcher::Resque
+  config.polydesk_job_dispatcher = Polydesk::JobDispatcher::ActiveJob
 
   Rails.application.routes.default_url_options[:host] = 'localhost:3000'
   Rails.application.routes.default_url_options[:protocol] = 'http'
