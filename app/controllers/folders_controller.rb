@@ -6,9 +6,9 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :index?
       if params.key?(:root) && params[:root] == 'true' then
-        @folders = Folder.where(parent_id: 0)
+        @folders = Folder.kept.where(parent_id: 0)
       else
-        @folders = Folder.all
+        @folders = Folder.kept
       end
 
       @folders = @folders.order('id').page(current_page).per(per_page)
@@ -22,7 +22,7 @@ class FoldersController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :show?
-      @folder = Folder.find(params[:id])
+      @folder = Folder.kept.find(params[:id])
       render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end
@@ -68,8 +68,8 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
       authorize Folder, :documents?
-      folders = Folder.where(parent_id: params[:id] || 0)
-      documents = Document.where(folder_id: params[:id] || 0)
+      folders = Folder.kept.where(parent_id: params[:id] || 0)
+      documents = Document.kept.where(folder_id: params[:id] || 0)
       # Save counts so we don't repeat the SQL query later
       folders_count = folders.count
       documents_count = documents.count
@@ -101,7 +101,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
       set_folder
-      folders = @folder.children.order('id').page(current_page).per(per_page)
+      folders = @folder.children.kept.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: folders).generate
       render json: FolderSerializer.new(folders, options).serialized_json, status: :ok
     end
@@ -125,7 +125,7 @@ class FoldersController < ApplicationController
       authorize Document, :index?
       authorize Folder, :documents?
       set_folder
-      documents = @folder.documents.order('id').page(current_page).per(per_page)
+      documents = @folder.documents.kept.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: documents).generate
       render json: DocumentSerializer.new(documents, options).serialized_json, status: :ok
     end
