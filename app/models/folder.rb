@@ -15,6 +15,39 @@ class Folder < ApplicationRecord
     self.parent_id ||= 0
   end
 
+  before_save do
+    if name_changed?
+      update_path
+    end
+  end
+
+  # TODO: Broken
+  # after_update do
+  #   if saved_changes.include?('name')
+  #     update_child_paths
+  #   end
+  # end
+  #
+  # def update_child_paths
+  #   children.each { |child|
+  #     child.update_path!
+  #   }
+  # end
+
+  def update_path!
+    update_path
+    save!
+  end
+
+  def update_path
+    if parent_id == 0
+      self.path = '/' + name
+    else
+      parent_path = parent.path
+      self.path = [parent_path, name].join('/')
+    end
+  end
+
   def url
     folder_url(id: self.id, identifier: Apartment::Tenant.current)
   end

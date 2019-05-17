@@ -1,6 +1,6 @@
 class FolderSerializer
   include FastJsonapi::ObjectSerializer
-  attributes :name, :created_at, :updated_at, :discarded_at
+  attributes :name, :created_at, :updated_at, :discarded_at, :path
 
   attribute :discarded_at do |folder|
     folder.discarded_at || ''
