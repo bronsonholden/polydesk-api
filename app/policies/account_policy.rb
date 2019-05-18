@@ -11,7 +11,9 @@ class AccountPolicy < ApplicationPolicy
   end
 
   def update?
-    default_policy
+    allowed = super
+    return allowed unless allowed.nil?
+    has_permission(:account_update)
   end
 
   def destroy?

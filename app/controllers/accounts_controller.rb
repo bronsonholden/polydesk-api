@@ -27,7 +27,7 @@ class AccountsController < ApplicationController
   def update
     authorize Account, :update?
     set_account
-    @account.update!(account_params)
+    @account.update!(account_update_params)
     render json: AccountSerializer.new(@account).serialized_json
   end
 
@@ -50,6 +50,10 @@ class AccountsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_account
       @account = Account.find_by!(identifier: params[:identifier])
+    end
+
+    def account_update_params
+      params.permit(:name)
     end
 
     # Only allow a trusted parameter "white list" through.

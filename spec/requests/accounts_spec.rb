@@ -37,6 +37,20 @@ RSpec.describe 'Accounts', type: :request do
     end
   end
 
+  describe 'PATCH /rspec/account' do
+    context 'with permission' do
+      let!(:permission) { create :permission, code: :account_update, account_user: AccountUser.last }
+      it 'updates account information' do
+        account = Account.last
+        patch '/rspec/account', headers: rspec_session, params: { name: 'RSpec Renamed' }.to_json
+        expect(response).to have_http_status(200)
+        expect(json).to be_an('account')
+        expect(account).to have_changed_attributes
+        expect(account.reload.name).to eq('RSpec Renamed')
+      end
+    end
+  end
+
   # TODO: Create Account factory, verify access is forbidden
   # describe 'GET /acme/account' do
   #   it 'blocks restricted account information retrieval' do
