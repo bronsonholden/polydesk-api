@@ -12,7 +12,6 @@ class AccountsController < ApplicationController
 
   # GET /:identifier/account
   def show
-    authorize Account, :show?
     set_account
     render json: AccountSerializer.new(@account).serialized_json
   end
