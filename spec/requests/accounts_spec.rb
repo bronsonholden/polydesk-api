@@ -49,6 +49,14 @@ RSpec.describe 'Accounts', type: :request do
         expect(account.reload.name).to eq('RSpec Renamed')
       end
     end
+
+    context 'without permission' do
+      it 'returns authorization error' do
+        patch '/rspec/account', headers: rspec_session, params: { name: 'RSpec Renamed' }.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
   end
 
   # TODO: Create Account factory, verify access is forbidden
