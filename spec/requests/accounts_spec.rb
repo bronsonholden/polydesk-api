@@ -50,6 +50,29 @@ RSpec.describe 'Accounts', type: :request do
       end
     end
 
+    context 'guest with permission' do
+      let!(:guest) { create :rspec_guest, set_permissions: [:account_update] }
+      it 'returns authorization error' do
+        patch '/rspec/account', headers: rspec_session(guest),
+                                params: { name: 'RSpec Renamed' }.to_json
+        expect(response).to have_http_status(403)
+        expect(json).to have_errors
+      end
+    end
+
+    context 'admin without permission' do
+      let!(:admin) { create :rspec_administrator }
+      it 'updates account information' do
+        account = Account.last
+        patch '/rspec/account', headers: rspec_session(admin),
+                                params: { name: 'RSpec Renamed' }.to_json
+        expect(response).to have_http_status(200)
+        expect(json).to be_an('account')
+        expect(account).to have_changed_attributes
+        expect(account.reload.name).to eq('RSpec Renamed')
+      end
+    end
+
     context 'without permission' do
       it 'returns authorization error' do
         patch '/rspec/account', headers: rspec_session, params: { name: 'RSpec Renamed' }.to_json
