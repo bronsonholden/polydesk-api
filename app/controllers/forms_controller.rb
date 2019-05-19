@@ -1,4 +1,13 @@
 class FormsController < ApplicationController
+  include StrongerParameters::ControllerSupport::PermittedParameters
+
+  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :index, {}
+  permitted_parameters :show, { id: Parameters.id }
+  permitted_parameters :create, { name: Parameters.string }
+  permitted_parameters :update, { id: Parameters.id, name: Parameters.string }
+  permitted_parameters :destroy, { id: Parameters.id }
+
   before_action :authenticate_user!
 
   # GET /:identifier/forms

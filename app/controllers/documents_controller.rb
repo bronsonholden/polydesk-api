@@ -1,6 +1,18 @@
 require 'json'
 
 class DocumentsController < ApplicationController
+  include StrongerParameters::ControllerSupport::PermittedParameters
+
+  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :index, {}
+  permitted_parameters :create, { name: Parameters.string, content: Parameters.file }
+  permitted_parameters :update, { id: Parameters. id, name: Parameters.string, content: Parameters.file }
+  permitted_parameters :show, { id: Parameters.id }
+  permitted_parameters :destroy, { id: Parameters.id }
+  permitted_parameters :restore, { id: Parameters.id }
+  permitted_parameters :download, { id: Parameters.id }
+  permitted_parameters :download_version, { id: Parameters.id, version: Parameters.id }
+
   # User must be authenticated before they can interact with documents
   before_action :authenticate_user!
 

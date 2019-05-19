@@ -1,6 +1,21 @@
 class AccountsController < ApplicationController
+  include StrongerParameters::ControllerSupport::PermittedParameters
+
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!, except: [:create]
+
+  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :create, { account_name: Parameters.string,
+                                  account_identifier: Parameters.string,
+                                  user_name: Parameters.string,
+                                  user_email: Parameters.string,
+                                  password: Parameters.string,
+                                  password_confirmation: Parameters.string }
+  permitted_parameters :update, { name: Parameters.string }
+  permitted_parameters :index, {}
+  permitted_parameters :show, {}
+  permitted_parameters :destroy, {}
+  permitted_parameters :restore, {}
 
   # GET /accounts
   # Returns only accounts the current user has access to
@@ -18,8 +33,9 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
-    account = Account.create!(account_create_params)
-    User.create!(user_params.merge({ default_account: account }))
+    p = params
+    account = Account.create!(p.slice(:account_name, :account_identifier))
+    User.create!(p.slice(:user_name, :user_email, :password, :password_confirmation).merge({ default_account: account }))
     render json: AccountSerializer.new(account).serialized_json, status: :created
   end
 
@@ -27,7 +43,7 @@ class AccountsController < ApplicationController
   def update
     authorize Account, :update?
     set_account
-    @account.update!(account_update_params)
+    @account.update!(permitted_params)
     render json: AccountSerializer.new(@account).serialized_json
   end
 
@@ -46,26 +62,14 @@ class AccountsController < ApplicationController
     render json: AccountSerializer.new(@account).serialized_json, status: :ok
   end
 
+  protected
+    def permitted_params
+      # Account identifier is used for AccountController actions
+      params.except(:controller, :action)
+    end
+
   private
-    # Use callbacks to share common setup or constraints between actions.
     def set_account
-      @account = Account.find_by!(identifier: params[:identifier])
-    end
-
-    def account_update_params
-      params.permit(:name)
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def account_params
-      params.permit(:name, :identifier)
-    end
-
-    def account_create_params
-      params.permit(:account_name, :account_identifier)
-    end
-
-    def user_params
-      params.permit(:user_name, :user_email, :password, :password_confirmation)
+      @account = Account.find_by!(identifier: permitted_params.fetch(:identifier))
     end
 end

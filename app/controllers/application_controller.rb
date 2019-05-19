@@ -5,6 +5,9 @@ class ApplicationController < ActionController::API
   include Pundit
   include Polydesk
 
+  # Parameters isn't in scope, so make an alias for convenience
+  Parameters = ActionController::Parameters
+
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -37,6 +40,12 @@ class ApplicationController < ActionController::API
 
     def per_page
       (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
+    end
+
+    # TODO: Better implementation of this. Some controllers need identifier
+    # to retrieve an Account.
+    def permitted_params
+      params.except(:controller, :action, :identifier)
     end
 
   private

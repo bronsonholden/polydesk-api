@@ -1,4 +1,11 @@
 class PermissionsController < ApplicationController
+  include StrongerParameters::ControllerSupport::PermittedParameters
+
+  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :index, { id: Parameters.id }
+  permitted_parameters :create, { id: Parameters.id, code: Parameters.string }
+  permitted_parameters :destroy, { id:Parameters.id, code: Parameters.string }
+
   # User must be authenticated before they can interact with permissions
   before_action :authenticate_user!
   before_action :set_account
@@ -8,14 +15,15 @@ class PermissionsController < ApplicationController
   # POST /:identifier/users/:id/permissions
   def create
     Apartment::Tenant.switch(params[:identifier]) do
-      @permission = Permission.find_by_code(params[:code]) || Permission.create!(permission_params)
+      code = permitted_params.fetch(:code)
+      @permission = @account_user.permissions.find_by_code(code) || @account_user.permissions.create!(permitted_params.slice(:code))
       render json: PermissionSerializer.new(@permission).serialized_json, status: :created
     end
   end
 
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
-      @permission = Permission.find_by_code(params[:code])
+      @permission = @account_user.permissions.find_by_code(permitted_params.fetch(:code))
       return if @permission.nil?
       @permission.destroy
     end
@@ -24,19 +32,24 @@ class PermissionsController < ApplicationController
   # GET /:identifier/users/:id/permissions
   def index
     Apartment::Tenant.switch(params[:identifier]) do
-      @permissions = Permission.where(account_user_id: @account_user.user_id).order('id').page(current_page).per(per_page)
+      @permissions = @account_user.permissions.order('id').page(current_page).per(per_page)
       options = PaginationGenerator.new(request: request, paginated: @permissions).generate
       render json: PermissionSerializer.new(@permissions, options).serialized_json, status: :ok
     end
   end
 
   private
+    def permitted_params
+      # Account identifier is used for some Permission actions
+      params.except(:controller, :action)
+    end
+
     def set_account
-      @account = Account.find_by_identifier!(params[:identifier])
+      @account = Account.find_by_identifier!(permitted_params.fetch(:identifier))
     end
 
     def set_user
-      @user = User.find(params[:id])
+      @user = User.find(permitted_params.fetch(:id))
     end
 
     def set_account_user

@@ -1,11 +1,30 @@
 class FoldersController < ApplicationController
+  include StrongerParameters::ControllerSupport::PermittedParameters
+
+  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :index, { root: Parameters.boolean }
+  permitted_parameters :show, { id: Parameters.id }
+  permitted_parameters :create, { name: Parameters.string,
+                                  parent_id: Parameters.id }
+  permitted_parameters :update, { id: Parameters.id, name: Parameters.string }
+  permitted_parameters :destroy, { id: Parameters.id }
+  permitted_parameters :restore, { id: Parameters.id }
+  permitted_parameters :content, { id: Parameters.id }
+  permitted_parameters :folders, { id: Parameters.id }
+  permitted_parameters :documents, { id: Parameters.id }
+  permitted_parameters :add_folder, { id: Parameters.id,
+                                      name: Parameters.string }
+  permitted_parameters :add_document, { id: Parameters.id,
+                                        name: Parameters.string,
+                                        content: Parameters.file }
+
   before_action :authenticate_user!
 
   # GET /:identifier/folders
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :index?
-      if params.key?(:root) && params[:root] == 'true' then
+      if params.fetch(:root, false) then
         @folders = Folder.kept.where(parent_id: 0)
       else
         @folders = Folder.kept
@@ -22,7 +41,7 @@ class FoldersController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :show?
-      @folder = Folder.kept.find(params[:id])
+      @folder = Folder.kept.find(permitted_params.fetch(:id))
       render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end
@@ -31,7 +50,7 @@ class FoldersController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
-      @folder = Folder.create!(folder_params)
+      @folder = Folder.create!(permitted_params)
       render json: FolderSerializer.new(@folder).serialized_json, status: :created
     end
   end
@@ -41,7 +60,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :update?
       set_folder
-      @folder.update!(folder_params)
+      @folder.update!(permitted_params)
       render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end
@@ -68,8 +87,9 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
       authorize Folder, :documents?
-      folders = Folder.kept.where(parent_id: params[:id] || 0)
-      documents = Document.kept.where(folder_id: params[:id] || 0)
+      folder_id = permitted_params.fetch(:id, 0)
+      folders = Folder.kept.where(parent_id: folder_id)
+      documents = Document.kept.where(folder_id: folder_id)
       # Save counts so we don't repeat the SQL query later
       folders_count = folders.count
       documents_count = documents.count
@@ -114,7 +134,7 @@ class FoldersController < ApplicationController
       authorize Folder, :add_folder?
       set_folder
       # For this path, disallow parent_folder param
-      new_folder = @folder.children.create!(params.permit(:name))
+      new_folder = @folder.children.create!(permitted_params.except(:parent_id))
       render json: FolderSerializer.new(new_folder).serialized_json, status: :created
     end
   end
@@ -137,18 +157,13 @@ class FoldersController < ApplicationController
       authorize Document, :create?
       authorize Folder, :add_document?
       set_folder
-      document = @folder.documents.create!(params.permit(:content))
+      document = @folder.documents.create!(permitted_params.slice(:content))
       render json: DocumentSerializer.new(document).serialized_json, status: :created
     end
   end
 
   private
     def set_folder
-      @folder = Folder.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def folder_params
-      params.permit(:name, :parent_folder)
+      @folder = Folder.find(permitted_params.fetch(:id))
     end
 end
