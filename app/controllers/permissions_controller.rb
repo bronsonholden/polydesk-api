@@ -1,17 +1,4 @@
 class PermissionsController < ApplicationController
-  include StrongerParameters::ControllerSupport::PermittedParameters
-
-  permitted_parameters :all, { identifier: Parameters.string }
-  permitted_parameters :index, { id: Parameters.id }
-  permitted_parameters :create, { id: Parameters.id, code: Parameters.string }
-  permitted_parameters :destroy, { id:Parameters.id, code: Parameters.string }
-
-  # User must be authenticated before they can interact with permissions
-  before_action :authenticate_user!
-  before_action :set_account
-  before_action :set_user
-  before_action :set_account_user
-
   # POST /:identifier/users/:id/permissions
   def create
     Apartment::Tenant.switch(params[:identifier]) do

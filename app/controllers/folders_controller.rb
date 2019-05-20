@@ -1,23 +1,4 @@
 class FoldersController < ApplicationController
-  include StrongerParameters::ControllerSupport::PermittedParameters
-
-  permitted_parameters :all, { identifier: Parameters.string }
-  permitted_parameters :index, { root: Parameters.boolean }
-  permitted_parameters :show, { id: Parameters.id }
-  permitted_parameters :create, { name: Parameters.string,
-                                  parent_id: Parameters.id }
-  permitted_parameters :update, { id: Parameters.id, name: Parameters.string }
-  permitted_parameters :destroy, { id: Parameters.id }
-  permitted_parameters :restore, { id: Parameters.id }
-  permitted_parameters :content, { id: Parameters.id }
-  permitted_parameters :folders, { id: Parameters.id }
-  permitted_parameters :documents, { id: Parameters.id }
-  permitted_parameters :add_folder, { id: Parameters.id,
-                                      name: Parameters.string }
-  permitted_parameters :add_document, { id: Parameters.id,
-                                        name: Parameters.string,
-                                        content: Parameters.file }
-
   before_action :authenticate_user!
 
   # GET /:identifier/folders

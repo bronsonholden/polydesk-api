@@ -15,7 +15,7 @@ Rails.application.routes.draw do
   get '/', to: 'application#show'
 
   scope '/:identifier' do
-    resources :documents
+    jsonapi_resources :documents
     resources :folders
     resources :users
     resources :reports
@@ -32,7 +32,7 @@ Rails.application.routes.draw do
     post '/users/:id/permissions', to: 'permissions#create'
     delete '/users/:id/permissions', to: 'permissions#destroy'
 
-    get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
+    # get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
     get '/documents/:id/download', to: 'documents#download', as: :document_download
     get '/documents/:id/versions/:version/download', to: 'documents#download_version', as: :document_download_version
     put '/documents/:id/restore', to: 'documents#restore', as: :document_restore

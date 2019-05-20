@@ -1,21 +1,6 @@
 class AccountsController < ApplicationController
-  include StrongerParameters::ControllerSupport::PermittedParameters
-
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!, except: [:create]
-
-  permitted_parameters :all, { identifier: Parameters.string }
-  permitted_parameters :create, { account_name: Parameters.string,
-                                  account_identifier: Parameters.string,
-                                  user_name: Parameters.string,
-                                  user_email: Parameters.string,
-                                  password: Parameters.string,
-                                  password_confirmation: Parameters.string }
-  permitted_parameters :update, { name: Parameters.string }
-  permitted_parameters :index, {}
-  permitted_parameters :show, {}
-  permitted_parameters :destroy, {}
-  permitted_parameters :restore, {}
 
   # GET /accounts
   # Returns only accounts the current user has access to

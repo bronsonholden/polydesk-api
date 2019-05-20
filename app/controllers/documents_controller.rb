@@ -1,18 +1,6 @@
 require 'json'
 
 class DocumentsController < ApplicationController
-  include StrongerParameters::ControllerSupport::PermittedParameters
-
-  permitted_parameters :all, { identifier: Parameters.string }
-  permitted_parameters :index, {}
-  permitted_parameters :create, { name: Parameters.string, content: Parameters.file }
-  permitted_parameters :update, { id: Parameters. id, name: Parameters.string, content: Parameters.file }
-  permitted_parameters :show, { id: Parameters.id }
-  permitted_parameters :destroy, { id: Parameters.id }
-  permitted_parameters :restore, { id: Parameters.id }
-  permitted_parameters :download, { id: Parameters.id }
-  permitted_parameters :download_version, { id: Parameters.id, version: Parameters.id }
-
   # User must be authenticated before they can interact with documents
   before_action :authenticate_user!
 
@@ -21,7 +9,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
       @document = Document.create!(document_params)
-      render json: DocumentSerializer.new(@document).serialized_json, status: :created
+      #render json: DocumentSerializer.new(@document).serialized_json, status: :created
     end
   end
 
@@ -31,7 +19,7 @@ class DocumentsController < ApplicationController
       authorize Document, :update?
       @document = Document.find(params[:id])
       @document.update!(document_params)
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      # render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
 
@@ -40,7 +28,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      # render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
 
@@ -48,19 +36,10 @@ class DocumentsController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
-
-      if params.key?(:root) && params[:root] == 'true' then
-        @documents = Document.left_outer_joins(:folder)
-                             .where(folders: { id: nil })
-                             .references(:folders)
-      else
-        @documents = Document.all
-      end
-
-      @documents = @documents.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @documents).generate
-
-      render json: DocumentSerializer.new(@documents, options).serialized_json, status: :ok
+      @documents = Document.all
+      # render json: DocumentSerializer.new(@documents, options).serialized_json, status: :ok
+      @document_resources = @documents.map { |document| DocumentResource.new(document, nil) }
+      render json: JSONAPI::ResourceSerializer.new(DocumentResource).serialize_to_hash(@document_resources), status: :ok
     end
   end
 

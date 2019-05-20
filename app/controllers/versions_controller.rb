@@ -1,13 +1,4 @@
 class VersionsController < ApplicationController
-  include StrongerParameters::ControllerSupport::PermittedParameters
-
-  permitted_parameters :all, { identifier: Parameters.string,
-                               model: Parameters.string,
-                               id: Parameters.id }
-  permitted_parameters :index, {}
-  permitted_parameters :show, { version: Parameters.id }
-  permitted_parameters :restore, { version: Parameters.id }
-
   before_action :authenticate_user!
 
   # GET /:identifier/:model/:id/versions

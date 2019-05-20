@@ -1,11 +1,4 @@
 class UsersController < ApplicationController
-  include StrongerParameters::ControllerSupport::PermittedParameters
-
-  permitted_parameters :all, { identifier: Parameters.string }
-  permitted_parameters :index, {}
-  permitted_parameters :show, { id: Parameters.id }
-  permitted_parameters :destroy, { id: Parameters.id }
-
   before_action :authenticate_user!
 
   # GET /:identifier/users

@@ -1,12 +1,10 @@
 require 'polydesk/auth_context'
 
 class ApplicationController < ActionController::API
+  include JSONAPI::ActsAsResourceController
   include DeviseTokenAuth::Concerns::SetUserByToken
   include Pundit
   include Polydesk
-
-  # Parameters isn't in scope, so make an alias for convenience
-  Parameters = ActionController::Parameters
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
@@ -17,6 +15,10 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
+
+  def context
+    { user: pundit_user }
+  end
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, params[:identifier])
