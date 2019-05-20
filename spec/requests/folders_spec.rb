@@ -87,7 +87,11 @@ RSpec.describe 'Folders', type: :request do
       let!(:permission) { create :permission, code: :folder_create, account_user: AccountUser.last }
       it 'creates new folder' do
         post '/rspec/folders', headers: rspec_session,
-                               params: { name: 'RSpec Test' }.to_json
+                               params: {
+                                 data: {
+                                   attributes: {
+                                     name: 'RSpec Test'
+                                   } } }.to_json
         expect(response).to have_http_status(201)
         expect(json).to be_a('folder')
       end
@@ -97,7 +101,11 @@ RSpec.describe 'Folders', type: :request do
       let!(:guest) { create :rspec_guest, set_permissions: [:folder_create] }
       it 'creates new folder' do
         post '/rspec/folders', headers: rspec_session(guest),
-                               params: { name: 'RSpec Test' }.to_json
+                               params: {
+                                 data: {
+                                   attributes: {
+                                     name: 'RSpec Test'
+                                   } } }.to_json
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -107,7 +115,11 @@ RSpec.describe 'Folders', type: :request do
       let!(:admin) { create :rspec_administrator }
       it 'creates new folder' do
         post '/rspec/folders', headers: rspec_session(admin),
-                               params: { name: 'RSpec Test' }.to_json
+                               params: {
+                                 data: {
+                                   attributes: {
+                                     name: 'RSpec Test'
+                                   } } }.to_json
         expect(response).to have_http_status(201)
         expect(json).to be_a('folder')
       end
@@ -116,7 +128,11 @@ RSpec.describe 'Folders', type: :request do
     context 'without permission' do
       it 'returns authorization error' do
         post '/rspec/folders', headers: rspec_session,
-                               params: { name: 'RSpec Test' }.to_json
+                               params: {
+                                 data: {
+                                   attributes: {
+                                     name: 'RSpec Test'
+                                   } } }.to_json
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -130,7 +146,11 @@ RSpec.describe 'Folders', type: :request do
 
       it 'updates folder name' do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session,
-                                             params: { name: 'Updated Name' }.to_json
+                                             params: {
+                                               data: {
+                                                 attributes: {
+                                                   name: 'Updated Name'
+                                                 } } }.to_json
         expect(response).to have_http_status(200)
         expect(folder).to have_changed_attributes
         expect(json).to be_a('folder')
@@ -139,14 +159,20 @@ RSpec.describe 'Folders', type: :request do
 
       it 'is idempotent' do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session,
-                                             params: {}.to_json
+                                             params: {
+                                               data: {
+                                                 attributes: {} } }.to_json
         expect(response).to have_http_status(200)
         expect(folder).not_to have_changed_attributes
       end
 
       it 'disallows blank folder name' do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session,
-                                             params: { name: '' }.to_json
+                                             params: {
+                                               data: {
+                                                 attributes: {
+                                                   name: ''
+                                                 } } }.to_json
         expect(response).to have_http_status(422)
         expect(json).to have_errors
       end
@@ -157,7 +183,11 @@ RSpec.describe 'Folders', type: :request do
       let!(:folder) { create :folder, name: 'Initial Name' }
       it 'returns authorization error' do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session(guest),
-                                             params: { name: 'Updated Name' }.to_json
+                                             params: {
+                                               data: {
+                                                 attributes: {
+                                                   name: 'Updated Name'
+                                                 } } }.to_json
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -168,7 +198,11 @@ RSpec.describe 'Folders', type: :request do
       let!(:folder) { create :folder, name: 'Initial Name' }
       it 'updates folder name' do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session(admin),
-                                             params: { name: 'Updated Name' }.to_json
+                                             params: {
+                                               data: {
+                                                 attributes: {
+                                                   name: 'Updated Name'
+                                                 } } }.to_json
         expect(response).to have_http_status(200)
         expect(folder).to have_changed_attributes
       end
@@ -178,7 +212,11 @@ RSpec.describe 'Folders', type: :request do
       let!(:folder) { create :folder, name: 'Initial Name' }
       it 'returns authorization error' do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session,
-                                             params: { name: 'Updated Name' }.to_json
+                                             params: {
+                                               data: {
+                                                 attributes: {
+                                                   name: 'Updated Name'
+                                                 } } }.to_json
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -193,7 +231,10 @@ RSpec.describe 'Folders', type: :request do
       it 'uploads a document to a folder' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
-                                 params: { content: file }
+                                                      params: {
+                                                        data: {
+                                                          attributes: {
+                                                            content: file } } }
         expect(response).to have_http_status(201)
         expect(json).to be_a('document')
       end
@@ -205,7 +246,10 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session(guest),
-                                 params: { content: file }
+                                                      params: {
+                                                        data: {
+                                                          attributes: {
+                                                            content: file } } }
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -217,7 +261,10 @@ RSpec.describe 'Folders', type: :request do
       it 'uploads a document to a folder' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session(admin),
-                                 params: { content: file }
+                                                      params: {
+                                                        data: {
+                                                          attributes: {
+                                                            content: file } } }
         expect(response).to have_http_status(201)
         expect(json).to be_a('document')
       end
@@ -229,7 +276,10 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
-                                 params: { content: file }
+                                                      params: {
+                                                        data: {
+                                                          attributes: {
+                                                            content: file } } }
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -241,7 +291,10 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
-                                 params: { content: file }
+                                                      params: {
+                                                        data: {
+                                                          attributes: {
+                                                            content: file } } }
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -252,7 +305,10 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
-                                 params: { content: file }
+                                                      params: {
+                                                        data: {
+                                                          attributes: {
+                                                            content: file } } }
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end

@@ -93,6 +93,9 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
+  # Log an error if unpermitted parameters are submitted
+  config.action_controller.action_on_unpermitted_parameters = :log
+
   config.polydesk_www = 'polydesk.io'
   config.polydesk_headless = false
   config.polydesk_job_dispatcher = Polydesk::JobDispatcher::ActiveJob

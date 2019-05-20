@@ -1,22 +1,36 @@
 class FoldersController < ApplicationController
   include StrongerParameters::ControllerSupport::PermittedParameters
 
-  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :all, { identifier: Parameters.string, folder: {} }
   permitted_parameters :index, { root: Parameters.boolean }
   permitted_parameters :show, { id: Parameters.id }
-  permitted_parameters :create, { name: Parameters.string,
-                                  parent_id: Parameters.id }
-  permitted_parameters :update, { id: Parameters.id, name: Parameters.string }
+  permitted_parameters :create, { data: {
+                                    type: Parameters.enum('folder'),
+                                    attributes: {
+                                      name: Parameters.string,
+                                      parent_id: Parameters.id } } }
+  permitted_parameters :update, { id: Parameters.id,
+                                  data: {
+                                    id: Parameters.id,
+                                    type: Parameters.enum('folder'),
+                                    attributes: {
+                                      name: Parameters.string } } }
   permitted_parameters :destroy, { id: Parameters.id }
   permitted_parameters :restore, { id: Parameters.id }
   permitted_parameters :content, { id: Parameters.id }
   permitted_parameters :folders, { id: Parameters.id }
   permitted_parameters :documents, { id: Parameters.id }
   permitted_parameters :add_folder, { id: Parameters.id,
-                                      name: Parameters.string }
+                                      data: {
+                                        type: Parameters.enum('folder'),
+                                        attributes: {
+                                          name: Parameters.string } } }
   permitted_parameters :add_document, { id: Parameters.id,
-                                        name: Parameters.string,
-                                        content: Parameters.file }
+                                        data: {
+                                          type: Parameters.enum('document'),
+                                          attributes: {
+                                            name: Parameters.string,
+                                            content: Parameters.file } } }
 
   before_action :authenticate_user!
 
@@ -50,7 +64,7 @@ class FoldersController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
-      @folder = Folder.create!(permitted_params)
+      @folder = Folder.create!(attribute_params)
       render json: FolderSerializer.new(@folder).serialized_json, status: :created
     end
   end
@@ -60,7 +74,7 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :update?
       set_folder
-      @folder.update!(permitted_params)
+      @folder.update!(attribute_params)
       render json: FolderSerializer.new(@folder).serialized_json, status: :ok
     end
   end
@@ -134,7 +148,7 @@ class FoldersController < ApplicationController
       authorize Folder, :add_folder?
       set_folder
       # For this path, disallow parent_folder param
-      new_folder = @folder.children.create!(permitted_params.except(:parent_id))
+      new_folder = @folder.children.create!(attribute_params.except(:parent_id))
       render json: FolderSerializer.new(new_folder).serialized_json, status: :created
     end
   end
@@ -157,7 +171,7 @@ class FoldersController < ApplicationController
       authorize Document, :create?
       authorize Folder, :add_document?
       set_folder
-      document = @folder.documents.create!(permitted_params.slice(:content))
+      document = @folder.documents.create!(attribute_params)
       render json: DocumentSerializer.new(document).serialized_json, status: :created
     end
   end

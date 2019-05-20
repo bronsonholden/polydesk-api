@@ -3,12 +3,16 @@ require 'rails_helper'
 RSpec.describe 'Accounts', type: :request do
   describe 'POST /accounts' do
     it 'creates new account with password' do
-      post '/accounts', params: { account_identifier: 'rspec2',
-                                  account_name: 'RSpec 2',
-                                  user_name: 'RSpec User 2',
-                                  user_email: 'rspec2@polydesk.io',
-                                  password: 'password',
-                                  password_confirmation: 'password' }
+      post '/accounts', params: {
+                          data: {
+                            type: 'account',
+                            attributes: {
+                              account_identifier: 'rspec2',
+                              account_name: 'RSpec 2',
+                              user_name: 'RSpec User 2',
+                              user_email: 'rspec2@polydesk.io',
+                              password: 'password',
+                              password_confirmation: 'password' } } }
       expect(response).to have_http_status(201)
       expect(json).to be_an('account')
       user = User.find_by!(email: 'rspec2@polydesk.io')
@@ -19,10 +23,14 @@ RSpec.describe 'Accounts', type: :request do
     end
 
     it 'creates new account without password' do
-      post '/accounts', params: { account_identifier: 'rspec3',
-                                  account_name: 'RSpec 3',
-                                  user_name: 'RSpec User 3',
-                                  user_email: 'rspec3@polydesk.io' }
+      post '/accounts', params: {
+                          data: {
+                            type: 'account',
+                            attributes: {
+                              account_identifier: 'rspec3',
+                              account_name: 'RSpec 3',
+                              user_name: 'RSpec User 3',
+                              user_email: 'rspec3@polydesk.io' } } }
       expect(response).to have_http_status(201)
       expect(json).to be_an('account')
       expect(User.last.has_password?).to be false
@@ -42,7 +50,13 @@ RSpec.describe 'Accounts', type: :request do
       let!(:permission) { create :permission, code: :account_update, account_user: AccountUser.last }
       it 'updates account information' do
         account = Account.last
-        patch '/rspec/account', headers: rspec_session, params: { name: 'RSpec Renamed' }.to_json
+        patch '/rspec/account', headers: rspec_session,
+                                params: {
+                                  data: {
+                                    id: account.id,
+                                    type: 'account',
+                                    attributes: {
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(200)
         expect(json).to be_an('account')
         expect(account).to have_changed_attributes
@@ -53,8 +67,14 @@ RSpec.describe 'Accounts', type: :request do
     context 'guest with permission' do
       let!(:guest) { create :rspec_guest, set_permissions: [:account_update] }
       it 'returns authorization error' do
+        account = Account.last
         patch '/rspec/account', headers: rspec_session(guest),
-                                params: { name: 'RSpec Renamed' }.to_json
+                                params: {
+                                  data: {
+                                    id: account.id,
+                                    type: 'account',
+                                    attributes: {
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -65,7 +85,12 @@ RSpec.describe 'Accounts', type: :request do
       it 'updates account information' do
         account = Account.last
         patch '/rspec/account', headers: rspec_session(admin),
-                                params: { name: 'RSpec Renamed' }.to_json
+                                params: {
+                                  data: {
+                                    id: account.id,
+                                    type: 'account',
+                                    attributes: {
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(200)
         expect(json).to be_an('account')
         expect(account).to have_changed_attributes
@@ -75,7 +100,14 @@ RSpec.describe 'Accounts', type: :request do
 
     context 'without permission' do
       it 'returns authorization error' do
-        patch '/rspec/account', headers: rspec_session, params: { name: 'RSpec Renamed' }.to_json
+        account = Account.last
+        patch '/rspec/account', headers: rspec_session,
+                                params: {
+                                  data: {
+                                    id: account.id,
+                                    type: 'account',
+                                    attributes: {
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end

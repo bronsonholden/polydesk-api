@@ -4,8 +4,16 @@ class OptionsController < ApplicationController
   permitted_parameters :all, { identifier: Parameters.string }
   permitted_parameters :index, {}
   permitted_parameters :show, { id: Parameters.id }
-  permitted_parameters :create, { name: Parameters.string }
-  permitted_parameters :update, { id: Parameters.id, name: Parameters.string }
+  permitted_parameters :create, { data: {
+                                    attributes: {
+                                      name: Parameters.string } } }
+  permitted_parameters :update, { id: Parameters.id,
+                                  data: {
+                                    id: Parameters.id,
+                                    type: Parameters.enum('option'),
+                                    attributes: {
+                                      name: Parameters.string,
+                                      value: Parameters.string } } }
   permitted_parameters :destroy, { id: Parameters.id }
 
   before_action :authenticate_user!

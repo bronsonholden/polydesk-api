@@ -44,6 +44,8 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  # Raise an error if unpermitted parameters are submitted
+  config.action_controller.action_on_unpermitted_parameters = :raise
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true

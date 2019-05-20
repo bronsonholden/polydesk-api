@@ -1,11 +1,23 @@
 class FormsController < ApplicationController
   include StrongerParameters::ControllerSupport::PermittedParameters
 
-  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :all, { identifier: Parameters.string, form: {} }
   permitted_parameters :index, {}
   permitted_parameters :show, { id: Parameters.id }
-  permitted_parameters :create, { name: Parameters.string }
-  permitted_parameters :update, { id: Parameters.id, name: Parameters.string }
+  permitted_parameters :create, { data: {
+                                    type: Parameters.enum('form'),
+                                    attributes: {
+                                      name: Parameters.string,
+                                      schema: Parameters.map,
+                                      layout: Parameters.map } } }
+  permitted_parameters :update, { id: Parameters.id,
+                                  data: {
+                                    id: Parameters.id,
+                                    type: Parameters.enum('form'),
+                                    attributes: {
+                                      name: Parameters.string,
+                                      schema: Parameters.map,
+                                      layout: Parameters.map } } }
   permitted_parameters :destroy, { id: Parameters.id }
 
   before_action :authenticate_user!
@@ -33,7 +45,7 @@ class FormsController < ApplicationController
   def create
     Apartment::Tenant.switch(params['identifier']) do
       authorize Form, :create?
-      @form = Form.create!(form_params)
+      @form = Form.create!(attribute_params)
       render json: FormSerializer.new(@form).serialized_json, status: :created
     end
   end
@@ -43,7 +55,7 @@ class FormsController < ApplicationController
     Apartment::Tenant.switch(params['identifier']) do
       authorize Form, :update?
       set_form
-      @form.update!(form_params)
+      @form.update!(attribute_params)
       @form.reload
       render json: FormSerializer.new(@form).serialized_json, status: :ok
     end
@@ -64,10 +76,5 @@ class FormsController < ApplicationController
       Apartment::Tenant.switch(params['identifier']) do
         @form = Form.find(params[:id])
       end
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def form_params
-      params.permit(:name, schema: {}, layout: {})
     end
 end

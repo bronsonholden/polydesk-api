@@ -3,10 +3,20 @@ require 'json'
 class DocumentsController < ApplicationController
   include StrongerParameters::ControllerSupport::PermittedParameters
 
-  permitted_parameters :all, { identifier: Parameters.string }
+  permitted_parameters :all, { identifier: Parameters.string, data: {}, document: {} }
   permitted_parameters :index, {}
-  permitted_parameters :create, { name: Parameters.string, content: Parameters.file }
-  permitted_parameters :update, { id: Parameters. id, name: Parameters.string, content: Parameters.file }
+  permitted_parameters :create, { data: {
+                                    type: Parameters.enum('document'),
+                                    attributes: {
+                                      name: Parameters.string,
+                                      content: Parameters.file } } }
+  permitted_parameters :update, { id: Parameters. id,
+                                  data: {
+                                    id: Parameters.id,
+                                    type: Parameters.enum('document'),
+                                    attributes: {
+                                      name: Parameters.string,
+                                      content: Parameters.file } } }
   permitted_parameters :show, { id: Parameters.id }
   permitted_parameters :destroy, { id: Parameters.id }
   permitted_parameters :restore, { id: Parameters.id }
@@ -20,7 +30,7 @@ class DocumentsController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
-      @document = Document.create!(document_params)
+      @document = Document.create!(attribute_params)
       render json: DocumentSerializer.new(@document).serialized_json, status: :created
     end
   end
@@ -30,7 +40,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
       @document = Document.find(params[:id])
-      @document.update!(document_params)
+      @document.update!(attribute_params)
       render json: DocumentSerializer.new(@document).serialized_json, status: :ok
     end
   end
@@ -129,9 +139,5 @@ class DocumentsController < ApplicationController
       else
         render nothing: true, status: :not_found
       end
-    end
-
-    def document_params
-      params.permit(:content, :name)
     end
 end

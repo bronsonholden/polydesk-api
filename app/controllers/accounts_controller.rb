@@ -4,14 +4,21 @@ class AccountsController < ApplicationController
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!, except: [:create]
 
-  permitted_parameters :all, { identifier: Parameters.string }
-  permitted_parameters :create, { account_name: Parameters.string,
-                                  account_identifier: Parameters.string,
-                                  user_name: Parameters.string,
-                                  user_email: Parameters.string,
-                                  password: Parameters.string,
-                                  password_confirmation: Parameters.string }
-  permitted_parameters :update, { name: Parameters.string }
+  permitted_parameters :all, { identifier: Parameters.string, account: {} }
+  permitted_parameters :create, { data: {
+                                    type: Parameters.enum('account'),
+                                    attributes: {
+                                      account_name: Parameters.string,
+                                      account_identifier: Parameters.string,
+                                      user_name: Parameters.string,
+                                      user_email: Parameters.string,
+                                      password: Parameters.string,
+                                      password_confirmation: Parameters.string } } }
+  permitted_parameters :update, { data: {
+                                    id: Parameters.id,
+                                    type: Parameters.enum('account'),
+                                    attributes: {
+                                      name: Parameters.string } } }
   permitted_parameters :index, {}
   permitted_parameters :show, {}
   permitted_parameters :destroy, {}
@@ -33,9 +40,8 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
-    p = params
-    account = Account.create!(p.slice(:account_name, :account_identifier))
-    User.create!(p.slice(:user_name, :user_email, :password, :password_confirmation).merge({ default_account: account }))
+    account = Account.create!(attribute_params.slice(:account_name, :account_identifier))
+    User.create!(attribute_params.slice(:user_name, :user_email, :password, :password_confirmation).merge({ default_account: account }))
     render json: AccountSerializer.new(account).serialized_json, status: :created
   end
 
@@ -43,7 +49,7 @@ class AccountsController < ApplicationController
   def update
     authorize Account, :update?
     set_account
-    @account.update!(permitted_params)
+    @account.update!(attribute_params)
     render json: AccountSerializer.new(@account).serialized_json
   end
 

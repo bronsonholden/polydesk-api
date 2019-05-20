@@ -156,7 +156,12 @@ RSpec.describe 'Documents', type: :request do
       it 'caches new file' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
         patch "/rspec/documents/#{document.id}", headers: rspec_session,
-                                                 params: { content: file }
+                                                 params: {
+                                                   data: {
+                                                     id: document.id,
+                                                     type: 'document',
+                                                     attributes: {
+                                                       content: file } } }
         expect(response).to have_http_status(200)
         expect(document.reload.content.data['storage']).to eq('cache')
         expect(json).to be_a('document')
@@ -170,7 +175,11 @@ RSpec.describe 'Documents', type: :request do
       it 'uploads a top-level document' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session,
-                                 params: { content: file }
+                                 params: {
+                                   data: {
+                                     type: 'document',
+                                     attributes: {
+                                       content: file } } }
         expect(response).to have_http_status(201)
         expect(json).to be_a('document')
       end
@@ -181,7 +190,11 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session(guest),
-                                 params: { content: file }
+                                 params: {
+                                   data: {
+                                     type: 'document',
+                                     attributes: {
+                                       content: file } } }
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -193,7 +206,11 @@ RSpec.describe 'Documents', type: :request do
       it 'uploads a top-level document' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session(admin),
-                                 params: { content: file }
+                                 params: {
+                                   data: {
+                                     type: 'document',
+                                     attributes: {
+                                       content: file } } }
         expect(response).to have_http_status(201)
         expect(json).to be_a('document')
       end
@@ -203,7 +220,11 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session,
-                                 params: { content: file }
+                                 params: {
+                                   data: {
+                                     type: 'document',
+                                     attributes: {
+                                       content: file } } }
         expect(response).to have_http_status(403)
         expect(json).to have_errors
       end
@@ -215,7 +236,11 @@ RSpec.describe 'Documents', type: :request do
       it 'returns unprocessable error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session,
-                                 params: { content: file }
+                                 params: {
+                                   data: {
+                                     type: 'document',
+                                     attributes: {
+                                       content: file } } }
         expect(response).to have_http_status(422)
         expect(json).to have_errors
       end

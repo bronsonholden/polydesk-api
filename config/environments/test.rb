@@ -44,6 +44,9 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
+  # Raise an error if unpermitted parameters are submitted
+  config.action_controller.action_on_unpermitted_parameters = :raise
+
   config.polydesk_www = 'localhost:4200'
   config.polydesk_headless = true
   config.polydesk_job_dispatcher = Polydesk::JobDispatcher::Null

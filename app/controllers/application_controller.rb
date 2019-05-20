@@ -48,6 +48,10 @@ class ApplicationController < ActionController::API
       params.except(:controller, :action, :identifier)
     end
 
+    def attribute_params
+      params[:data][:attributes]
+    end
+
   private
     def invalid_confirmation_token_exception(exception)
       render_exception_for exception.record, status_code: :not_found
