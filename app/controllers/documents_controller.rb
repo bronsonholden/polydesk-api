@@ -28,6 +28,7 @@ class DocumentsController < ApplicationController
 
   # POST /:identifier/documents
   def create
+    validate_params! :create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
       @document = Document.create!(attribute_params)
@@ -37,6 +38,7 @@ class DocumentsController < ApplicationController
 
   # PATCH/PUT /:identifier/documents/:id
   def update
+    validate_params! :update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
       @document = Document.find(params[:id])
@@ -47,6 +49,7 @@ class DocumentsController < ApplicationController
 
   # POST /:identifier/documents/:id
   def show
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])
@@ -56,6 +59,7 @@ class DocumentsController < ApplicationController
 
   # GET /:identifier/documents
   def index
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
 
@@ -76,6 +80,7 @@ class DocumentsController < ApplicationController
 
   # DELETE /:identifier/documents/:id
   def destroy
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :destroy?
       @document = Document.find(params[:id])
@@ -85,6 +90,7 @@ class DocumentsController < ApplicationController
 
   # PUT /:identifier/documents/:id/restore
   def restore
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
       @document = Document.find(params[:id])
@@ -95,6 +101,7 @@ class DocumentsController < ApplicationController
 
   # GET /:identifier/documents/:id/folder
   def folder
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       authorize Folder, :show?
@@ -112,6 +119,7 @@ class DocumentsController < ApplicationController
 
   # GET /:identifier/documents/:id/download
   def download
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])
@@ -121,6 +129,7 @@ class DocumentsController < ApplicationController
 
   # GET /:identifier/documents/:id/versions/:version/download
   def download_version
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])

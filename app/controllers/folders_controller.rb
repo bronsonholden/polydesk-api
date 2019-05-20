@@ -36,6 +36,7 @@ class FoldersController < ApplicationController
 
   # GET /:identifier/folders
   def index
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :index?
       if params.fetch(:root, false) then
@@ -53,6 +54,7 @@ class FoldersController < ApplicationController
 
   # GET /:identifier/folders/:id
   def show
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :show?
       @folder = Folder.kept.find(permitted_params.fetch(:id))
@@ -62,6 +64,7 @@ class FoldersController < ApplicationController
 
   # POST /:identifier/folders
   def create
+    validate_params! :create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
       @folder = Folder.create!(attribute_params)
@@ -71,6 +74,7 @@ class FoldersController < ApplicationController
 
   # PATCH/PUT /:identifier/folders/:id
   def update
+    validate_params! :update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :update?
       set_folder
@@ -81,6 +85,7 @@ class FoldersController < ApplicationController
 
   # DELETE /:identifier/folders/:id
   def destroy
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :destroy?
       set_folder
@@ -90,6 +95,7 @@ class FoldersController < ApplicationController
 
   # PUT /:identifier/folders/:id/restore
   def restore
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       set_folder
       @folder.undiscard!
@@ -98,6 +104,7 @@ class FoldersController < ApplicationController
   end
 
   def content
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
       authorize Folder, :documents?
@@ -132,6 +139,7 @@ class FoldersController < ApplicationController
 
   # GET /:identifier/folders/:id/folders
   def folders
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
       set_folder
@@ -143,6 +151,7 @@ class FoldersController < ApplicationController
 
   # POST /:identifier/folders/:id/folders
   def add_folder
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
       authorize Folder, :add_folder?
@@ -155,6 +164,7 @@ class FoldersController < ApplicationController
 
   # GET /:identifier/folders/:id/documents
   def documents
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
       authorize Folder, :documents?
@@ -167,6 +177,7 @@ class FoldersController < ApplicationController
 
   # POST /:identifier/folders/:id/documents
   def add_document
+    validate_params! :read
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
       authorize Folder, :add_document?

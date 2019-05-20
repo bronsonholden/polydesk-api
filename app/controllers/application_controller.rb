@@ -52,7 +52,33 @@ class ApplicationController < ActionController::API
       params[:data][:attributes]
     end
 
+    # Workaround for lack of required fields in stronger_parameters. This
+    # will check params to ensure it has any required properties to be
+    # compliant with JSON API specs.
+    def validate_params!(mode)
+      fn = :"validate_#{mode}_params"
+      self.send(fn)
+    end
+
   private
+    def validate_read_params
+    end
+
+    def validate_update_params
+      params.require(:data).tap { |data|
+        data.require(:id)
+        data.require(:type)
+        data.require(:attributes)
+      }
+    end
+
+    def validate_create_params
+      params.require(:data).tap { |data|
+        data.require(:type)
+        data.require(:attributes)
+      }
+    end
+
     def invalid_confirmation_token_exception(exception)
       render_exception_for exception.record, status_code: :not_found
     end

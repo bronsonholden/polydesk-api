@@ -27,6 +27,7 @@ class AccountsController < ApplicationController
   # GET /accounts
   # Returns only accounts the current user has access to
   def index
+    validate_params! :read
     accounts = current_user.accounts.page(current_page).per(per_page)
     options = PaginationGenerator.new(request: request, paginated: accounts).generate
     render json: AccountSerializer.new(accounts, options).serialized_json
@@ -34,12 +35,14 @@ class AccountsController < ApplicationController
 
   # GET /:identifier/account
   def show
+    validate_params! :read
     set_account
     render json: AccountSerializer.new(@account).serialized_json
   end
 
   # POST /accounts
   def create
+    validate_params! :create
     account = Account.create!(attribute_params.slice(:account_name, :account_identifier))
     User.create!(attribute_params.slice(:user_name, :user_email, :password, :password_confirmation).merge({ default_account: account }))
     render json: AccountSerializer.new(account).serialized_json, status: :created
@@ -47,6 +50,7 @@ class AccountsController < ApplicationController
 
   # PATCH/PUT /:identifier/account
   def update
+    validate_params! :update
     authorize Account, :update?
     set_account
     @account.update!(attribute_params)
@@ -55,6 +59,7 @@ class AccountsController < ApplicationController
 
   # DELETE /:identifier/account
   def destroy
+    validate_params! :read
     authorize Account, :destroy?
     set_account
     @account.discard!
@@ -62,6 +67,7 @@ class AccountsController < ApplicationController
 
   # PUT /:identifier/account/restore
   def restore
+    validate_params! :read
     authorize Account, :restore?
     set_account
     @account.undiscard!
@@ -72,6 +78,17 @@ class AccountsController < ApplicationController
     def permitted_params
       # Account identifier is used for AccountController actions
       params.except(:controller, :action)
+    end
+
+    def validate_params
+      if action_name == 'create'
+        params.require(:data).tap { |data|
+          data.require(:type)
+          data.require(:attributes)
+        }
+      else
+        super
+      end
     end
 
   private
