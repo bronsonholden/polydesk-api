@@ -9,7 +9,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
       @document = Document.create!(document_params)
-      #render json: DocumentSerializer.new(@document).serialized_json, status: :created
+      render json: JSONAPI::ResourceSerializer.new(DocumentResource).serialize_to_hash(DocumentResource.new(@document, nil)), status: :ok
     end
   end
 
@@ -19,7 +19,7 @@ class DocumentsController < ApplicationController
       authorize Document, :update?
       @document = Document.find(params[:id])
       @document.update!(document_params)
-      # render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      render json: JSONAPI::ResourceSerializer.new(DocumentResource).serialize_to_hash(DocumentResource.new(@document, nil)), status: :ok
     end
   end
 
@@ -28,7 +28,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
       @document = Document.find(params[:id])
-      # render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      render json: JSONAPI::ResourceSerializer.new(DocumentResource).serialize_to_hash(DocumentResource.new(@document, nil)), status: :ok
     end
   end
 
@@ -37,7 +37,6 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
       @documents = Document.all
-      # render json: DocumentSerializer.new(@documents, options).serialized_json, status: :ok
       @document_resources = @documents.map { |document| DocumentResource.new(document, nil) }
       render json: JSONAPI::ResourceSerializer.new(DocumentResource).serialize_to_hash(@document_resources), status: :ok
     end

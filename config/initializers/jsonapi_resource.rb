@@ -9,7 +9,6 @@ module JSONAPI
     # doesn't play nice with a parameterized route prefix. The tenant name is
     # the first route parameter, so we insert it.
     def call_url_helper(method, *args)
-      puts args.first
       routes.url_helpers.public_send(method, Apartment::Tenant.current, *args)
     rescue NoMethodError => e
       raise e

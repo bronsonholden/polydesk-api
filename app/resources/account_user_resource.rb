@@ -2,43 +2,42 @@
 # established with a User's AccountUser record in an account (tenant), so
 # we serialize the AccountUser and pull in any attributes/data from the
 # corresponding User as needed.
-class AccountUserSerializer
-  include FastJsonapi::ObjectSerializer
-  attributes :created_at, :updated_at
+class AccountUserResource < JSONAPI::Resource
+  attributes :name, :email, :role, :default_account, :confirmed_at, :confirmation_token, :created_at, :updated_at
 
-  set_type :user
-
-  attribute :name do |account_user, params|
-    user = account_user.user
-    user.name if user
+  def type
+    :user
   end
 
-  attributes :email do |account_user, params|
-    user = account_user.user
+  def name
+    @model.user.name
+  end
+
+  def email
+    user = @model.user
     user.email if user
   end
 
-  attribute :confirmed_at do |account_user, params|
-    user = account_user.user
+  def confirmed_at
+    user = @model.user
     (user.confirmed_at || '') if user
   end
 
-  attribute :confirmation_token do |account_user, params|
-    user = account_user.user
-    if user && account_user.role == :administrator
+  def confirmation_token
+    user = @model.user
+    if user && @model.role == :administrator
       user.confirmation_token || ''
     else
       '*'
     end
   end
 
-  attribute :role do |account_user, params|
-    account_user.role
-  end
-
   # Only want to show default account identifier
-  attribute :default_account do |account_user, params|
-    user = account_user.user
+  def default_account
+    user = @model.user
     user.default_account.identifier
   end
+
+  # TODO: Fix this with rework of AccountUser/User API
+  exclude_links [:self]
 end
