@@ -31,22 +31,10 @@
 #   }
 # end
 
-class FolderResource < JSONAPI::Resource
-  attributes :name, :created_at, :updated_at
+class FolderResource < DiscardableResource
+  attributes :name, :created_at, :updated_at, :discarded_at
 
-  attribute :discarded_at do |folder|
-    folder.discarded_at || ''
-  end
-
-  attribute :parent_folder_id do |folder|
-    if folder.parent_id == 0
-      ''
-    else
-      folder.parent_id.to_s
-    end
-  end
-
+  has_one :parent
   has_many :documents
-
   has_many :folders
 end

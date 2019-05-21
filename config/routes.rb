@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
   scope '/:identifier' do
     jsonapi_resources :documents
-    resources :folders
+    jsonapi_resources :folders
     resources :users
     resources :reports
     resources :forms

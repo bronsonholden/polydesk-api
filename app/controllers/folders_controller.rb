@@ -1,60 +1,6 @@
 class FoldersController < ApplicationController
   before_action :authenticate_user!
 
-  # GET /:identifier/folders
-  def index
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Folder, :index?
-      if params.fetch(:root, false) then
-        @folders = Folder.kept.where(parent_id: 0)
-      else
-        @folders = Folder.kept
-      end
-
-      @folders = @folders.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @folders).generate
-
-      render json: FolderSerializer.new(@folders, options).serialized_json, status: :ok
-    end
-  end
-
-  # GET /:identifier/folders/:id
-  def show
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Folder, :show?
-      @folder = Folder.kept.find(permitted_params.fetch(:id))
-      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
-    end
-  end
-
-  # POST /:identifier/folders
-  def create
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Folder, :create?
-      @folder = Folder.create!(permitted_params)
-      render json: FolderSerializer.new(@folder).serialized_json, status: :created
-    end
-  end
-
-  # PATCH/PUT /:identifier/folders/:id
-  def update
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Folder, :update?
-      set_folder
-      @folder.update!(permitted_params)
-      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
-    end
-  end
-
-  # DELETE /:identifier/folders/:id
-  def destroy
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Folder, :destroy?
-      set_folder
-      @folder.discard!
-    end
-  end
-
   # PUT /:identifier/folders/:id/restore
   def restore
     Apartment::Tenant.switch(params[:identifier]) do
