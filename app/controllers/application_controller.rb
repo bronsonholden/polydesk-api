@@ -16,6 +16,9 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
 
+  before_action :set_tenant
+  after_action :clear_tenant
+
   def context
     { user: pundit_user }
   end
@@ -36,6 +39,14 @@ class ApplicationController < ActionController::API
   end
 
   protected
+    def set_tenant
+      Apartment::Tenant.switch!(params[:identifier])
+    end
+
+    def clear_tenant
+      Apartment::Tenant.switch!
+    end
+
     def current_page
       (params[:page] || PaginationGenerator::DEFAULT_PAGE).to_i
     end

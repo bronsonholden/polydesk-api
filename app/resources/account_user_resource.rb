@@ -2,7 +2,7 @@
 # established with a User's AccountUser record in an account (tenant), so
 # we serialize the AccountUser and pull in any attributes/data from the
 # corresponding User as needed.
-class AccountUserResource < JSONAPI::Resource
+class AccountUserResource < ApplicationResource
   attributes :name, :email, :role, :default_account, :confirmed_at, :confirmation_token, :created_at, :updated_at
 
   def type

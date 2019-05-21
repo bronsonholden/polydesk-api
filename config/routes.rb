@@ -25,28 +25,28 @@ Rails.application.routes.draw do
     get '/account', to: 'accounts#show'
     patch '/account', to: 'accounts#update'
     put '/account', to: 'accounts#update'
-    delete '/account', to: 'accounts#destroy', as: :account_destroy
+    delete '/account', to: 'accounts#destroy'
     put '/account/restore', to: 'accounts#restore', as: :account_restore
 
-    get '/users/:id/permissions', to: 'permissions#index'
-    post '/users/:id/permissions', to: 'permissions#create'
-    delete '/users/:id/permissions', to: 'permissions#destroy'
+    # get '/users/:id/permissions', to: 'permissions#index'
+    # post '/users/:id/permissions', to: 'permissions#create'
+    # delete '/users/:id/permissions', to: 'permissions#destroy'
 
     # get '/documents/:id/folder', to: 'documents#folder', as: :document_folder
+    # get '/documents/:id/versions/:version/download', to: 'documents#download_version', as: :document_download_version
     get '/documents/:id/download', to: 'documents#download', as: :document_download
-    get '/documents/:id/versions/:version/download', to: 'documents#download_version', as: :document_download_version
     put '/documents/:id/restore', to: 'documents#restore', as: :document_restore
 
-    get '/folders/:id/folders', to: 'folders#folders', as: :folder_folders
-    post '/folders/:id/folders', to: 'folders#add_folder'
-    get '/folders/:id/documents', to: 'folders#documents', as: :folder_documents
-    post '/folders/:id/documents', to: 'folders#add_document'
-    put '/folders/:id/restore', to: 'folders#restore', as: :folder_restore
-    get '/folders/:id/content', to: 'folders#content', as: :folder_content
-    get '/content', to: 'folders#content', as: :content
-
-    get '/:model/:id/versions', to: 'versions#index', as: :versions
-    get '/:model/:id/versions/:version', to: 'versions#show', as: :version
-    put '/:model/:id/versions/:version', to: 'versions#restore', as: :version_restore
+    # get '/folders/:id/folders', to: 'folders#folders', as: :folder_folders
+    # post '/folders/:id/folders', to: 'folders#add_folder'
+    # get '/folders/:id/documents', to: 'folders#documents', as: :folder_documents
+    # post '/folders/:id/documents', to: 'folders#add_document'
+    # put '/folders/:id/restore', to: 'folders#restore', as: :folder_restore
+    # get '/folders/:id/content', to: 'folders#content', as: :folder_content
+    # get '/content', to: 'folders#content', as: :content
+    #
+    # get '/:model/:id/versions', to: 'versions#index', as: :versions
+    # get '/:model/:id/versions/:version', to: 'versions#show', as: :version
+    # put '/:model/:id/versions/:version', to: 'versions#restore', as: :version_restore
   end
 end

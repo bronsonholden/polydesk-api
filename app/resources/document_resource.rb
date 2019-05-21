@@ -18,8 +18,14 @@
 #   }
 # end
 
-class DocumentResource < JSONAPI::Resource
+class DocumentResource < ApplicationResource
   attributes :content_type, :file_size, :created_at, :updated_at, :name, :discarded_at
 
   has_one :folder
+
+  def remove
+    run_callbacks :remove do
+      :completed if @model.discard
+    end
+  end
 end

@@ -53,6 +53,10 @@ class AccountsController < ApplicationController
       params.except(:controller, :action)
     end
 
+    def set_tenant
+      super if action_name != 'create'
+    end
+
   private
     def set_account
       @account = Account.find_by!(identifier: permitted_params.fetch(:identifier))
