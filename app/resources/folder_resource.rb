@@ -34,7 +34,7 @@
 class FolderResource < DiscardableResource
   attributes :name, :created_at, :updated_at, :discarded_at
 
-  has_one :parent
+  has_one :folder
   has_many :documents
   has_many :folders
 end

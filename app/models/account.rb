@@ -1,5 +1,4 @@
 class Account < ApplicationRecord
-  include Rails.application.routes.url_helpers
   include Discard::Model
 
   alias_attribute :account_identifier, :identifier
@@ -15,13 +14,4 @@ class Account < ApplicationRecord
   validates :name, presence: true
   has_many :account_users
   has_many :users, through: :account_users, dependent: :destroy
-
-  # Specify that we want to use identifier column when using URL helpers
-  def to_param
-    identifier
-  end
-
-  def related_users_url
-    users_url(self)
-  end
 end
