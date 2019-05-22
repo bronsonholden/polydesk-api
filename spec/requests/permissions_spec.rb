@@ -1,11 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Permissions', type: :request do
-  describe 'GET /rspec/user/:id/permissions' do
+  describe 'GET /rspec/permissions' do
     let!(:permission) { create :permission, code: :document_show, account_user: AccountUser.last }
     it 'retrieves all permissions' do
-      account_user = AccountUser.last
-      get "/rspec/users/#{account_user.id}/permissions", headers: rspec_session
+      get "/rspec/users/permissions", headers: rspec_session
       expect(response).to have_http_status(200)
     end
   end
@@ -13,8 +12,12 @@ RSpec.describe 'Permissions', type: :request do
   describe 'POST /rspec/user/:id/permissions' do
     it 'creates new permission' do
       account_user = AccountUser.last
-      post "/rspec/users/#{account_user.id}/permissions", headers: rspec_session,
-                                                         params: { code: :document_create }.to_json
+      post "/rspec/permissions", headers: rspec_session,
+                                 params: {
+                                   data: {
+                                     type: 'permissions',
+                                     attributes: {
+                                       code: 'document_create' } } }.to_json
       expect(response).to have_http_status(201)
     end
 

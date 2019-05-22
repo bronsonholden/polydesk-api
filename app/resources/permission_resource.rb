@@ -1,4 +1,3 @@
-class PermissionSerializer
-  include FastJsonapi::ObjectSerializer
+class PermissionResource < ApplicationResource
   attributes :created_at, :updated_at
 end

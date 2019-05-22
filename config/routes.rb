@@ -17,9 +17,10 @@ Rails.application.routes.draw do
   scope '/:identifier' do
     jsonapi_resources :documents
     jsonapi_resources :folders
-    resources :users
+    jsonapi_resources :permissions
+    jsonapi_resources :account_users
+    jsonapi_resources :forms
     resources :reports
-    resources :forms
     resources :options
 
     get '/account', to: 'accounts#show'

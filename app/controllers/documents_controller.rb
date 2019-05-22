@@ -28,18 +28,15 @@ class DocumentsController < ApplicationController
   end
 
   private
-    def serve_content(document)
-      storage = document.content.storage
-      if storage.instance_of? Shrine::Storage::FileSystem
-        send_file ['storage', document.content_url].join
-      elsif storage.instance_of? Shrine::Storage::S3
-        redirect_to document.content_url
-      else
-        render nothing: true, status: :not_found
-      end
-    end
 
-    def document_params
-      params.permit(:content, :name)
+  def serve_content(document)
+    storage = document.content.storage
+    if storage.instance_of? Shrine::Storage::FileSystem
+      send_file ['storage', document.content_url].join
+    elsif storage.instance_of? Shrine::Storage::S3
+      redirect_to document.content_url
+    else
+      render nothing: true, status: :not_found
     end
+  end
 end
