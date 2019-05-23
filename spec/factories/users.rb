@@ -3,16 +3,11 @@ FactoryBot.define do
     name { 'Test user' }
     email { 'test@polydesk.io' }
     password { 'password' }
-    association :default_account, factory: :account
+    account_name { 'Test user account' }
+    identifier { 'test' }
     after(:create) do |user|
-      user.create_tenant unless user.default_account.identifier == 'rspec'
+      user.link_account
       user.confirm
     end
-  end
-
-  factory :rspec_user, parent: :user do
-    name { 'RSpec user' }
-    email { 'rspec_user@polydesk.io' }
-    default_account { Account.first }
   end
 end

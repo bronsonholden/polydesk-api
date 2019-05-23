@@ -52,7 +52,7 @@ Rails.application.configure do
     domain: Rails.application.credentials[Rails.env.to_sym][:gmail][:domain],
     authentication: :login,
     enable_starttls_auto: true,
-    user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:username],
+    user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:identifier],
     password: Rails.application.credentials[Rails.env.to_sym][:gmail][:password]
   }
 

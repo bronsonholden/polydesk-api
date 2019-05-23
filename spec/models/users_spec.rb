@@ -6,7 +6,7 @@ describe User do
     it 'succeeds' do
       expect(user).not_to be_nil
       # Account created by user factory and default RSpec account
-      expect(Account.all.size).to eq(2)
+      expect(User.all.size).to eq(2)
     end
   end
 end

@@ -26,15 +26,6 @@ ActiveRecord::Schema.define(version: 2019_05_23_043726) do
     t.index ["user_id"], name: "index_account_users_on_user_id"
   end
 
-  create_table "accounts", force: :cascade do |t|
-    t.string "identifier", null: false
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "discarded_at"
-    t.index ["discarded_at"], name: "index_accounts_on_discarded_at"
-  end
-
   create_table "documents", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -119,8 +110,8 @@ ActiveRecord::Schema.define(version: 2019_05_23_043726) do
     t.datetime "updated_at", null: false
     t.bigint "default_account_id"
     t.string "account_name", null: false
-    t.string "account_identifier", null: false
-    t.index ["account_identifier"], name: "index_users_on_account_identifier", unique: true
+    t.string "identifier", null: false
+    t.index ["identifier"], name: "index_users_on_identifier", unique: true
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["default_account_id"], name: "index_users_on_default_account_id"
     t.index ["email"], name: "index_users_on_email", unique: true
@@ -138,7 +129,5 @@ ActiveRecord::Schema.define(version: 2019_05_23_043726) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "account_users", "accounts"
-  add_foreign_key "account_users", "users"
-  add_foreign_key "users", "accounts", column: "default_account_id"
+  add_foreign_key "users", "users", column: "default_account_id"
 end

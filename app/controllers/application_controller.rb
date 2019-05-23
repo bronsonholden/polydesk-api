@@ -55,8 +55,6 @@ class ApplicationController < ActionController::API
       (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
     end
 
-    # TODO: Better implementation of this. Some controllers need identifier
-    # to retrieve an Account.
     def permitted_params
       params.except(:controller, :action, :identifier)
     end

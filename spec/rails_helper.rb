@@ -31,11 +31,11 @@ RSpec.configure do |config|
     # Tenant cleanup
     Apartment::Tenant.drop('rspec') rescue nil
     # Account & user creation
-    account = Account.create(name: 'RSpec', identifier: 'rspec')
-    user = User.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password', default_account: account)
+    user = User.create!(identifier: 'rspec', account_name: 'RSpec', name: 'RSpec', email: 'rspec@polydesk.io', password: 'password')
     user.confirm
-    account_user = user.link_account
-    account_user.update!(role: 'user')
+    user.link_account do |account_user|
+      account_user.update!(role: 'user')
+    end
   end
 
   config.before(:each) do

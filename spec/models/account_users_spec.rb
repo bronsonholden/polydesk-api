@@ -31,7 +31,6 @@ describe AccountUser do
     let!(:account_user) { create :account_user }
     it 'links new user and account' do
       expect(account_user).not_to be_nil
-      expect(account_user.user.email).to eq('rspec_user@polydesk.io')
       expect(account_user.user.valid_password?('password')).to be true
       expect(account_user.account.identifier).to eq('rspec')
     end
