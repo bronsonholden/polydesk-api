@@ -10,9 +10,9 @@ Rails.application.routes.draw do
     post '/confirmations/:confirmation_token', to: 'overrides/confirmations#confirm', as: :user_confirmation_confirm
   end
 
-  resources :accounts, only: [:create, :index]
-
   get '/', to: 'application#show'
+
+  jsonapi_resources :users, only: [:create], as: :user_create
 
   scope '/:identifier' do
     jsonapi_resources :documents
@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     jsonapi_resources :permissions
     jsonapi_resources :account_users
     jsonapi_resources :forms
+    jsonapi_resources :users, except: [:create]
     resources :reports
     resources :options
 
