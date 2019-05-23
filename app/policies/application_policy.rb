@@ -2,6 +2,10 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(auth, record)
+    verify_user
+  end
+
+  def verify_user(auth, record)
     @account = User.find_by!(identifier: auth.identifier)
     @account_user = AccountUser.find_by user_id: auth.user.id, account_id: @account.id
     raise Polydesk::ApiExceptions::UserException::NoAccountAccess.new(auth.user) unless @account_user

@@ -23,6 +23,7 @@ class ApplicationController < ActionController::API
     { user: pundit_user }
   end
 
+  # TODO: Combine with context method and improve?
   def pundit_user
     Polydesk::AuthContext.new(current_user, params[:identifier])
   end

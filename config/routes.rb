@@ -20,6 +20,9 @@ Rails.application.routes.draw do
     jsonapi_resources :permissions
     jsonapi_resources :account_users
     jsonapi_resources :forms
+    # TODO: Fix routes. Should be /:identifier/users, not
+    # /:identifier/users/:id/users --- :id is a redundant identifying
+    # attribute for the same user.
     jsonapi_resources :users, except: [:create]
     resources :reports
     resources :options
