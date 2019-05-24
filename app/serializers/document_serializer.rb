@@ -1,19 +1,8 @@
-class DocumentSerializer
-  include FastJsonapi::ObjectSerializer
-
+class DocumentSerializer < ApplicationSerializer
   attributes :content_type, :file_size, :created_at, :updated_at, :name, :discarded_at
+  has_one :folder
 
-  attribute :discarded_at do |document|
-    document.discarded_at || ''
+  def meta
+    { latest_version: object.versions.last.id } if object.versions.any?
   end
-
-  has_one :folder, lazy_load_data: true, links: {
-    related: -> (document) {
-      document.related_folder_url
-    }
-  }
-
-  link :self, -> (document) {
-    document.url
-  }
 end

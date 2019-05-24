@@ -62,6 +62,8 @@ gem 'kaminari'
 gem 'json-schema'
 gem 'paper_trail'
 gem 'discard', '~> 1.0'
+gem 'jsonapi-realizer'
+gem 'jsonapi-serializers'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

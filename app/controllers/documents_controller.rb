@@ -9,7 +9,7 @@ class DocumentsController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
       @document = Document.create!(document_params)
-      render json: DocumentSerializer.new(@document).serialized_json, status: :created
+      render json: JSONAPI::Serializer.serialize(@document), status: :created
     end
   end
 
@@ -27,8 +27,8 @@ class DocumentsController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
-      @document = Document.find(params[:id])
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      realizer = DocumentRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
 
@@ -36,19 +36,10 @@ class DocumentsController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
-
-      if params.key?(:root) && params[:root] == 'true' then
-        @documents = Document.left_outer_joins(:folder)
-                             .where(folders: { id: nil })
-                             .references(:folders)
-      else
-        @documents = Document.all
-      end
-
-      @documents = @documents.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @documents).generate
-
-      render json: DocumentSerializer.new(@documents, options).serialized_json, status: :ok
+      realizer = DocumentRealizer.new(intent: :index, parameters: params, headers: request.headers)
+      documents = realizer.object
+      options = PaginationGenerator.new(request: request, paginated: documents).generate
+      render json: DocumentSerializer.new(documents, options).serialized_json, status: :ok
     end
   end
 
@@ -56,8 +47,8 @@ class DocumentsController < ApplicationController
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :destroy?
-      @document = Document.find(params[:id])
-      @document.discard!
+      realizer = DocumentRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      realizer.object.discard!
     end
   end
 
@@ -65,9 +56,9 @@ class DocumentsController < ApplicationController
   def restore
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
-      @document = Document.find(params[:id])
-      @document.undiscard!
-      render json: DocumentSerializer.new(@document.reload).serialized_json, status: :ok
+      realizer = DocumentRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      realizer.object.undiscard!
+      render json: DocumentSerializer.new(realizer.object).serialized_json, status: :ok
     end
   end
 
@@ -86,6 +77,10 @@ class DocumentsController < ApplicationController
 
       render json: folder_json, status: :ok
     end
+  end
+
+  def folder_relationship
+    render json: { data: [] }, status: :ok
   end
 
   # GET /:identifier/documents/:id/download

@@ -1,7 +1,7 @@
 PaperTrail.serializer = PaperTrail::Serializers::JSON
 
 PaperTrail.config.has_paper_trail_defaults = {
-  on: %i[create update]
+  on: %i[update]
 }
 
 PaperTrail::Version.class_eval do

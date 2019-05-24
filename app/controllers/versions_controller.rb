@@ -5,7 +5,7 @@ class VersionsController < ApplicationController
   def index
     Apartment::Tenant.switch(params['identifier']) do
       set_data
-      render json: VersionSerializer.new(@object.versions).serialized_json, status: :ok
+      render json: JSONAPI::Serializer.serialize(@object.versions, is_collection: true), status: :ok
     end
   end
 
