@@ -18,8 +18,9 @@ class DocumentsController < ApplicationController
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
-      realizer = DocumentRealizer.new(intent: :update, parameters: params, headers: request.headers)
-      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+      realizer = DocumentRealizer.new(intent: :update, parameters: params.require(:data).permit(:id), headers: request.headers)
+      realizer.object.update!(params.require(:data).permit(attributes: [:name]))
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
 
