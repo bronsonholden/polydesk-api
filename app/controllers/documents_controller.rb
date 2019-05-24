@@ -8,8 +8,9 @@ class DocumentsController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
-      @document = Document.create!(document_params)
-      render json: JSONAPI::Serializer.serialize(@document), status: :created
+      realizer = DocumentRealizer.new(intent: :create, parameters: params, headers: request.headers)
+      realizer.object.create!
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
   end
 
@@ -17,9 +18,8 @@ class DocumentsController < ApplicationController
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
-      @document = Document.find(params[:id])
-      @document.update!(document_params)
-      render json: DocumentSerializer.new(@document).serialized_json, status: :ok
+      realizer = DocumentRealizer.new(intent: :update, parameters: params, headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
   end
 
@@ -38,8 +38,7 @@ class DocumentsController < ApplicationController
       authorize Document, :index?
       realizer = DocumentRealizer.new(intent: :index, parameters: params, headers: request.headers)
       documents = realizer.object
-      options = PaginationGenerator.new(request: request, paginated: documents).generate
-      render json: DocumentSerializer.new(documents, options).serialized_json, status: :ok
+      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: { page_offset: page_offset, page_limit: page_limit }), status: :ok
     end
   end
 
@@ -79,16 +78,12 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def folder_relationship
-    render json: { data: [] }, status: :ok
-  end
-
   # GET /:identifier/documents/:id/download
   def download
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
-      @document = Document.find(params[:id])
-      serve_content(@document)
+      realizer = DocumentRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      serve_content(realizer.object)
     end
   end
 
@@ -96,9 +91,9 @@ class DocumentsController < ApplicationController
   def download_version
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :show?
-      @document = Document.find(params[:id])
-      @version = @document.versions.find(params[:version])
-      serve_content(@version.reify)
+      realizer = DocumentRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      version = realizer.object.versions.find(params[:version])
+      serve_content(version.reify)
     end
   end
 

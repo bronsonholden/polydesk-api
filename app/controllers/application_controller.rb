@@ -31,12 +31,12 @@ class ApplicationController < ActionController::API
   end
 
   protected
-    def current_page
-      (params[:page] || PaginationGenerator::DEFAULT_PAGE).to_i
+    def page_offset
+      (params.dig(:page, :offset) || 0).to_i
     end
 
-    def per_page
-      (params[:limit] || PaginationGenerator::DEFAULT_PER_PAGE).to_i
+    def page_limit
+      (params.dig(:page, :limit) || 25).to_i
     end
 
   private
