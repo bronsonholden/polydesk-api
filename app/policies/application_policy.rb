@@ -2,7 +2,7 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(auth, record)
-    verify_user
+    verify_user(auth, record)
   end
 
   def verify_user(auth, record)
