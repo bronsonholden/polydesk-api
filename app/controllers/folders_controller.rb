@@ -5,16 +5,8 @@ class FoldersController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :index?
-      if params.key?(:root) && params[:root] == 'true' then
-        @folders = Folder.kept.where(parent_id: 0)
-      else
-        @folders = Folder.kept
-      end
-
-      @folders = @folders.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @folders).generate
-
-      render json: FolderSerializer.new(@folders, options).serialized_json, status: :ok
+      realizer = FolderRealizer.new(intent: :index, parameters: params, headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
     end
   end
 
@@ -22,8 +14,8 @@ class FoldersController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :show?
-      @folder = Folder.kept.find(params[:id])
-      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
+      realizer = FolderRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
 
@@ -31,8 +23,9 @@ class FoldersController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
-      @folder = Folder.create!(folder_params)
-      render json: FolderSerializer.new(@folder).serialized_json, status: :created
+      realizer = FolderRealizer.new(intent: :create, parameters: params, headers: request.headers)
+      realizer.object.create!
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
   end
 
@@ -40,9 +33,9 @@ class FoldersController < ApplicationController
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :update?
-      set_folder
-      @folder.update!(folder_params)
-      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
+      realizer = FolderRealizer.new(intent: :create, parameters: params.require(:data).permit(:id), headers: request.headers)
+      realizer.object.update!(params.require(:data).permit(attributes: [:name]))
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
 
@@ -50,17 +43,17 @@ class FoldersController < ApplicationController
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :destroy?
-      set_folder
-      @folder.discard!
+      realizer = FolderRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      realizer.object.discard!
     end
   end
 
   # PUT /:identifier/folders/:id/restore
   def restore
     Apartment::Tenant.switch(params[:identifier]) do
-      set_folder
-      @folder.undiscard!
-      render json: FolderSerializer.new(@folder).serialized_json, status: :ok
+      realizer = FolderRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      realizer.object.undiscard!
+      render json: JSONAPI::Serializer.serialize(realizer.object.reload), status: :ok
     end
   end
 
@@ -100,10 +93,8 @@ class FoldersController < ApplicationController
   def folders
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
-      set_folder
-      folders = @folder.children.kept.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: folders).generate
-      render json: FolderSerializer.new(folders, options).serialized_json, status: :ok
+      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object.folders, is_collection: true), status: :ok
     end
   end
 
@@ -111,11 +102,9 @@ class FoldersController < ApplicationController
   def add_folder
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
-      authorize Folder, :add_folder?
-      set_folder
-      # For this path, disallow parent_folder param
-      new_folder = @folder.children.create!(params.permit(:name))
-      render json: FolderSerializer.new(new_folder).serialized_json, status: :created
+      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
+      folder = realizer.object.folders.create!(params.require(:data).permit(attributes: [:name]))
+      render json: JSONAPI::Serializer.serialize(folder), status: :created
     end
   end
 
@@ -124,10 +113,8 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
       authorize Folder, :documents?
-      set_folder
-      documents = @folder.documents.kept.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: documents).generate
-      render json: DocumentSerializer.new(documents, options).serialized_json, status: :ok
+      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object.documents, is_collection: true), status: :ok
     end
   end
 
@@ -136,9 +123,9 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
       authorize Folder, :add_document?
-      set_folder
-      document = @folder.documents.create!(params.permit(:content))
-      render json: DocumentSerializer.new(document).serialized_json, status: :created
+      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
+      document = realizer.object.documents.create!(params.require(:data).permit(attributes: [:name]))
+      render json: JSONAPI::Serializer.serialize(document), status: :created
     end
   end
 
