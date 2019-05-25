@@ -10,7 +10,7 @@ Rails.application.routes.draw do
     post '/confirmations/:confirmation_token', to: 'overrides/confirmations#confirm', as: :user_confirmation_confirm
   end
 
-  resources :accounts, only: [:create, :index]
+  resources :accounts, only: [:create]
 
   get '/', to: 'application#show'
 

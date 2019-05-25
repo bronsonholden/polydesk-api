@@ -1,5 +1,7 @@
 require 'polydesk/auth_context'
 
+# TODO: For all POST requests that contain resource objects, need to check
+# type and return 409 if it doesn't match with the collection resource type.
 class ApplicationController < ActionController::API
   include DeviseTokenAuth::Concerns::SetUserByToken
   include Pundit
