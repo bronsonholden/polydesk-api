@@ -5,7 +5,8 @@ class FoldersController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :index?
-      realizer = FolderRealizer.new(intent: :index, parameters: params, headers: request.headers)
+      schema = IndexFoldersSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :index, parameters: schema, headers: request.headers)
       render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
     end
   end
@@ -14,7 +15,8 @@ class FoldersController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :show?
-      realizer = FolderRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      schema = ShowFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
@@ -23,8 +25,9 @@ class FoldersController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :create?
-      realizer = FolderRealizer.new(intent: :create, parameters: params, headers: request.headers)
-      realizer.object.create!
+      schema = CreateFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+      realizer.object.save!
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
   end
@@ -33,8 +36,9 @@ class FoldersController < ApplicationController
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :update?
-      realizer = FolderRealizer.new(intent: :create, parameters: params.require(:data).permit(:id), headers: request.headers)
-      realizer.object.update!(params.require(:data).permit(attributes: [:name]))
+      schema = UpdateFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+      realizer.object.save!
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
@@ -43,7 +47,8 @@ class FoldersController < ApplicationController
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :destroy?
-      realizer = FolderRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      schema = ShowFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
       realizer.object.discard!
     end
   end
@@ -51,7 +56,8 @@ class FoldersController < ApplicationController
   # PUT /:identifier/folders/:id/restore
   def restore
     Apartment::Tenant.switch(params[:identifier]) do
-      realizer = FolderRealizer.new(intent: :show, parameters: params, headers: request.headers)
+      schema = ShowFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
       realizer.object.undiscard!
       render json: JSONAPI::Serializer.serialize(realizer.object.reload), status: :ok
     end
@@ -93,18 +99,9 @@ class FoldersController < ApplicationController
   def folders
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Folder, :folders?
-      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
+      schema = ShowFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
       render json: JSONAPI::Serializer.serialize(realizer.object.folders, is_collection: true), status: :ok
-    end
-  end
-
-  # POST /:identifier/folders/:id/folders
-  def add_folder
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Folder, :create?
-      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
-      folder = realizer.object.folders.create!(params.require(:data).permit(attributes: [:name]))
-      render json: JSONAPI::Serializer.serialize(folder), status: :created
     end
   end
 
@@ -113,19 +110,9 @@ class FoldersController < ApplicationController
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :index?
       authorize Folder, :documents?
-      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
+      schema = ShowFolderSchema.new(request.params)
+      realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
       render json: JSONAPI::Serializer.serialize(realizer.object.documents, is_collection: true), status: :ok
-    end
-  end
-
-  # POST /:identifier/folders/:id/documents
-  def add_document
-    Apartment::Tenant.switch(params[:identifier]) do
-      authorize Document, :create?
-      authorize Folder, :add_document?
-      realizer = FolderRealizer.new(intent: :show, parameters: params.permit(:id), headers: request.headers)
-      document = realizer.object.documents.create!(params.require(:data).permit(attributes: [:name]))
-      render json: JSONAPI::Serializer.serialize(document), status: :created
     end
   end
 
