@@ -23,4 +23,20 @@ class AccountPolicy < ApplicationPolicy
   def restore?
     default_policy
   end
+
+  def allowed_attributes_for_create
+    [:account_name, :account_identifier, :name, :email, :password, :password_confirmation]
+  end
+
+  def allowed_attributes_for_update
+    [:account_name, :name, :password]
+  end
+
+  def allowed_relationships_for_create
+    []
+  end
+
+  def allowed_relationships_for_update
+    []
+  end
 end

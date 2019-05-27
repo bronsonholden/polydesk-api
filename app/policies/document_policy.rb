@@ -35,4 +35,20 @@ class DocumentPolicy < ApplicationPolicy
     return allowed unless allowed.nil?
     has_permission(:document_destroy)
   end
+
+  def allowed_attributes_for_create
+    [:name]
+  end
+
+  def allowed_relationships_for_create
+    [:folder]
+  end
+
+  def allowed_attributes_for_update
+    [:name]
+  end
+
+  def allowed_relationships_for_update
+    [:folder]
+  end
 end

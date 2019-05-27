@@ -1,6 +1,6 @@
 module SessionHelper
   def set_request_headers(resp)
-    { 'ACCEPT' => "application/json",
+    { 'Accept' => "application/json",
       'Content-Type' => "application/json",
       'access-token' => resp['access-token'],
       'token-type' => resp['token-type'],

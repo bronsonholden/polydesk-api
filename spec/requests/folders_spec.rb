@@ -8,7 +8,6 @@ RSpec.describe 'Folders', type: :request do
       it 'retrieves all folders' do
         get '/rspec/folders', headers: rspec_session
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('folder')
       end
     end
 
@@ -18,7 +17,6 @@ RSpec.describe 'Folders', type: :request do
       it 'retrieves all folders' do
         get '/rspec/folders', headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('folder')
       end
     end
 
@@ -27,7 +25,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get '/rspec/folders', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -58,7 +55,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get '/rspec/content', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -68,7 +64,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get '/rspec/content', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -77,7 +72,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get '/rspec/content', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -89,7 +83,6 @@ RSpec.describe 'Folders', type: :request do
         post '/rspec/folders', headers: rspec_session,
                                params: { name: 'RSpec Test' }.to_json
         expect(response).to have_http_status(201)
-        expect(json).to be_a('folder')
       end
     end
 
@@ -99,7 +92,6 @@ RSpec.describe 'Folders', type: :request do
         post '/rspec/folders', headers: rspec_session(guest),
                                params: { name: 'RSpec Test' }.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -109,7 +101,6 @@ RSpec.describe 'Folders', type: :request do
         post '/rspec/folders', headers: rspec_session(admin),
                                params: { name: 'RSpec Test' }.to_json
         expect(response).to have_http_status(201)
-        expect(json).to be_a('folder')
       end
     end
 
@@ -118,7 +109,6 @@ RSpec.describe 'Folders', type: :request do
         post '/rspec/folders', headers: rspec_session,
                                params: { name: 'RSpec Test' }.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -133,8 +123,6 @@ RSpec.describe 'Folders', type: :request do
                                              params: { name: 'Updated Name' }.to_json
         expect(response).to have_http_status(200)
         expect(folder).to have_changed_attributes
-        expect(json).to be_a('folder')
-        expect(json).to have_attribute({ name: 'Updated Name' })
       end
 
       it 'is idempotent' do
@@ -148,7 +136,6 @@ RSpec.describe 'Folders', type: :request do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session,
                                              params: { name: '' }.to_json
         expect(response).to have_http_status(422)
-        expect(json).to have_errors
       end
     end
 
@@ -159,7 +146,6 @@ RSpec.describe 'Folders', type: :request do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session(guest),
                                              params: { name: 'Updated Name' }.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -180,7 +166,6 @@ RSpec.describe 'Folders', type: :request do
         patch "/rspec/folders/#{folder.id}", headers: rspec_session,
                                              params: { name: 'Updated Name' }.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -195,7 +180,6 @@ RSpec.describe 'Folders', type: :request do
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(201)
-        expect(json).to be_a('document')
       end
     end
 
@@ -207,7 +191,6 @@ RSpec.describe 'Folders', type: :request do
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session(guest),
                                  params: { content: file }
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -219,7 +202,6 @@ RSpec.describe 'Folders', type: :request do
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session(admin),
                                  params: { content: file }
         expect(response).to have_http_status(201)
-        expect(json).to be_a('document')
       end
     end
 
@@ -231,7 +213,6 @@ RSpec.describe 'Folders', type: :request do
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -243,7 +224,6 @@ RSpec.describe 'Folders', type: :request do
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -254,7 +234,6 @@ RSpec.describe 'Folders', type: :request do
         post "/rspec/folders/#{folder.id}/documents", headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -267,7 +246,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns folder documents' do
         get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('document')
       end
     end
 
@@ -277,7 +255,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns folder documents' do
         get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('document')
       end
     end
 
@@ -287,7 +264,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -297,7 +273,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -306,7 +281,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get "/rspec/folders/#{document.folder.id}/documents", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -318,7 +292,6 @@ RSpec.describe 'Folders', type: :request do
       it 'retrieves subfolders' do
         get "/rspec/folders/#{folder.id}/folders", headers: rspec_session
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('folder')
       end
     end
 
@@ -328,7 +301,6 @@ RSpec.describe 'Folders', type: :request do
       it 'retrieves subfolders' do
         get "/rspec/folders/#{folder.id}/folders", headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('folder')
       end
     end
 
@@ -337,7 +309,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         get "/rspec/folders/#{folder.id}/folders", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -358,7 +329,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         delete "/rspec/folders/#{folder.id}", headers: rspec_session(guest)
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -376,7 +346,6 @@ RSpec.describe 'Folders', type: :request do
       it 'returns authorization error' do
         delete "/rspec/folders/#{folder.id}", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end

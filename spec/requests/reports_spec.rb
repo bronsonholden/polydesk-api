@@ -8,7 +8,6 @@ RSpec.describe 'Reports', type: :request do
       it 'retrieves all reports' do
         get '/rspec/reports', headers: rspec_session
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('report')
       end
     end
 
@@ -18,7 +17,6 @@ RSpec.describe 'Reports', type: :request do
       it 'retrieves all reports' do
         get '/rspec/reports', headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('report')
       end
     end
 
@@ -27,7 +25,6 @@ RSpec.describe 'Reports', type: :request do
       it 'returns authorization error' do
         get '/rspec/reports', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -41,7 +38,6 @@ RSpec.describe 'Reports', type: :request do
         }
         post '/rspec/reports', headers: rspec_session, params: params.to_json
         expect(response).to have_http_status(201)
-        expect(json).to be_a('report')
       end
     end
 
@@ -53,7 +49,6 @@ RSpec.describe 'Reports', type: :request do
         }
         post '/rspec/reports', headers: rspec_session(guest), params: params.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -65,7 +60,6 @@ RSpec.describe 'Reports', type: :request do
         }
         post '/rspec/reports', headers: rspec_session(admin), params: params.to_json
         expect(response).to have_http_status(201)
-        expect(json).to be_a('report')
       end
     end
 
@@ -76,7 +70,6 @@ RSpec.describe 'Reports', type: :request do
         }
         post '/rspec/reports', headers: rspec_session, params: params.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end

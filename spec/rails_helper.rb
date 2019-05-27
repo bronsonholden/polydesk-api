@@ -30,12 +30,19 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
     # Tenant cleanup
     Apartment::Tenant.drop('rspec') rescue nil
-    # Account & user creation
-    account = Account.create(name: 'RSpec', identifier: 'rspec')
-    user = User.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password', default_account: account)
-    user.confirm
-    account_user = user.link_account
-    account_user.update!(role: 'user')
+    # Account creation
+    account = Account.create(account_name: 'RSpec',
+                             account_identifier: 'rspec',
+                             name: 'RSpec',
+                             email: 'rspec@polydesk.io',
+                             password: 'password')
+    account.confirm
+    account_user = account.link_account
+    Apartment::Tenant.switch('rspec') do
+      # By default, users are administrators, but we need to set to user
+      # to test permisisons.
+      AccountUser.first.update!(role: 'user')
+    end
   end
 
   config.before(:each) do

@@ -13,11 +13,11 @@ describe Account do
     # This test makes sure post-test cleanup properly removes tenants that
     # aren't rspec
     context 'test2' do
-      let!(:account) { create :account, identifier: 'test2' }
+      let!(:account) { create :account, account_identifier: 'test2' }
       it 'succeeds' do
         expect(account).not_to be_nil
         expect(account.users.size).to eq(0)
-        expect(Account.find_by_identifier('rspec')).not_to be_nil
+        expect(Account.find_by_account_identifier('rspec')).not_to be_nil
       end
     end
   end

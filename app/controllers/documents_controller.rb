@@ -1,15 +1,15 @@
 require 'json'
 
 class DocumentsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_account!
 
   # POST /:identifier/documents
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :create?
-      puts request.params.inspect
       schema = CreateDocumentSchema.new(request.params)
-      realizer = DocumentRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+      payload = sanitize_payload(schema.to_hash, Document)
+      realizer = DocumentRealizer.new(intent: :create, parameters: payload, headers: request.headers)
       realizer.object.save!
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
@@ -19,8 +19,9 @@ class DocumentsController < ApplicationController
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Document, :update?
-      schema = UpdateDocumentSchema.new (request.params)
-      realizer = DocumentRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+      schema = UpdateDocumentSchema.new(request.params)
+      payload = sanitize_payload(schema.to_hash, Document)
+      realizer = DocumentRealizer.new(intent: :update, parameters: payload, headers: request.headers)
       realizer.object.save!
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end

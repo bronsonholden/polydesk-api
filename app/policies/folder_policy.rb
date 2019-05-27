@@ -59,4 +59,20 @@ class FolderPolicy < ApplicationPolicy
     return allowed unless allowed.nil?
     has_permission(:folder_add_folder)
   end
+
+  def allowed_attributes_for_create
+    [:name]
+  end
+
+  def allowed_relationships_for_create
+    [:parent]
+  end
+
+  def allowed_attributes_for_update
+    [:name]
+  end
+
+  def allowed_relationships_for_update
+    [:parent]
+  end
 end

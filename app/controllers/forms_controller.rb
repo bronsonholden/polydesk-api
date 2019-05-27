@@ -1,5 +1,5 @@
 class FormsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_account!
 
   # POST /:identifier/forms
   def create

@@ -8,7 +8,6 @@ RSpec.describe 'Documents', type: :request do
       it 'retrieves all documents' do
         get '/rspec/documents', headers: rspec_session
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('document')
       end
     end
 
@@ -18,7 +17,6 @@ RSpec.describe 'Documents', type: :request do
       it 'retrieves all documents' do
         get '/rspec/documents', headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('document')
       end
     end
 
@@ -27,7 +25,6 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         get '/rspec/documents', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -38,7 +35,6 @@ RSpec.describe 'Documents', type: :request do
     it 'retrieves document' do
       get "/rspec/documents/#{document.id}", headers: rspec_session
       expect(response).to have_http_status(200)
-      expect(json).to be_a('document')
     end
 
     context 'admin without permission' do
@@ -47,7 +43,6 @@ RSpec.describe 'Documents', type: :request do
       it 'retrieves document' do
         get "/rspec/documents/#{document.id}", headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_a('document')
       end
     end
   end
@@ -68,7 +63,6 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         delete "/rspec/documents/#{document.id}", headers: rspec_session(guest)
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -100,7 +94,6 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         get "/rspec/documents/#{document.id}/download", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -133,7 +126,6 @@ RSpec.describe 'Documents', type: :request do
         version = document.versions.last
         get "/rspec/documents/#{document.id}/versions/#{version.id}/download", headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -159,7 +151,6 @@ RSpec.describe 'Documents', type: :request do
                                                  params: { content: file }
         expect(response).to have_http_status(200)
         expect(document.reload.content.data['storage']).to eq('cache')
-        expect(json).to be_a('document')
       end
     end
   end
@@ -172,7 +163,6 @@ RSpec.describe 'Documents', type: :request do
         post '/rspec/documents', headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(201)
-        expect(json).to be_a('document')
       end
     end
 
@@ -183,7 +173,6 @@ RSpec.describe 'Documents', type: :request do
         post '/rspec/documents', headers: rspec_session(guest),
                                  params: { content: file }
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -195,7 +184,6 @@ RSpec.describe 'Documents', type: :request do
         post '/rspec/documents', headers: rspec_session(admin),
                                  params: { content: file }
         expect(response).to have_http_status(201)
-        expect(json).to be_a('document')
       end
     end
 
@@ -205,7 +193,6 @@ RSpec.describe 'Documents', type: :request do
         post '/rspec/documents', headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
@@ -217,7 +204,6 @@ RSpec.describe 'Documents', type: :request do
         post '/rspec/documents', headers: rspec_session,
                                  params: { content: file }
         expect(response).to have_http_status(422)
-        expect(json).to have_errors
       end
     end
   end

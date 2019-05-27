@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :account_user do
-    association :user, factory: :rspec_user
-    account { user.default_account }
+    account { Account.first }
+    association :user, factory: :account
+    role { :user }
     transient do
       set_permissions { [] }
     end
@@ -13,11 +14,10 @@ FactoryBot.define do
   end
 
   factory :rspec_administrator, parent: :account_user do
-    account { Account.find_by_identifier!('rspec') }
     role { :administrator }
   end
 
   factory :rspec_guest, parent: :account_user do
-    account { Account.find_by_identifier!('rspec') }
+    role { :guest }
   end
 end

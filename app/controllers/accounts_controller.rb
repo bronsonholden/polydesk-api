@@ -1,26 +1,33 @@
 class AccountsController < ApplicationController
   # User must be authenticated before they can interact with accounts
-  before_action :authenticate_user!, except: [:create]
+  before_action :authenticate_account!, except: [:create]
 
   # GET /:identifier/account
   def show
     schema = ShowAccountSchema.new(request.params)
-    realizer = AccountRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.to_hash
+    # Since Account paths don't specify an ID in the path
+    payload.merge!({ 'id' => schema.id })
+    realizer = AccountRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
   # POST /accounts
   def create
-    account = Account.create!(account_create_params)
-    User.create!(user_params.merge({ default_account: account }))
-    render json: AccountSerializer.new(account).serialized_json, status: :created
+    schema = CreateAccountSchema.new(request.params)
+    realizer = AccountRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+    realizer.object.save!
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
 
   # PATCH/PUT /:identifier/account
   def update
     authorize Account, :update?
     schema = UpdateAccountSchema.new(request.params)
-    realizer = AccountRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+    payload = sanitize_payload(schema.to_hash, Account)
+    # Since Account paths don't specify an ID in the path
+    payload.merge!({ 'id' => schema.id })
+    realizer = AccountRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end

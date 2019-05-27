@@ -4,7 +4,7 @@ module Polydesk
 
     def initialize(user, account_identifier)
       @user = user
-      @account = Account.find_by! identifier: account_identifier
+      @account = Account.find_by! account_identifier: account_identifier
     end
   end
 end

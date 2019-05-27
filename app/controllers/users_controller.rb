@@ -1,10 +1,10 @@
 class UsersController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_account!
 
   # GET /:identifier/users
   def index
     Apartment::Tenant.switch(params[:identifier]) do
-      account = Account.find_by_identifier!(params[:identifier])
+      account = Account.find_by_account_identifier!(params[:identifier])
       @account_users = AccountUser.where(account_id: account.id)
                                   .includes('user')
                                   .order('id')

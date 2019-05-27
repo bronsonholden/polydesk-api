@@ -1,5 +1,5 @@
 class VersionsController < ApplicationController
-  before_action :authenticate_user!
+  before_action :authenticate_account!
 
   # GET /:identifier/:model/:id/versions
   def index

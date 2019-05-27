@@ -11,7 +11,7 @@ module Overrides
     # GET /confirmations/:id
     def show
       p = confirmation_params
-      @user = User.find_by_confirmation_token(p[:confirmation_token])
+      @user = Account.find_by_confirmation_token(p[:confirmation_token])
       raise Polydesk::ApiExceptions::InvalidConfirmationToken.new(User.new) if @user.nil?
       render json: ConfirmationSerializer.new(@user).serialized_json, status: :ok
     end
@@ -22,7 +22,7 @@ module Overrides
 
       ActiveRecord::Base.transaction do
         token = p[:confirmation_token]
-        @user = User.find_by_confirmation_token(token)
+        @user = Account.find_by_confirmation_token(token)
         @user.update!(p) if !@user.has_password?
         if !@user.confirm
           render json: ErrorSerializer.new(@user.errors).serialized_json, status: :unprocessable_entity

@@ -15,7 +15,7 @@ class UpdateDocumentSchema
         field :folder, type: Strict::Hash.optional do
           field :data, type: Strict::Hash.optional do
             field :id, type: Strict::String.optional
-            field :type, type: Strict::String.enum('folders').optional
+            field :type, type: Strict::String.enum('folders')
           end
         end
       end

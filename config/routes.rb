@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  mount_devise_token_auth_for 'User', at: 'auth', controllers: {
+  mount_devise_token_auth_for 'Account', at: 'auth', controllers: {
     sessions:  'overrides/sessions',
     confirmations: 'overrides/confirmations'
   }, skip: [:confirmations]

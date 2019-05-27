@@ -1,8 +1,8 @@
 class AccountUser < ApplicationRecord
   validates :user_id, presence: true
   validates :account_id, presence: true, uniqueness: { scope: :user_id }
-  belongs_to :user
-  belongs_to :account
+  belongs_to :user, class_name: 'Account', foreign_key: 'user_id'
+  belongs_to :account, class_name: 'Account', foreign_key: 'account_id'
   has_many :permissions
 
   enum role: [

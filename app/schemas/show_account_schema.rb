@@ -5,7 +5,7 @@ class ShowAccountSchema
   # override the method to not pull the ID from request params but instead
   # find the account by identifier and return its ID.
   def id
-    Account.find_by!(identifier: identifier).id
+    Account.find_by!(account_identifier: identifier).id.to_s
   end
 
   schema type: Strict::Hash do
