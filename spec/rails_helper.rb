@@ -51,7 +51,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    Apartment::Tenant.reset
+    Apartment::Tenant.switch!
     Apartment.tenant_names.each do |tenant|
       Apartment::Tenant.drop(tenant) if tenant != 'rspec'
     end
