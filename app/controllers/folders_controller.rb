@@ -74,22 +74,22 @@ class FoldersController < ApplicationController
       documents_count = documents.count
       total = folders_count + documents_count
       # Index of first/last item in the combined collection
-      first_item = ((current_page - 1) * per_page)
-      last_item = first_item + per_page
+      first_item = (page_offset * page_limit)
+      last_item = first_item + page_limit
       content = []
       if first_item >= folders_count
         # If the page doesn't include any Folders
-        content = documents.order('id').offset(first_item - folders_count).limit(per_page)
+        content = documents.order('id').offset(first_item - folders_count).limit(page_limit)
       elsif last_item < folders_count
         # Likewise, if the page doesn't include any Documents...
-        content = folders.order('id').offset(first_item).limit(per_page)
+        content = folders.order('id').offset(first_item).limit(page_limit)
       else
         # If the page includes both, get the trailing Folders and combine
         # with as many Documents as needed to fill the page.
         content = folders.order('id').offset(first_item) + documents.order('id').limit(last_item - folders_count)
       end
       # Create pseudo-paginated collection
-      pagination_props = PaginationProperties.new(current_page, (total.to_f / per_page).ceil, per_page)
+      pagination_props = PaginationProperties.new(page_offset, (total.to_f / page_limit).ceil, page_limit)
       options = PaginationGenerator.new(request: request, paginated: pagination_props, count: total).generate
       render json: FolderContentSerializer.new(content, options).serialized_json, status: :ok
     end
@@ -101,7 +101,7 @@ class FoldersController < ApplicationController
       authorize Folder, :folders?
       schema = ShowFolderSchema.new(request.params)
       realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
-      render json: JSONAPI::Serializer.serialize(realizer.object.folders, is_collection: true), status: :ok
+      render json: JSONAPI::Serializer.serialize(realizer.object.children, is_collection: true), status: :ok
     end
   end
 

@@ -5,11 +5,7 @@ class FolderContentSerializer
     end
 
     @data = content.map { |item|
-      if item.instance_of?(Document)
-        DocumentSerializer.new(item).serializable_hash[:data]
-      elsif item.instance_of?(Folder)
-        FolderSerializer.new(item).serializable_hash[:data]
-      end
+      JSONAPI::Serializer.serialize(item)[:data]
     }
     @pagination = options
   end

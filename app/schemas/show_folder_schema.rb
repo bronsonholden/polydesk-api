@@ -6,7 +6,7 @@ class ShowFolderSchema
     sparse_params
     field :id, type: Strict::String
     field :controller, type: Strict::String.enum('folders')
-    field :action, type: Strict::String.enum('show', 'destroy', 'restore')
+    field :action, type: Strict::String.enum('show', 'destroy', 'restore', 'folders', 'documents')
     field :data, type: Strict::Nil
   end
 end
