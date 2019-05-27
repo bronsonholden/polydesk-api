@@ -1,4 +1,4 @@
-class CreateReportchema
+class CreateReportSchema
   include SmartParams
 
   schema type: Strict::Hash do

@@ -1,8 +1,3 @@
-class ReportSerializer
-  include FastJsonapi::ObjectSerializer
+class ReportSerializer < ApplicationSerializer
   attributes :name, :created_at, :updated_at
-
-  link :self, -> (report) {
-    report.url
-  }
 end

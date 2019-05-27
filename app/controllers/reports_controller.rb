@@ -28,7 +28,7 @@ class ReportsController < ApplicationController
       schema = CreateReportSchema.new(request.params)
       realizer = ReportRealizer.new(intent: :create, parameters: schema, headers: request.headers)
       realizer.object.save!
-      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
   end
 
