@@ -1,5 +1,5 @@
 class FoldersController < ApplicationController
-  before_action :authenticate_account!
+  before_action :authenticate_user!
 
   # GET /:identifier/folders
   def index

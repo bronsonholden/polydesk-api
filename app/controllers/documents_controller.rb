@@ -1,7 +1,7 @@
 require 'json'
 
 class DocumentsController < ApplicationController
-  before_action :authenticate_account!
+  before_action :authenticate_user!
 
   # POST /:identifier/documents
   def create

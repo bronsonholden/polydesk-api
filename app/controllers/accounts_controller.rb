@@ -1,6 +1,6 @@
 class AccountsController < ApplicationController
   # User must be authenticated before they can interact with accounts
-  before_action :authenticate_account!, except: [:create]
+  before_action :authenticate_user!
 
   # GET /:identifier/account
   def show
@@ -14,10 +14,13 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
-    schema = CreateAccountSchema.new(request.params)
-    realizer = AccountRealizer.new(intent: :create, parameters: schema, headers: request.headers)
-    realizer.object.save!
-    render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+    ActiveRecord::Base.transaction do
+      schema = CreateAccountSchema.new(request.params)
+      realizer = AccountRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+      realizer.object.save!
+      Apartment::Tenant.create(realizer.object.identifier)
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+    end
   end
 
   # PATCH/PUT /:identifier/account
@@ -47,19 +50,5 @@ class AccountsController < ApplicationController
     realizer = AccountRealizer.new(intent: :show, parameters: schema, headers: request.headers)
     realizer.object.undiscard!
     render json: JSONAPI::Serializer.serialize(realizer.objet), status: :ok
-  end
-
-  private
-
-  def account_params
-    params.permit(:name, :identifier)
-  end
-
-  def account_create_params
-    params.permit(:account_name, :account_identifier)
-  end
-
-  def user_params
-    params.permit(:user_name, :user_email, :password, :password_confirmation)
   end
 end

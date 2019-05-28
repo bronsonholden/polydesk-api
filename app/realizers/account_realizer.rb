@@ -1,11 +1,9 @@
 class AccountRealizer
   include JSONAPI::Realizer::Resource
   type :accounts, class_name: 'Account', adapter: :active_record
-  has_many :users, class_name: 'AccountRealizer'
+  has_many :users, class_name: 'UserRealizer'
   has :name
-  has :email
-  has :account_name
-  has :account_identifier
+  has :identifier
   has :password
   has :password_confirmation
 end

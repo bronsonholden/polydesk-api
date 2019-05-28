@@ -1,5 +1,5 @@
 class ReportsController < ApplicationController
-  before_action :authenticate_account!
+  before_action :authenticate_user!
 
   # GET /:identifier/reports
   def index

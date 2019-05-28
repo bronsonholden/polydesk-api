@@ -7,12 +7,8 @@ RSpec.describe 'Accounts', type: :request do
                           data: {
                             type: 'accounts',
                             attributes: {
-                              account_identifier: 'rspec2',
-                              account_name: 'RSpec 2',
-                              name: 'RSpec User 2',
-                              email: 'rspec2@polydesk.io',
-                              password: 'password',
-                              password_confirmation: 'password' } } }
+                              identifier: 'rspec2',
+                              name: 'RSpec 2' } } }
       expect(response).to have_http_status(201)
       account = Account.find_by!(email: 'rspec2@polydesk.io')
       account_user = account.link_account
@@ -25,10 +21,8 @@ RSpec.describe 'Accounts', type: :request do
                           data: {
                             type: 'accounts',
                             attributes: {
-                              account_identifier: 'rspec2',
-                              account_name: 'RSpec 2',
-                              name: 'RSpec User 2',
-                              email: 'rspec2@polydesk.io' } } }
+                              identifier: 'rspec2',
+                              name: 'RSpec 2' } } }
       expect(response).to have_http_status(201)
       expect(Account.last.has_password?).to be false
     end
@@ -52,10 +46,10 @@ RSpec.describe 'Accounts', type: :request do
                                     id: account.id.to_s,
                                     type: 'accounts',
                                     attributes: {
-                                      account_name: 'RSpec Renamed' } } }.to_json
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(200)
         expect(account).to have_changed_attributes
-        expect(account.reload.account_name).to eq('RSpec Renamed')
+        expect(account.reload.name).to eq('RSpec Renamed')
       end
     end
 
@@ -69,7 +63,7 @@ RSpec.describe 'Accounts', type: :request do
                                     id: account.id.to_s,
                                     type: 'accounts',
                                     attributes: {
-                                      account_name: 'RSpec Renamed' } } }.to_json
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(403)
       end
     end
@@ -84,10 +78,10 @@ RSpec.describe 'Accounts', type: :request do
                                     id: account.id.to_s,
                                     type: 'accounts',
                                     attributes: {
-                                      account_name: 'RSpec Renamed' } } }.to_json
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(200)
         expect(account).to have_changed_attributes
-        expect(account.reload.account_name).to eq('RSpec Renamed')
+        expect(account.reload.name).to eq('RSpec Renamed')
       end
     end
 
@@ -100,7 +94,7 @@ RSpec.describe 'Accounts', type: :request do
                                     id: account.id.to_s,
                                     type: 'accounts',
                                     attributes: {
-                                      account_name: 'RSpec Renamed' } } }.to_json
+                                      name: 'RSpec Renamed' } } }.to_json
         expect(response).to have_http_status(403)
       end
     end

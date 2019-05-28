@@ -1,33 +1,52 @@
 class UsersController < ApplicationController
-  before_action :authenticate_account!
+  before_action :authenticate_user!, except: [:create]
 
-  # GET /:identifier/users
+  # GET /users
   def index
-    Apartment::Tenant.switch(params[:identifier]) do
-      account = Account.find_by_account_identifier!(params[:identifier])
-      @account_users = AccountUser.where(account_id: account.id)
-                                  .includes('user')
-                                  .order('id')
-                                  .page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @account_users).generate
-      render json: AccountUserSerializer.new(@account_users, options).serialized_json
-    end
+    schema = IndexUsersSchema.new(request.params)
+    realizer = UserRealizer.new(intent: :index, parameters: schema, headers: request.headers)
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
   end
 
-  # GET /:identifier/users/:id
+  # POST /users
+  # Create user while not authenticated.
+  def create
+    schema = CreateUserSchema.new(request.params)
+    # Since we're not authenticated, we can't use policies to permit
+    # attributes.
+    payload = schema.to_hash
+    payload.dig('data').slice!('attributes')
+    realizer = UserRealizer.new(intent: :create, parameters: payload, headers: request.headers)
+    realizer.object.save!
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+  end
+
+  # POST /:identifier/users
+  def create_auth
+    schema = CreateUserSchema.new(request.params)
+    payload = sanitize_payload(schema.to_hash, User)
+    realizer = UserRealizer.new(intent: :create, parameters: payload, headers: request.headers)
+    realizer.object.save!
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+  end
+
+  # PATCH /users/:id
+  def update
+    schema = UpdateUserSchema.new(request.params)
+    payload = sanitize_payload(schema.to_hash, User)
+    realizer = UserRealizer.new(intent: :update, parameters: payload, headers: request.headers)
+    realizer.object.save!
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
+  end
+
+  # GET /users/:id
   def show
-    Apartment::Tenant.switch(params[:identifier]) do
-      @account_user = AccountUser.find_by!(user_id: params[:id]).includes('user')
-      render json: AccountUserSerializer.new(@account_user).serialized_json, status: :ok
-    end
+    schema = ShowUserSchema.new(request.params)
+    realizer = UserRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
-  # DELETE /:identifier/users/:id
+  # DELETE /users/:id
   def destroy
-    # Delete while in the tenant schema so associated records can be destroyed
-    Apartment::Tenant.switch(params[:identifier]) do
-      @account = Account.where(identifier: params[:identifier]).first
-      AccountUser.find_by!(user_id: params[:id], account_id: @account.id).destroy
-    end
   end
 end

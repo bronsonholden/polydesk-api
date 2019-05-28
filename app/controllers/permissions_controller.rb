@@ -1,6 +1,6 @@
 class PermissionsController < ApplicationController
   # User must be authenticated before they can interact with permissions
-  before_action :authenticate_account!
+  before_action :authenticate_user!
   before_action :set_account
   before_action :set_user
   before_action :set_account_user
@@ -32,7 +32,7 @@ class PermissionsController < ApplicationController
 
   private
     def set_account
-      @account = Account.find_by_account_identifier!(params[:identifier])
+      @account = Account.find_by_identifier!(params[:identifier])
     end
 
     def set_user

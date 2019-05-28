@@ -7,19 +7,19 @@ class ApplicationController < ActionController::API
   include Pundit
   include Polydesk
 
-  rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
-  rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
-  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
-  rescue_from Polydesk::ApiExceptions::NotVersionable, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
-  rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
+  # rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
+  # rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
+  # rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  # # rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
+  # rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
+  # rescue_from Polydesk::ApiExceptions::NotVersionable, with: :invalid_exception
+  # rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
+  # rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
+  # rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
+  # rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
 
   def pundit_user
-    Polydesk::AuthContext.new(current_account, params[:identifier])
+    Polydesk::AuthContext.new(current_user, params[:identifier])
   end
 
   # GET /
@@ -43,31 +43,31 @@ class ApplicationController < ActionController::API
     (params.dig(:page, :limit) || 25).to_i
   end
 
-  def allowed_attributes(record_klass)
-    policy_restrictions(:attributes, record_klass)
+  def allowed_attributes(_policy)
+    policy_restrictions(:attributes, _policy)
   end
 
-  def allowed_relationships(record_klass)
-    policy_restrictions(:relationships, record_klass)
+  def allowed_relationships(_policy)
+    policy_restrictions(:relationships, _policy)
   end
 
   def sanitize_payload(payload, record_klass)
+    _policy = policy(record_klass)
     forbid_client_generated_id(payload)
-    forbid_disallowed_attributes(payload, record_klass)
-    forbid_disallowed_relationships(payload, record_klass)
+    forbid_disallowed_attributes(payload, _policy)
+    forbid_disallowed_relationships(payload, _policy)
     payload
   end
 
-  def policy_restrictions(type, record_klass)
+  def policy_restrictions(type, _policy)
     # Only relevant when creating or updating.
     return [] if !['create', 'update'].include?(action_name)
     # Get the policy for this record
-    p = policy(record_klass)
     fn = :"allowed_#{type}_for_#{action_name}"
     # No attributes allowed without a Policy allowing them
-    return [] if p.nil? || !p.respond_to?(fn)
+    return [] if _policy.nil? || !_policy.respond_to?(fn)
     # Retrieve allowed attributes (default to none allowed)
-    p.send(fn) || []
+    _policy.send(fn) || []
   end
 
   private
@@ -83,8 +83,8 @@ class ApplicationController < ActionController::API
   end
 
   def user_not_authorized(exception)
-    current_account.errors.add('user', 'is not authorized to perform this action')
-    render_exception_for current_account, status_code: :forbidden
+    current_user.errors.add('user', 'is not authorized to perform this action')
+    render_exception_for current_user, status_code: :forbidden
   end
 
   def forbidden_exception(exception)
@@ -126,8 +126,8 @@ class ApplicationController < ActionController::API
     end
   end
 
-  def forbid_disallowed_relationships(payload, record_klass)
-    allowed = allowed_relationships(record_klass)
+  def forbid_disallowed_relationships(payload, _policy)
+    allowed = allowed_relationships(_policy)
     relationships = payload.dig('data', 'relationships')
     return if !relationships.respond_to?(:keys) || relationships.keys.empty?
     restricted = relationships.keys - allowed.map { |k| k.to_s }

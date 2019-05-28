@@ -2,9 +2,9 @@ module Polydesk
   class AuthContext
     attr_reader :user, :account
 
-    def initialize(user, account_identifier)
+    def initialize(user, identifier)
       @user = user
-      @account = Account.find_by! account_identifier: account_identifier
+      @account = Account.find_by_identifier!(identifier)
     end
   end
 end

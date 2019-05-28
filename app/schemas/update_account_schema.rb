@@ -2,7 +2,7 @@ class UpdateAccountSchema
   include SmartParams
 
   def id
-    Account.find_by!(account_identifier: identifier).id.to_s
+    Account.find_by_identifier!(identifier).id.to_s
   end
 
   schema type: Strict::Hash do
@@ -14,7 +14,6 @@ class UpdateAccountSchema
       field :id, type: Strict::String
       field :type, type: Strict::String.enum('accounts')
       field :attributes, type: Strict::Hash.optional do
-        field :account_name, type: Strict::String.optional
         field :name, type: Strict::String.optional
       end
     end

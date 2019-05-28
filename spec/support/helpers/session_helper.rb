@@ -1,12 +1,14 @@
 module SessionHelper
+  def base_headers
+    { 'Content-Type' => 'application/json' }
+  end
+
   def set_request_headers(resp)
-    { 'Accept' => "application/json",
-      'Content-Type' => "application/json",
-      'access-token' => resp['access-token'],
-      'token-type' => resp['token-type'],
-      'client' => resp['client'],
-      'expiry' => resp['expiry'],
-      'uid' => resp['uid'] }
+    base_headers.merge({ 'access-token' => resp['access-token'],
+                         'token-type' => resp['token-type'],
+                         'client' => resp['client'],
+                         'expiry' => resp['expiry'],
+                         'uid' => resp['uid'] })
   end
 
   def account_login(identifier, email, password)
