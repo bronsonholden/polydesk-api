@@ -7,6 +7,6 @@ class ShowUserSchema
     field :id, type: Strict::String
     field :controller, type: Strict::String.enum('users')
     field :action, type: Strict::String.enum('show')
-    field :data, type: Strict::nil
+    field :data, type: Strict::Nil
   end
 end
