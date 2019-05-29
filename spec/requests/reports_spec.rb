@@ -8,7 +8,6 @@ RSpec.describe 'Reports', type: :request do
       it 'retrieves all reports' do
         get '/rspec/reports', headers: rspec_session
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('report')
       end
     end
 
@@ -18,7 +17,6 @@ RSpec.describe 'Reports', type: :request do
       it 'retrieves all reports' do
         get '/rspec/reports', headers: rspec_session(admin)
         expect(response).to have_http_status(200)
-        expect(json).to be_array_of('report')
       end
     end
 
@@ -27,7 +25,6 @@ RSpec.describe 'Reports', type: :request do
       it 'returns authorization error' do
         get '/rspec/reports', headers: rspec_session
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
@@ -36,48 +33,54 @@ RSpec.describe 'Reports', type: :request do
     context 'with permission' do
       let!(:permission) { create :permission, code: :report_create, account_user: AccountUser.last }
       it 'creates new report' do
-        params = {
-          name: 'RSpec Report'
-        }
-        post '/rspec/reports', headers: rspec_session, params: params.to_json
+        post '/rspec/reports', headers: rspec_session,
+                               params: {
+                                 data: {
+                                   type: 'reports',
+                                   attributes: {
+                                     name: 'RSpec Report' } } }.to_json
         expect(response).to have_http_status(201)
-        expect(json).to be_a('report')
       end
     end
 
     context 'guest with permission' do
       let!(:guest) { create :rspec_guest, set_permissions: [:report_create] }
       it 'returns authorization error' do
-        params = {
-          name: 'RSpec Report'
-        }
-        post '/rspec/reports', headers: rspec_session(guest), params: params.to_json
+        post '/rspec/reports', headers: rspec_session(guest),
+                               params: {
+                                 data: {
+                                   type: 'reports',
+                                   attributes: {
+                                     name: 'RSpec Report' } } }.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
 
     context 'admin without permission' do
       let!(:admin) { create :rspec_administrator }
       it 'creates new report' do
-        params = {
-          name: 'RSpec Report'
-        }
-        post '/rspec/reports', headers: rspec_session(admin), params: params.to_json
+        post '/rspec/reports', headers: rspec_session(admin),
+                               params: {
+                                 data: {
+                                   type: 'reports',
+                                   attributes: {
+                                     name: 'RSpec Report' } } }.to_json
         expect(response).to have_http_status(201)
-        expect(json).to be_a('report')
       end
     end
 
     context 'without permission' do
       it 'returns authorization error' do
-        params = {
-          name: 'RSpec Report'
-        }
-        post '/rspec/reports', headers: rspec_session, params: params.to_json
+        post '/rspec/reports', headers: rspec_session,
+                               params: {
+                                 data: {
+                                   type: 'reports',
+                                   attributes: {
+                                     name: 'RSpec Report' } } }.to_json
         expect(response).to have_http_status(403)
-        expect(json).to have_errors
       end
     end
   end
+
+  # TODO: Test report updates
 end

@@ -5,7 +5,6 @@ module Polydesk
         extend ActiveSupport::Concern
 
         included do
-          validates :content, presence: true
           validates :name, presence: true, format: {
             # Allow alphanumerals, spaces, and _ . - ( ) [ ]
             # The first character may not be a space, and the last must not be a space or period.

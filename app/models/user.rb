@@ -8,18 +8,14 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :confirmable
   include DeviseTokenAuth::Concerns::User
-  include Polydesk::Activation
-  alias_attribute :user_name, :name
-  alias_attribute :user_email, :email
-  validates :name, presence: true
+  include Discard::Model
   validates :email, presence: true, uniqueness: true
   validates_confirmation_of :password
   has_many :account_users
   has_many :accounts, through: :account_users, dependent: :destroy
-  belongs_to :default_account, class_name: 'Account'
+  belongs_to :default_account, class_name: 'Account', optional: true
 
   before_create :send_confirmation_email, if: -> {
-    #!Rails.env.test? &&
     User.devise_modules.include?(:confirmable)
   }
 
@@ -28,12 +24,14 @@ class User < ActiveRecord::Base
   end
 
   protected
-    def password_required?
-      false
-    end
+
+  def password_required?
+    false
+  end
 
   private
-    def send_confirmation_email
-      self.send_confirmation_instructions
-    end
+
+  def send_confirmation_email
+    self.send_confirmation_instructions
+  end
 end

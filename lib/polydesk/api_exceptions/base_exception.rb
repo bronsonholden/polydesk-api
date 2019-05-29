@@ -13,6 +13,12 @@ module Polydesk
         'NotVersionable' => Proc.new { |record|
           record.errors.add(record.class.name.underscore, 'is not versionable')
         },
+        'ClientGeneratedIdsForbidden' => Proc.new { |record|
+        },
+        'ForbiddenAttributes' => Proc.new { |record|
+        },
+        'ForbiddenRelationships' => Proc.new { |record|
+        },
         'FolderException::NoThankYou' => Proc.new { |record|
           record.errors.add('no', 'thank you')
         },
@@ -21,10 +27,10 @@ module Polydesk
         },
         'UserException::NoAccountAccess' => Proc.new { |record|
           record.errors.add('user', 'does not have access to this account')
-        }
+        },
       }
 
-      def initialize(record)
+      def initialize(record = nil)
         @record = record
         error_type = self.class.name.scan(/Polydesk::ApiExceptions::(.*)/).flatten.first
         Polydesk::ApiExceptions::BaseException::ERROR_DETAILS.fetch(error_type).call(record)

@@ -47,17 +47,16 @@ describe Document do
         second_dup = document.folder.documents.create!(content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')), name: 'Subdocument')
         expect(second_dup.name).to eq('Subdocument (2)')
       end
-
-      it 'requires content' do
-        expect { Document.create!(name: 'No Content') }.to raise_error(ActiveRecord::RecordInvalid)
-      end
     end
 
     context 'without parent folder' do
-      let!(:original) { create :document, name: 'Document' }
+      let!(:document) { create :document, name: 'Document' }
 
-      it 'requires content' do
-        expect { Document.create!(name: 'No Content') }.to raise_error(ActiveRecord::RecordInvalid)
+      it 'prevents duplicate name' do
+        first_dup = Document.create!(content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')), name: 'Document')
+        expect(first_dup.name).to eq('Document (1)')
+        second_dup = Document.create!(content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt')), name: 'Document')
+        expect(second_dup.name).to eq('Document (2)')
       end
     end
 

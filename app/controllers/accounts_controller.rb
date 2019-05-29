@@ -1,71 +1,58 @@
 class AccountsController < ApplicationController
   # User must be authenticated before they can interact with accounts
-  before_action :authenticate_user!, except: [:create]
+  before_action :authenticate_user!
 
-  # GET /accounts
-  # Returns only accounts the current user has access to
-  def index
-    accounts = current_user.accounts.page(current_page).per(per_page)
-    options = PaginationGenerator.new(request: request, paginated: accounts).generate
-    render json: AccountSerializer.new(accounts, options).serialized_json
-  end
-
-  # GET /:identifier/account
+  # GET /account/1
   def show
-    set_account
-    render json: AccountSerializer.new(@account).serialized_json
+    schema = ShowAccountSchema.new(request.params)
+    payload = schema.to_hash
+    # Since Account paths don't specify an ID in the path
+    payload.merge!({ 'id' => schema.id })
+    realizer = AccountRealizer.new(intent: :show, parameters: payload, headers: request.headers)
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
   # POST /accounts
   def create
-    account = Account.create!(account_create_params)
-    User.create!(user_params.merge({ default_account: account }))
-    render json: AccountSerializer.new(account).serialized_json, status: :created
+    ActiveRecord::Base.transaction do
+      schema = CreateAccountSchema.new(request.params)
+      realizer = AccountRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+      realizer.object.save!
+      Apartment::Tenant.create(realizer.object.identifier)
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+    end
   end
 
-  # PATCH/PUT /:identifier/account
+  # PATCH/PUT /accounts/1
   def update
     authorize Account, :update?
-    set_account
-    @account.update!(account_update_params)
-    render json: AccountSerializer.new(@account).serialized_json
+    schema = UpdateAccountSchema.new(request.params)
+    payload = sanitize_payload(schema.to_hash, Account)
+    # Since Account paths don't specify an ID in the path
+    payload.merge!({ 'id' => schema.id })
+    realizer = AccountRealizer.new(intent: :update, parameters: payload, headers: request.headers)
+    realizer.object.save!
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
-  # DELETE /:identifier/account
+  # DELETE /accounts/1
   def destroy
     authorize Account, :destroy?
-    set_account
-    @account.discard!
+    schema = ShowAccountSchema.new(request.params)
+    realizer = AccountRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    realizer.object.discard!
   end
 
-  # PUT /:identifier/account/restore
+  # PUT /accounts/1/restore
   def restore
     authorize Account, :restore?
-    set_account
-    @account.undiscard!
-    render json: AccountSerializer.new(@account).serialized_json, status: :ok
+    schema = ShowAccountSchema.new(request.params)
+    realizer = AccountRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    realizer.object.undiscard!
+    render json: JSONAPI::Serializer.serialize(realizer.objet), status: :ok
   end
 
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_account
-      @account = Account.find_by!(identifier: params[:identifier])
-    end
-
-    def account_update_params
-      params.permit(:name)
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def account_params
-      params.permit(:name, :identifier)
-    end
-
-    def account_create_params
-      params.permit(:account_name, :account_identifier)
-    end
-
-    def user_params
-      params.permit(:user_name, :user_email, :password, :password_confirmation)
-    end
+  def current_account
+    Account.find(params[:id])
+  end
 end

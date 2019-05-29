@@ -7,13 +7,13 @@ class PaginationGenerator
 
   def initialize(request:, paginated:, count: nil)
     @url = request.base_url + request.path
-    @page = paginated.current_page
+    @page = paginated.page_offset
     @total_pages = paginated.total_pages
-    @per_page = paginated.limit_value
+    @per_page = paginated.page_limit
     @hash = {
       links: {},
       meta: {
-        current_page: paginated.current_page,
+        page_offset: paginated.page_offset,
         total_pages: paginated.total_pages,
         count: count || paginated.count
       }

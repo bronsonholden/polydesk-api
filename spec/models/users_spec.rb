@@ -5,8 +5,6 @@ describe User do
     let!(:user) { create :user }
     it 'succeeds' do
       expect(user).not_to be_nil
-      # Account created by user factory and default RSpec account
-      expect(Account.all.size).to eq(2)
     end
   end
 end

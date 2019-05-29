@@ -2,7 +2,7 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(auth, record)
-    @account_user = AccountUser.find_by user_id: auth.user.id, account_id: auth.account.id
+    @account_user = AccountUser.find_by(user_id: auth.user.id, account_id: auth.account.id)
     raise Polydesk::ApiExceptions::UserException::NoAccountAccess.new(auth.user) unless @account_user
     raise Polydesk::ApiExceptions::AccountIsDisabled.new(auth.account) if auth.account.discarded?
     @record = record
@@ -58,7 +58,8 @@ class ApplicationPolicy
   end
 
   protected
-    def has_permission(code)
-      !!@account_user.permissions.find_by(code: code)
-    end
+
+  def has_permission(code)
+    !!@account_user.permissions.find_by(code: code)
+  end
 end

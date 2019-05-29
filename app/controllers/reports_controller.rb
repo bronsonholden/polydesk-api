@@ -5,10 +5,9 @@ class ReportsController < ApplicationController
   def index
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Report, :index?
-      @reports = Report.all.order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @reports).generate
-
-      render json: ReportSerializer.new(@reports, options).serialized_json, status: :ok
+      schema = IndexReportsSchema.new(request.params)
+      realizer = ReportRealizer.new(intent: :index, parameters: schema, headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
     end
   end
 
@@ -16,8 +15,9 @@ class ReportsController < ApplicationController
   def show
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Report, :show?
-      set_report
-      render json: ReportSerializer.new(@report).serialized_json, status: :ok
+      schema = ShowReportSchema.new(request.params)
+      realizer = ReportRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
 
@@ -25,8 +25,10 @@ class ReportsController < ApplicationController
   def create
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Report, :create?
-      @report = Report.create!(report_params)
-      render json: ReportSerializer.new(@report).serialized_json, status: :created
+      schema = CreateReportSchema.new(request.params)
+      realizer = ReportRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+      realizer.object.save!
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
   end
 
@@ -34,9 +36,10 @@ class ReportsController < ApplicationController
   def update
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Report, :update?
-      set_report
-      @report.update!(report_params)
-      render json: ReportSerializer.new(@report).serialized_json, status: :ok
+      schema = UpdateReportSchema.new(request.params)
+      realizer = ReportRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+      realizer.object.save!
+      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
     end
   end
 
@@ -44,19 +47,9 @@ class ReportsController < ApplicationController
   def destroy
     Apartment::Tenant.switch(params[:identifier]) do
       authorize Report, :destroy?
-      set_report
-      @report.destroy
+      schema = ShowReportSchema.new(request.params)
+      realizer = ReportRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+      realizer.object.discard!
     end
   end
-
-  private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_report
-      @report = Report.find(params[:id])
-    end
-
-    # Only allow a trusted parameter "white list" through.
-    def report_params
-      params.permit(:name)
-    end
 end

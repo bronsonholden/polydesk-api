@@ -11,12 +11,6 @@ class AccountUser < ApplicationRecord
     :administrator
   ]
 
-  # Destroy all associated tenant records on delete, since there is no
-  # foreign key used to relate them to the public AccountUser record.
-  before_destroy { |record|
-    record.permissions.destroy_all
-  }
-
   # TODO: Bind to attribute
   # Useful for testing, at least
   def disabled?

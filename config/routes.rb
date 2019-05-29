@@ -10,24 +10,19 @@ Rails.application.routes.draw do
     post '/confirmations/:confirmation_token', to: 'overrides/confirmations#confirm', as: :user_confirmation_confirm
   end
 
-  resources :accounts, only: [:create, :index]
+  resources :accounts
+  resources :users
 
   get '/', to: 'application#show'
 
   scope '/:identifier' do
     resources :documents
     resources :folders
-    resources :users
     resources :reports
     resources :forms
     resources :options
 
-    get '/account', to: 'accounts#show'
-    patch '/account', to: 'accounts#update'
-    put '/account', to: 'accounts#update'
-    delete '/account', to: 'accounts#destroy', as: :account_destroy
-    put '/account/restore', to: 'accounts#restore', as: :account_restore
-
+    post '/users', to: 'users#create_auth'
     get '/users/:id/permissions', to: 'permissions#index'
     post '/users/:id/permissions', to: 'permissions#create'
     delete '/users/:id/permissions', to: 'permissions#destroy'

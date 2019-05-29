@@ -30,12 +30,12 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
     # Tenant cleanup
     Apartment::Tenant.drop('rspec') rescue nil
-    # Account & user creation
-    account = Account.create(name: 'RSpec', identifier: 'rspec')
-    user = User.create(name: 'RSpec', email: 'rspec@polydesk.io', password: 'password', default_account: account)
+    user = User.create(first_name: 'RSpec', last_name: 'User', email: 'rspec@polydesk.io', password: 'password')
     user.confirm
-    account_user = user.link_account
-    account_user.update!(role: 'user')
+    # Account creation
+    account = Account.create(name: 'RSpec Account', identifier: 'rspec')
+    account_user = AccountUser.create(account: account, user: user, role: 'user')
+    Apartment::Tenant.create('rspec')
   end
 
   config.before(:each) do
@@ -44,7 +44,7 @@ RSpec.configure do |config|
   end
 
   config.after(:each) do
-    Apartment::Tenant.reset
+    Apartment::Tenant.switch!
     Apartment.tenant_names.each do |tenant|
       Apartment::Tenant.drop(tenant) if tenant != 'rspec'
     end
