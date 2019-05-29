@@ -4,15 +4,18 @@ module SessionHelper
   end
 
   def set_request_headers(resp)
-    base_headers.merge({ 'access-token' => resp['access-token'],
+    t = base_headers.merge({ 'access-token' => resp['access-token'],
                          'token-type' => resp['token-type'],
                          'client' => resp['client'],
                          'expiry' => resp['expiry'],
                          'uid' => resp['uid'] })
+    #puts t.inspect
+    t
   end
 
   def account_login(identifier, email, password)
     post '/auth/sign_in', params: { email: email, password: password }
+    #puts response.inspect
     return set_request_headers(response.headers)
   end
 

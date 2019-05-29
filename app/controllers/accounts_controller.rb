@@ -2,7 +2,7 @@ class AccountsController < ApplicationController
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!
 
-  # GET /:identifier/account
+  # GET /account/1
   def show
     schema = ShowAccountSchema.new(request.params)
     payload = schema.to_hash
@@ -23,7 +23,7 @@ class AccountsController < ApplicationController
     end
   end
 
-  # PATCH/PUT /:identifier/account
+  # PATCH/PUT /accounts/1
   def update
     authorize Account, :update?
     schema = UpdateAccountSchema.new(request.params)
@@ -35,7 +35,7 @@ class AccountsController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
-  # DELETE /:identifier/account
+  # DELETE /accounts/1
   def destroy
     authorize Account, :destroy?
     schema = ShowAccountSchema.new(request.params)
@@ -43,12 +43,16 @@ class AccountsController < ApplicationController
     realizer.object.discard!
   end
 
-  # PUT /:identifier/account/restore
+  # PUT /accounts/1/restore
   def restore
     authorize Account, :restore?
     schema = ShowAccountSchema.new(request.params)
     realizer = AccountRealizer.new(intent: :show, parameters: schema, headers: request.headers)
     realizer.object.undiscard!
     render json: JSONAPI::Serializer.serialize(realizer.objet), status: :ok
+  end
+
+  def current_account
+    Account.find(params[:id])
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_05_010159) do
+ActiveRecord::Schema.define(version: 2019_05_29_050219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,52 +26,13 @@ ActiveRecord::Schema.define(version: 2019_05_05_010159) do
     t.index ["user_id"], name: "index_account_users_on_user_id"
   end
 
-  create_table "reports", force: :cascade do |t|
-    t.string "name", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "accounts", force: :cascade do |t|
     t.string "identifier", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-  end
-
-  create_table "users", force: :cascade do |t|
-    t.string "provider", default: "email", null: false
-    t.string "uid", default: "", null: false
-    t.string "encrypted_password", default: "", null: false
-    t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.boolean "allow_password_change", default: false
-    t.datetime "remember_created_at"
-    t.integer "sign_in_count", default: 0, null: false
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string "current_sign_in_ip"
-    t.string "last_sign_in_ip"
-    t.string "confirmation_token"
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
-    t.string "unconfirmed_email"
-    t.string "first_name"
-    t.string "last_name"
-    t.string "nickname"
-    t.string "image"
-    t.string "email", null: false
-    t.json "tokens"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.datetime "discarded_at"
-    t.bigint "default_account_id"
-    t.jsonb "options", default: {}, null: false
-    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
-    t.index ["default_account_id"], name: "index_users_on_default_account_id"
-    t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
-    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
+    t.index ["discarded_at"], name: "index_accounts_on_discarded_at"
   end
 
   create_table "documents", force: :cascade do |t|
@@ -110,12 +71,59 @@ ActiveRecord::Schema.define(version: 2019_05_05_010159) do
     t.index ["name"], name: "index_forms_on_name", unique: true
   end
 
+  create_table "options", force: :cascade do |t|
+    t.integer "name", null: false
+    t.string "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_options_on_name", unique: true
+  end
+
   create_table "permissions", force: :cascade do |t|
     t.integer "code", null: false
     t.bigint "account_user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["code", "account_user_id"], name: "index_permissions_on_code_and_account_user_id", unique: true
+  end
+
+  create_table "reports", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string "provider", default: "email", null: false
+    t.string "uid", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.boolean "allow_password_change", default: false
+    t.datetime "remember_created_at"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.string "nickname"
+    t.string "image"
+    t.string "email", null: false
+    t.json "tokens"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "default_account_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["default_account_id"], name: "index_users_on_default_account_id"
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true
   end
 
   create_table "versions", force: :cascade do |t|

@@ -8,7 +8,7 @@ class CreateAccountSchema
     field :data, type: Strict::Hash do
       field :type, type: Strict::String.enum('accounts')
       field :attributes, type: Strict::Hash.optional do
-        field :bane, type: Strict::String.optional
+        field :name, type: Strict::String.optional
         field :identifier, type: Strict::String.optional
       end
     end

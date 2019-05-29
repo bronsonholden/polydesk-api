@@ -6,7 +6,6 @@ FactoryBot.define do
     password { 'password' }
     association :default_account, factory: :account
     after(:create) do |user|
-      user.create_tenant unless user.default_account.identifier == 'rspec'
       user.confirm
     end
   end

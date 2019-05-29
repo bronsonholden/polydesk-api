@@ -1,10 +1,7 @@
 module Overrides
   class SessionsController < DeviseTokenAuth::SessionsController
     def render_create_success
-      account = @resource.default_account || @resource
-      Apartment::Tenant.switch(account.identifier) do
-        render json: JSONAPI::Serializer.serialize(account), status: :ok
-      end
+      render json: JSONAPI::Serializer.serialize(@resource), status: :ok
     end
   end
 end

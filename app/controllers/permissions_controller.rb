@@ -24,9 +24,8 @@ class PermissionsController < ApplicationController
   # GET /:identifier/users/:id/permissions
   def index
     Apartment::Tenant.switch(params[:identifier]) do
-      @permissions = Permission.where(account_user_id: @account_user.user_id).order('id').page(current_page).per(per_page)
-      options = PaginationGenerator.new(request: request, paginated: @permissions).generate
-      render json: PermissionSerializer.new(@permissions, options).serialized_json, status: :ok
+      @permissions = Permission.where(account_user_id: @account_user.user_id).order('id')
+      render json: PermissionSerializer.new(@permissions).serialized_json, status: :ok
     end
   end
 

@@ -1,4 +1,5 @@
 class Account < ApplicationRecord
+  include Discard::Model
   attr_readonly :identifier
   validates :identifier, uniqueness: true,
                          presence: true,

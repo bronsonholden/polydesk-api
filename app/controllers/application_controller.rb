@@ -7,19 +7,23 @@ class ApplicationController < ActionController::API
   include Pundit
   include Polydesk
 
-  # rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
-  # rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
-  # rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  # # rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
-  # rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
-  # rescue_from Polydesk::ApiExceptions::NotVersionable, with: :invalid_exception
-  # rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
-  # rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
-  # rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
-  # rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
+  rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
+  rescue_from Polydesk::ApiExceptions::NotVersionable, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::FolderException::NoThankYou, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
+  rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
 
   def pundit_user
-    Polydesk::AuthContext.new(current_user, params[:identifier])
+    Polydesk::AuthContext.new(current_user, current_account)
+  end
+
+  def current_account
+    Account.find_by_identifier!(params[:identifier])
   end
 
   # GET /

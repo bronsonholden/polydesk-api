@@ -2,12 +2,12 @@ require 'rails_helper'
 
 describe AccountUser do
   describe 'rspec user' do
+    let!(:user) { create :account_user }
     it 'correctly creates user' do
-      account = Account.first
-      account_user = AccountUser.first
-      expect(account_user.role).to eq('user')
-      expect(account.has_password?).to be true
-      expect(account.valid_password?('password')).to be true
+      account_user = AccountUser.last
+      expect(user.role).to eq('user')
+      expect(user.user.valid_password?('password')).to be true
+      expect(user.user.accounts.size).to eq(1)
     end
   end
 
@@ -16,7 +16,7 @@ describe AccountUser do
     it 'correctly creates admin' do
       expect(admin.role).to eq('administrator')
       expect(admin.user.valid_password?('password')).to be true
-      expect(admin.user.accounts.size).to eq(2)
+      expect(admin.user.accounts.size).to eq(1)
     end
   end
 
@@ -25,7 +25,7 @@ describe AccountUser do
     it 'correctly creates guest' do
       expect(guest.role).to eq('guest')
       expect(guest.user.valid_password?('password')).to be true
-      expect(guest.user.accounts.size).to eq(2)
+      expect(guest.user.accounts.size).to eq(1)
     end
   end
 
@@ -34,7 +34,7 @@ describe AccountUser do
     it 'links new user and account' do
       expect(account_user).not_to be_nil
       expect(account_user.user.valid_password?('password')).to be true
-      expect(account_user.user.accounts.size).to eq(2)
+      expect(account_user.user.accounts.size).to eq(1)
     end
   end
 end

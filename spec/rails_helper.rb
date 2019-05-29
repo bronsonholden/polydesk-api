@@ -30,7 +30,7 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
     # Tenant cleanup
     Apartment::Tenant.drop('rspec') rescue nil
-    user = User.create(first_name: 'RSpec', last_name: 'User', email: 'rspec@Polydesk.io', password: 'password')
+    user = User.create(first_name: 'RSpec', last_name: 'User', email: 'rspec@polydesk.io', password: 'password')
     user.confirm
     # Account creation
     account = Account.create(name: 'RSpec Account', identifier: 'rspec')
