@@ -52,7 +52,10 @@ class DocumentsController < ApplicationController
       authorize Document, :show?
       schema = ShowDocumentSchema.new(request.params)
       realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
-      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
+      render json: JSONAPI::Serializer.serialize(
+                     realizer.object,
+                     include: (schema.include.split(',') if schema.key?('include'))
+                  ), status: :ok
     end
   end
 
@@ -63,7 +66,11 @@ class DocumentsController < ApplicationController
       schema = IndexDocumentsSchema.new(request.params)
       realizer = DocumentRealizer.new(intent: :index, parameters: schema, headers: request.headers)
       documents = realizer.object
-      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: { page_offset: page_offset, page_limit: page_limit }), status: :ok
+      render json: JSONAPI::Serializer.serialize(
+                     realizer.object,
+                     is_collection: true,
+                     include: (schema.include.split(',') if schema.key?('include'))
+                  ), status: :ok
     end
   end
 
