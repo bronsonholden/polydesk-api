@@ -7,7 +7,11 @@ class FoldersController < ApplicationController
       authorize Folder, :index?
       schema = IndexFoldersSchema.new(request.params)
       realizer = FolderRealizer.new(intent: :index, parameters: schema, headers: request.headers)
-      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
+      render json: JSONAPI::Serializer.serialize(
+                     realizer.object,
+                     is_collection: true,
+                     include: (schema.include.split(',') if schema.key?('include'))
+                  ), status: :ok
     end
   end
 
@@ -17,7 +21,10 @@ class FoldersController < ApplicationController
       authorize Folder, :show?
       schema = ShowFolderSchema.new(request.params)
       realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
-      render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
+      render json: JSONAPI::Serializer.serialize(
+                     realizer.object,
+                     include: (schema.include.split(',') if schema.key?('include'))
+                   ), status: :ok
     end
   end
 
@@ -89,9 +96,8 @@ class FoldersController < ApplicationController
         content = folders.order('id').offset(first_item) + documents.order('id').limit(last_item - folders_count)
       end
       # Create pseudo-paginated collection
-      pagination_props = PaginationProperties.new(page_offset, (total.to_f / page_limit).ceil, page_limit)
-      options = PaginationGenerator.new(request: request, paginated: pagination_props, count: total).generate
-      render json: FolderContentSerializer.new(content, options).serialized_json, status: :ok
+      pagination_props = PaginationProperties.new(page_offset, page_limit, total, (total.to_f / page_limit).ceil)
+      render json: JSONAPI::Serializer.serialize(content, is_collection: true, meta: pagination_props), status: :ok
     end
   end
 
@@ -113,6 +119,17 @@ class FoldersController < ApplicationController
       schema = ShowFolderSchema.new(request.params)
       realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
       render json: JSONAPI::Serializer.serialize(realizer.object.documents, is_collection: true), status: :ok
+    end
+  end
+
+  # Non-JSON:API document create
+  def upload_document
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :create?
+      authorize Folder, :update?
+      folder = Folder.find(params.permit(:id).fetch(:id))
+      document = folder.documents.create!(params.permit(:content, :name))
+      render json: JSONAPI::Serializer.serialize(document), status: :created
     end
   end
 

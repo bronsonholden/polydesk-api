@@ -22,6 +22,10 @@ Rails.application.routes.draw do
     resources :forms
     resources :options
 
+    post '/upload', to: 'documents#upload_new'
+    post '/folders/:id/upload', to: 'folders#upload_document'
+    patch '/documents/:id/upload', to: 'documents#upload_version'
+
     post '/users', to: 'users#create_auth'
     get '/users/:id/permissions', to: 'permissions#index'
     post '/users/:id/permissions', to: 'permissions#create'

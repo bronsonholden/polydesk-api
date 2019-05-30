@@ -15,6 +15,25 @@ class DocumentsController < ApplicationController
     end
   end
 
+  # Non-JSON:API create
+  def upload_new
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :create?
+      document = Document.create!(params.permit(:content, :name))
+      render json: JSONAPI::Serializer.serialize(document), status: :created
+    end
+  end
+
+  # Non-JSON:API update
+  def upload_version
+    Apartment::Tenant.switch(params[:identifier]) do
+      authorize Document, :create?
+      document = Document.find(params.permit(:id).fetch(:id))
+      document.update!(params.permit(:content, :name))
+      render json: JSONAPI::Serializer.serialize(document), status: :ok
+    end
+  end
+
   # PATCH/PUT /:identifier/documents/:id
   def update
     Apartment::Tenant.switch(params[:identifier]) do
