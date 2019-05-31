@@ -16,6 +16,7 @@ class AccountsController < ApplicationController
       schema = CreateAccountSchema.new(request.params)
       realizer = AccountRealizer.new(intent: :create, parameters: schema, headers: request.headers)
       realizer.object.save!
+      realizer.object.users << current_user
       Apartment::Tenant.create(realizer.object.identifier)
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end
