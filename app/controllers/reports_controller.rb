@@ -7,7 +7,8 @@ class ReportsController < ApplicationController
       authorize Report, :index?
       schema = IndexReportsSchema.new(request.params)
       realizer = ReportRealizer.new(intent: :index, parameters: schema, headers: request.headers)
-      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
+      pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
+      render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props), status: :ok
     end
   end
 

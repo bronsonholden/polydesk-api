@@ -5,7 +5,8 @@ class VersionsController < ApplicationController
   def index
     Apartment::Tenant.switch(params['identifier']) do
       set_data
-      render json: JSONAPI::Serializer.serialize(@object.versions, is_collection: true), status: :ok
+      pagination_props = PaginationProperties.new(page_offset, page_limit, @object.versions.size)
+      render json: JSONAPI::Serializer.serialize(@object.versions, is_collection: true, meta: pagination_props), status: :ok
     end
   end
 
