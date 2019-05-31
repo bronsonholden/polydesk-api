@@ -10,11 +10,11 @@ module SmartParams
     end
 
     def compounding_params
-      field :include, type: (Strict::String | Strict::Array.of(Strict::String)).optional
+      field :include, type: Strict::String.constrained(min_size: 1).optional
     end
 
     def sorting_params
-      field :sort, type: (Strict::String | Strict::Array.of(Strict::String)).optional
+      field :sort, type: Strict::String.constrained(min_size: 1).optional
     end
 
     def sparse_params
