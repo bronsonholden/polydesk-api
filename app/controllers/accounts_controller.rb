@@ -6,8 +6,6 @@ class AccountsController < ApplicationController
   def show
     schema = ShowAccountSchema.new(request.params)
     payload = schema.to_hash
-    # Since Account paths don't specify an ID in the path
-    payload.merge!({ 'id' => schema.id })
     realizer = AccountRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -28,8 +26,6 @@ class AccountsController < ApplicationController
     authorize Account, :update?
     schema = UpdateAccountSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, Account)
-    # Since Account paths don't specify an ID in the path
-    payload.merge!({ 'id' => schema.id })
     realizer = AccountRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
