@@ -14,7 +14,8 @@ class AccountsController < ApplicationController
   def create
     ActiveRecord::Base.transaction do
       schema = CreateAccountSchema.new(request.params)
-      realizer = AccountRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+      payload = sanitize_payload(schema.to_hash, Account)
+      realizer = AccountRealizer.new(intent: :create, parameters: payload, headers: request.headers)
       realizer.object.save!
       realizer.object.users << current_user
       Apartment::Tenant.create(realizer.object.identifier)
@@ -50,6 +51,6 @@ class AccountsController < ApplicationController
   end
 
   def current_account
-    Account.find(params[:id])
+    Account.find_by_id(params[:id])
   end
 end

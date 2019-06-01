@@ -23,7 +23,7 @@ class ApplicationController < ActionController::API
   end
 
   def current_account
-    Account.find_by_identifier!(params[:identifier])
+    Account.find_by_identifier(params[:identifier])
   end
 
   # GET /

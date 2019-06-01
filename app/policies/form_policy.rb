@@ -9,30 +9,30 @@ class FormPolicy < ApplicationPolicy
   def create?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:form_create)
+    has_permission?(:form_create)
   end
 
   def show?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:form_show)
+    has_permission?(:form_show)
   end
 
   def index?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:form_index)
+    has_permission?(:form_index)
   end
 
   def update?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:form_update)
+    has_permission?(:form_update)
   end
 
   def destroy?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:form_destroy)
+    has_permission?(:form_destroy)
   end
 end

@@ -1,9 +1,10 @@
 class AccountPolicy < ApplicationPolicy
-  attr_reader :user, :account
-
   def initialize(auth, account)
     super
-    @account = account
+  end
+
+  def create?
+    true
   end
 
   def show?
@@ -13,7 +14,7 @@ class AccountPolicy < ApplicationPolicy
   def update?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:account_update)
+    has_permission?(:account_update)
   end
 
   def destroy?

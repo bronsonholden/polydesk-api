@@ -2,15 +2,29 @@ class ApplicationPolicy
   attr_reader :user, :record
 
   def initialize(auth, record)
-    @account_user = AccountUser.find_by(user_id: auth.user.id, account_id: auth.account.id)
-    raise Polydesk::ApiExceptions::UserException::NoAccountAccess.new(auth.user) unless @account_user
-    raise Polydesk::ApiExceptions::AccountIsDisabled.new(auth.account) if auth.account.discarded?
+    @user = auth.user
+    @account = auth.account
+    @account_user = AccountUser.find_by(user: @user, account: @account)
     @record = record
+    # TODO
+    # raise Polydesk::ApiExceptions::AccountIsDisabled.new(auth.account) if auth.account.discarded?
+  end
+
+  def has_role?(role)
+    !@account_user.nil? && @account_user.role == role
+  end
+
+  def administrator?
+    has_role?('administrator')
+  end
+
+  def guest?
+    has_role?('guest')
   end
 
   def default_policy
     return false if @account_user.nil? || @account_user.disabled?
-    return true if @account_user.role == 'administrator'
+    return true if administrator?
   end
 
   def index?
@@ -22,7 +36,7 @@ class ApplicationPolicy
   end
 
   def create?
-    return false if @account_user.role == 'guest'
+    return false if guest?
     default_policy
   end
 
@@ -31,7 +45,7 @@ class ApplicationPolicy
   end
 
   def update?
-    return false if @account_user.role == 'guest'
+    return false if guest?
     default_policy
   end
 
@@ -40,7 +54,7 @@ class ApplicationPolicy
   end
 
   def destroy?
-    return false if @account_user.role == 'guest'
+    return false if guest?
     default_policy
   end
 
@@ -59,7 +73,7 @@ class ApplicationPolicy
 
   protected
 
-  def has_permission(code)
-    !!@account_user.permissions.find_by(code: code)
+  def has_permission?(code)
+    !@account_user.nil? && !!@account_user.permissions.find_by(code: code)
   end
 end

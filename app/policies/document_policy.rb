@@ -9,31 +9,31 @@ class DocumentPolicy < ApplicationPolicy
   def create?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:document_create)
+    has_permission?(:document_create)
   end
 
   def show?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:document_show)
+    has_permission?(:document_show)
   end
 
   def index?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:document_index)
+    has_permission?(:document_index)
   end
 
   def update?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:document_update)
+    has_permission?(:document_update)
   end
 
   def destroy?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:document_destroy)
+    has_permission?(:document_destroy)
   end
 
   def allowed_attributes_for_create

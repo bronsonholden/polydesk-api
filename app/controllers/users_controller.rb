@@ -10,20 +10,7 @@ class UsersController < ApplicationController
   end
 
   # POST /users
-  # Create user while not authenticated.
   def create
-    schema = CreateUserSchema.new(request.params)
-    # Since we're not authenticated, we can't use policies to permit
-    # attributes.
-    payload = schema.to_hash
-    payload.dig('data').slice!('attributes')
-    realizer = UserRealizer.new(intent: :create, parameters: payload, headers: request.headers)
-    realizer.object.save!
-    render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
-  end
-
-  # POST /:identifier/users
-  def create_auth
     schema = CreateUserSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, User)
     realizer = UserRealizer.new(intent: :create, parameters: payload, headers: request.headers)

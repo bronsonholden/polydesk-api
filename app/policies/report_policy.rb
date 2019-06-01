@@ -9,30 +9,30 @@ class ReportPolicy < ApplicationPolicy
   def create?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:report_create)
+    has_permission?(:report_create)
   end
 
   def show?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:report_show)
+    has_permission?(:report_show)
   end
 
   def index?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:report_index)
+    has_permission?(:report_index)
   end
 
   def update?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:report_update)
+    has_permission?(:report_update)
   end
 
   def destroy?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:report_destroy)
+    has_permission?(:report_destroy)
   end
 end

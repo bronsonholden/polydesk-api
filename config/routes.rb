@@ -21,6 +21,7 @@ Rails.application.routes.draw do
     resources :reports
     resources :forms
     resources :options
+    resources :account_users, path: 'users'
 
     post '/upload', to: 'documents#upload_new'
     post '/folders/:id/upload', to: 'folders#upload_document'

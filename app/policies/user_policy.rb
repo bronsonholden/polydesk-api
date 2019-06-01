@@ -6,6 +6,10 @@ class UserPolicy < ApplicationPolicy
     @user_subject = user_subject
   end
 
+  def create?
+    true
+  end
+
   def show?
     true
   end
@@ -13,7 +17,7 @@ class UserPolicy < ApplicationPolicy
   def update?
     allowed = super
     return allowed unless allowed.nil?
-    has_permission(:user_update)
+    has_permission?(:user_update)
   end
 
   def destroy?
@@ -27,11 +31,11 @@ class UserPolicy < ApplicationPolicy
   # Only applies when authenticated, i.e. creating a user for an invitee to
   # an existing account.
   def allowed_attributes_for_create
-    [:name, :email, :password, :password_confirmation]
+    [:first_name, :last_name, :email, :password, :password_confirmation]
   end
 
   def allowed_attributes_for_update
-    [:name, :password]
+    [:first_name, :last_name, :password]
   end
 
   def allowed_relationships_for_create
