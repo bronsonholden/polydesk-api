@@ -2,6 +2,14 @@ class AccountsController < ApplicationController
   # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!
 
+  # GET /accounts
+  def index
+    schema = IndexAccountsSchema.new(request.params)
+    payload = schema.to_hash
+    realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(Account))
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true)
+  end
+
   # GET /account/:id
   def show
     schema = ShowAccountSchema.new(request.params)
@@ -57,7 +65,8 @@ class AccountsController < ApplicationController
   protected
 
   def set_tenant
-    return if action_name == 'create'
-    Apartment::Tenant.switch!(Account.find(params[:id]).identifier)
+    id = params['id']
+    return if id.nil?
+    Apartment::Tenant.switch!(Account.find(id).identifier)
   end
 end

@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/paulholden2/smart_params.rb
-  revision: 5860e53dab3264e678428b1ff0b18932e09e4516
-  ref: 5860e53
+  revision: 534ce06a5f75308f378bad0837a2c85323c82351
+  ref: 534ce06
   specs:
     smart_params (2.3.1)
       activesupport (>= 5.2, >= 5.0.0, >= 4.1, >= 4.0.0)

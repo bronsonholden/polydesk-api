@@ -1,6 +1,21 @@
 class AccountPolicy < ApplicationPolicy
-  def initialize(auth, account)
-    super
+  class Scope
+    attr_reader :auth, :scope
+
+    def initialize(auth, scope)
+      @auth = auth
+      @scope = scope
+    end
+
+    def resolve
+      # TODO: Polydesk admins can see all accounts
+      # return scope.all if auth.user.email ...
+      auth.user.accounts
+    end
+  end
+
+  def index?
+    true
   end
 
   def create?
