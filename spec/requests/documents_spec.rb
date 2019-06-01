@@ -53,8 +53,10 @@ RSpec.describe 'Documents', type: :request do
     it 'deletes document' do
       delete "/rspec/documents/#{document.id}", headers: rspec_session
       expect(response).to have_http_status(204)
-      document.reload
-      expect(document.discarded_at).not_to be_nil
+      Apartment::Tenant.switch('rspec') do
+        document.reload
+        expect(document.discarded_at).not_to be_nil
+      end
     end
 
     context 'guest with permission' do
@@ -72,8 +74,10 @@ RSpec.describe 'Documents', type: :request do
       it 'deletes document' do
         delete "/rspec/documents/#{document.id}", headers: rspec_session(admin)
         expect(response).to have_http_status(204)
-        document.reload
-        expect(document.discarded_at).not_to be_nil
+        Apartment::Tenant.switch('rspec') do
+          document.reload
+          expect(document.discarded_at).not_to be_nil
+        end
       end
     end
   end
@@ -164,7 +168,9 @@ RSpec.describe 'Documents', type: :request do
                                                      attributes: {
                                                        name: 'New name.txt' } } }.to_json
         expect(response).to have_http_status(200)
-        expect(document.reload.name).to eq('New name.txt')
+        Apartment::Tenant.switch('rspec') do
+          expect(document.reload.name).to eq('New name.txt')
+        end
       end
     end
   end

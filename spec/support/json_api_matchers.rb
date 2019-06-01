@@ -39,6 +39,8 @@ end
 
 RSpec::Matchers.define :have_changed_attributes do
   match do |record|
-    return record.attributes != record.reload.attributes
+    Apartment::Tenant.switch('rspec') do
+      return record.attributes != record.reload.attributes
+    end
   end
 end

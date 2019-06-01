@@ -3,6 +3,9 @@ require 'polydesk/auth_context'
 # TODO: For all POST requests that contain resource objects, need to check
 # type and return 409 if it doesn't match with the collection resource type.
 class ApplicationController < ActionController::API
+  before_action :set_tenant
+  after_action :clear_tenant
+
   include DeviseTokenAuth::Concerns::SetUserByToken
   include Pundit
   include Polydesk
@@ -72,6 +75,14 @@ class ApplicationController < ActionController::API
     return [] if _policy.nil? || !_policy.respond_to?(fn)
     # Retrieve allowed attributes (default to none allowed)
     _policy.send(fn) || []
+  end
+
+  def set_tenant
+    Apartment::Tenant.switch!(params['identifier'])
+  end
+
+  def clear_tenant
+    Apartment::Tenant.switch!
   end
 
   private

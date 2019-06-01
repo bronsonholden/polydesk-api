@@ -53,4 +53,11 @@ class AccountsController < ApplicationController
   def current_account
     Account.find_by_id(params[:id])
   end
+
+  protected
+
+  def set_tenant
+    return if action_name == 'create'
+    Apartment::Tenant.switch!(Account.find(params[:id]).identifier)
+  end
 end
