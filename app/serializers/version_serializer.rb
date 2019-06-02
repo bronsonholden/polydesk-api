@@ -1,4 +1,4 @@
-class VersionSerializer < ApplicationSerializer
+class VersionSerializer < TenantSerializer
   def type
     object.reify.class.name.underscore if !object.reify.nil?
   end

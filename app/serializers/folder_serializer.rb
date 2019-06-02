@@ -1,4 +1,4 @@
-class FolderSerializer < ApplicationSerializer
+class FolderSerializer < TenantSerializer
   attributes :name, :created_at, :updated_at, :discarded_at
   has_one :parent
   has_many :children
