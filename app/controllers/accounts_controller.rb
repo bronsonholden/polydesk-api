@@ -7,7 +7,8 @@ class AccountsController < ApplicationController
     schema = IndexAccountsSchema.new(request.params)
     payload = schema.to_hash
     realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(Account))
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true)
+    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props)
   end
 
   # GET /account/:id
@@ -25,7 +26,7 @@ class AccountsController < ApplicationController
       payload = sanitize_payload(schema.to_hash, Account)
       realizer = AccountRealizer.new(intent: :create, parameters: payload, headers: request.headers)
       realizer.object.save!
-      realizer.object.users << current_user
+      realizer.object.account_users.create!(user: current_user, role: :administrator)
       Apartment::Tenant.create(realizer.object.identifier)
       render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
     end

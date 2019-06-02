@@ -11,6 +11,7 @@ RSpec.describe 'Accounts', type: :request do
                               identifier: 'rspec2',
                               name: 'RSpec 2' } } }.to_json
       expect(response).to have_http_status(201)
+      expect(AccountUser.last.role).to eq('administrator')
     end
 
     it 'creates new account without password' do
