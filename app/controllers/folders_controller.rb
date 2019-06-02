@@ -6,7 +6,8 @@ class FoldersController < ApplicationController
     authorize Folder, :index?
     schema = IndexFoldersSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :index, parameters: schema, headers: request.headers)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include'))), status: :ok
+    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props), status: :ok
   end
 
   # GET /:identifier/folders/:id
