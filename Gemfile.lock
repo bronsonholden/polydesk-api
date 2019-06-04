@@ -264,6 +264,7 @@ GEM
       activesupport (>= 5.2, >= 5.0.0, >= 4.1, >= 4.0.0)
       dry-types (~> 0.12)
       recursive-open-struct (~> 1.1)
+    smush (0.1.0)
     spring (2.0.2)
       activesupport (>= 4.2)
     spring-watcher-listen (2.0.1)
@@ -322,6 +323,7 @@ DEPENDENCIES
   rspec-rails (~> 3.8)
   shrine (~> 2.0)
   smart_params (~> 2.4.0)
+  smush
   spring
   spring-watcher-listen (~> 2.0.0)
   sqlite3 (~> 1.3, >= 1.3.11)

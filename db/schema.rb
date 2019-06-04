@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_29_050219) do
+ActiveRecord::Schema.define(version: 2019_06_04_015640) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -60,6 +60,19 @@ ActiveRecord::Schema.define(version: 2019_05_29_050219) do
     t.index ["discarded_at"], name: "index_folders_on_discarded_at"
     t.index ["parent_id", "name", "unique_enforcer"], name: "index_folders_on_parent_id_and_name_and_unique_enforcer", unique: true
     t.index ["parent_id"], name: "index_folders_on_parent_id"
+  end
+
+  create_table "form_submissions", force: :cascade do |t|
+    t.bigint "submitter_id"
+    t.jsonb "data", null: false
+    t.jsonb "flat_data", null: false
+    t.jsonb "schema_snapshot", default: {}
+    t.jsonb "layout_snapshot", default: {}
+    t.bigint "form_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "((flat_data ->> 'value'::text))", name: "index_form_submissions_on_flat_data_value"
+    t.index ["form_id"], name: "index_form_submissions_on_form_id"
   end
 
   create_table "forms", force: :cascade do |t|
@@ -138,5 +151,6 @@ ActiveRecord::Schema.define(version: 2019_05_29_050219) do
 
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
+  add_foreign_key "form_submissions", "forms"
   add_foreign_key "users", "accounts", column: "default_account_id"
 end
