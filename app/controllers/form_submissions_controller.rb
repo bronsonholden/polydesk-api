@@ -3,6 +3,7 @@ class FormSubmissionsController < ApplicationController
 
   # GET /:identifier/form-submissions
   def index
+    authorize FormSubmission, :index?
     schema = IndexFormSubmissionsSchema.new(request.params)
     realizer = FormSubmissionRealizer.new(intent: :index, parameters: schema.to_hash, headers: request.headers)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
@@ -10,6 +11,7 @@ class FormSubmissionsController < ApplicationController
 
   # POST /:identifier/form-submissions
   def create
+    authorize FormSubmission, :create?
     schema = CreateFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :create, parameters: payload, headers: request.headers)
@@ -20,6 +22,7 @@ class FormSubmissionsController < ApplicationController
 
   # GET /:identifier/form-submissions/:id
   def show
+    authorize FormSubmission, :show?
     schema = ShowFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :show, parameters: payload, headers: request.headers)
@@ -28,6 +31,7 @@ class FormSubmissionsController < ApplicationController
 
   # PATCH /:identifier/form-submissions/:id
   def update
+    authorize FormSubmission, :update?
     schema = UpdateFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :update, parameters: payload, headers: request.headers)
@@ -37,6 +41,7 @@ class FormSubmissionsController < ApplicationController
 
   # DELETE /:identifier/form-submissions/:id
   def destroy
+    authorize FormSubmission, :destroy?
     schema = ShowFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :show, parameters: payload, headers: request.headers)
