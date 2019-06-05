@@ -5,7 +5,6 @@ class Document < ApplicationRecord
 
   attr_accessor :skip_background_upload
 
-  include Rails.application.routes.url_helpers
   include Discard::Model
   include DocumentContentUploader::Attachment.new(:content)
   include Polydesk::Model::Validations::Document
@@ -13,10 +12,6 @@ class Document < ApplicationRecord
   include Polydesk::VerifyDocument
 
   belongs_to :folder, optional: true
-
-  def related_folder_url
-    document_folder_url(id: self.id, identifier: Apartment::Tenant.current)
-  end
 
   def default_folder
     self.folder_id ||= 0
@@ -81,9 +76,5 @@ class Document < ApplicationRecord
       self.content_type = content.metadata['mime_type']
       self.file_size = content.metadata['size']
     end
-  end
-
-  def url
-    document_url(id: self.id, identifier: Apartment::Tenant.current)
   end
 end
