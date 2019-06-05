@@ -1,4 +1,5 @@
 class FormSubmissionsController < ApplicationController
+  before_action :authenticate_user!
 
   # GET /:identifier/form-submissions
   def index
