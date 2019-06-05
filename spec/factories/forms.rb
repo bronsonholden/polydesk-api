@@ -6,9 +6,9 @@ FactoryBot.define do
         type: 'object',
         properties: {
           name: {
-            type: 'string'
-          }
-        }
+            type: 'string' },
+          email: {
+            type: 'string' } }
       }
     }
   end

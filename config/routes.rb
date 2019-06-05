@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     resources :folders
     resources :reports
     resources :forms
+    resources :form_submissions, path: 'form-submissions'
     resources :options
     resources :account_users, path: 'users'
 
