@@ -18,7 +18,7 @@ class FormSubmissionsController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
 
-    # GET /:identifier/form-submissions/:id
+  # GET /:identifier/form-submissions/:id
   def show
     schema = ShowFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
