@@ -1,5 +1,7 @@
 class FormSubmission < ApplicationRecord
   attr_readonly :flat_data
+  attr_readonly :schema_snapshot
+  attr_readonly :layout_snapshot
 
   validates :data, presence: true
   validates :flat_data, presence: true
