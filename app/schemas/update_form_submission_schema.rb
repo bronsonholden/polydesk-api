@@ -9,7 +9,7 @@ class UpdateFormSubmissionSchema
       field :id, type: Strict::String
       field :type, type: Strict::String.enum('form-submissions')
       field :attributes, type: Strict::Hash.optional do
-        field :data, type: Strict::String.Hash.optional
+        field :data, type: Strict::Hash.optional
       end
     end
   end
