@@ -1,4 +1,8 @@
 class FormSubmission < ApplicationRecord
+  include Statesman::Adapters::ActiveRecordQueries
+
+  has_many :form_submission_transitions, autosave: false
+
   attr_readonly :flat_data
   attr_readonly :schema_snapshot
   attr_readonly :layout_snapshot
@@ -10,6 +14,22 @@ class FormSubmission < ApplicationRecord
 
   before_validation :form_snapshot, on: :create
   before_validation :flatten_data
+
+  def state_machine
+    @state_machine ||= FormSubmissionStateMachine.new(self, transition_class: FormSubmissionTransition)
+  end
+
+  def self.transition_class
+    FormSubmissionTransition
+  end
+
+  def self.initial_state
+    :draft
+  end
+
+  private_class_method :initial_state
+
+  delegate :can_transition_to?, :transition_to!, :transition_to, :current_state, to: :state_machine
 
   protected
 

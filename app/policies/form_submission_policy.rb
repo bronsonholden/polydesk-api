@@ -20,7 +20,7 @@ class FormSubmissionPolicy < ApplicationPolicy
   end
 
   def allowed_attributes_for_create
-    [:data]
+    [:data, :state]
   end
 
   def allowed_relationships_for_create
@@ -28,7 +28,7 @@ class FormSubmissionPolicy < ApplicationPolicy
   end
 
   def allowed_attributes_for_update
-    [:data]
+    [:data, :state]
   end
 
   def allowed_relationships_for_update

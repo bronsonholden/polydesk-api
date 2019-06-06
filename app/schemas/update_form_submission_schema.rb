@@ -10,6 +10,7 @@ class UpdateFormSubmissionSchema
       field :type, type: Strict::String.enum('form-submissions')
       field :attributes, type: Strict::Hash.optional do
         field :data, type: Strict::Hash.optional
+        field :state, type: Strict::String.enum('draft', 'published').optional
       end
     end
   end

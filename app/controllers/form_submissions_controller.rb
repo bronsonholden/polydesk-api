@@ -14,9 +14,13 @@ class FormSubmissionsController < ApplicationController
     authorize FormSubmission, :create?
     schema = CreateFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
+    # Workaround since we can't do virtual attributes with jsonapi-realizer
+    attributes = payload.dig('data', 'attributes') || {}
+    state = attributes.delete('state')
     realizer = FormSubmissionRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     realizer.object.submitter = current_user
     realizer.object.save!
+    realizer.object.transition_to!(:published) if state != 'draft'
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
 
