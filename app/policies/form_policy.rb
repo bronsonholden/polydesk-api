@@ -1,6 +1,20 @@
 class FormPolicy < ApplicationPolicy
   attr_reader :user, :form
 
+  class Scope
+    attr_reader :auth, :scope
+
+    def initialize(auth, scope)
+      @auth = auth
+      @scope = scope
+    end
+
+    def resolve
+      #scope.kept
+      scope
+    end
+  end
+
   def initialize(auth, form)
     super
     @form = form

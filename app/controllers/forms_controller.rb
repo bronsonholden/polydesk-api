@@ -41,6 +41,6 @@ class FormsController < ApplicationController
     authorize Form, :destroy?
     schema = ShowFormSchema.new(request.params)
     realizer = FormRealizer.new(intent: :show, parameters: schema, headers: request.headers)
-    realizer.object.destroy
+    realizer.object.discard!
   end
 end
