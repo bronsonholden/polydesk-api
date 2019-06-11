@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_29_050219) do
+ActiveRecord::Schema.define(version: 2019_06_10_060609) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -62,12 +62,38 @@ ActiveRecord::Schema.define(version: 2019_05_29_050219) do
     t.index ["parent_id"], name: "index_folders_on_parent_id"
   end
 
+  create_table "form_submission_transitions", force: :cascade do |t|
+    t.string "to_state", null: false
+    t.json "metadata", default: {}
+    t.integer "sort_key", null: false
+    t.integer "form_submission_id", null: false
+    t.boolean "most_recent", null: false
+    t.datetime "created_at", null: false
+    t.index ["form_submission_id", "most_recent"], name: "index_form_submission_transitions_parent_most_recent", unique: true, where: "most_recent"
+    t.index ["form_submission_id", "sort_key"], name: "index_form_submission_transitions_parent_sort", unique: true
+  end
+
+  create_table "form_submissions", force: :cascade do |t|
+    t.bigint "submitter_id"
+    t.jsonb "data", null: false
+    t.jsonb "flat_data", null: false
+    t.jsonb "schema_snapshot", default: {}
+    t.jsonb "layout_snapshot", default: {}
+    t.bigint "form_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "((flat_data ->> 'value'::text))", name: "index_form_submissions_on_flat_data_value"
+    t.index ["form_id"], name: "index_form_submissions_on_form_id"
+  end
+
   create_table "forms", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "schema", default: {}, null: false
     t.jsonb "layout", default: {}, null: false
+    t.datetime "discarded_at"
+    t.index ["discarded_at"], name: "index_forms_on_discarded_at"
     t.index ["name"], name: "index_forms_on_name", unique: true
   end
 
@@ -138,5 +164,7 @@ ActiveRecord::Schema.define(version: 2019_05_29_050219) do
 
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
+  add_foreign_key "form_submission_transitions", "form_submissions"
+  add_foreign_key "form_submissions", "forms"
   add_foreign_key "users", "accounts", column: "default_account_id"
 end
