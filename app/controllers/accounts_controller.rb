@@ -1,5 +1,4 @@
 class AccountsController < ApplicationController
-  # User must be authenticated before they can interact with accounts
   before_action :authenticate_user!
 
   # GET /accounts
@@ -59,12 +58,16 @@ class AccountsController < ApplicationController
     render json: JSONAPI::Serializer.serialize(realizer.objet), status: :ok
   end
 
+  # Since Accounts are a global resource, fetch current account by the
+  # resource ID, not the :identifier path parameter.
   def current_account
     Account.find_by_id(params[:id])
   end
 
   protected
 
+  # Since Accounts are a global resource, set tenant by the resource ID, not
+  # the :identifier path parameter.
   def set_tenant
     id = params['id']
     return if id.nil?

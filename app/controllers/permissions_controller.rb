@@ -1,5 +1,4 @@
 class PermissionsController < ApplicationController
-  # User must be authenticated before they can interact with permissions
   before_action :authenticate_user!
   before_action :set_account
   before_action :set_user
