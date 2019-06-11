@@ -22,7 +22,8 @@ class FoldersController < ApplicationController
   def create
     authorize Folder, :create?
     schema = CreateFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+    payload = sanitize_payload(schema.to_hash, Folder)
+    realizer = FolderRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
@@ -31,7 +32,8 @@ class FoldersController < ApplicationController
   def update
     authorize Folder, :update?
     schema = UpdateFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+    payload = sanitize_payload(schema.to_hash, Folder)
+    realizer = FolderRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
