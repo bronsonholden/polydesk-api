@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_10_060609) do
+ActiveRecord::Schema.define(version: 2019_06_11_045949) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,7 +57,9 @@ ActiveRecord::Schema.define(version: 2019_06_10_060609) do
     t.datetime "updated_at", null: false
     t.integer "unique_enforcer", limit: 2, default: 0
     t.datetime "discarded_at"
+    t.bigint "folder_id"
     t.index ["discarded_at"], name: "index_folders_on_discarded_at"
+    t.index ["folder_id"], name: "index_folders_on_folder_id"
     t.index ["parent_id", "name", "unique_enforcer"], name: "index_folders_on_parent_id_and_name_and_unique_enforcer", unique: true
     t.index ["parent_id"], name: "index_folders_on_parent_id"
   end
@@ -164,6 +166,7 @@ ActiveRecord::Schema.define(version: 2019_06_10_060609) do
 
   add_foreign_key "account_users", "accounts"
   add_foreign_key "account_users", "users"
+  add_foreign_key "folders", "folders"
   add_foreign_key "form_submission_transitions", "form_submissions"
   add_foreign_key "form_submissions", "forms"
   add_foreign_key "users", "accounts", column: "default_account_id"
