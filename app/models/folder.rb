@@ -16,7 +16,7 @@ class Folder < ApplicationRecord
     self.parent_id ||= 0
   end
 
-  # before_save do
-  #   self.folder_id = self.parent_id
-  # end
+  before_save do
+    self.folder_id = self.parent_id
+  end
 end
