@@ -4,7 +4,7 @@ FactoryBot.define do
   end
 
   factory :subfolder, class: Folder do
-    association :parent, factory: :folder
+    association :folder, factory: :folder
     name { 'RSPec Subfolder' }
   end
 

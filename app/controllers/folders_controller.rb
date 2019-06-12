@@ -57,7 +57,7 @@ class FoldersController < ApplicationController
   def content
     authorize Folder, :folders?
     authorize Folder, :documents?
-    folders = Folder.kept.where(parent_id: params[:id] || 0)
+    folders = Folder.kept.where(folder_id: params[:id] || 0)
     documents = Document.kept.where(folder_id: params[:id] || 0)
     # Save counts so we don't repeat the SQL query later
     folders_count = folders.count
@@ -87,8 +87,8 @@ class FoldersController < ApplicationController
     authorize Folder, :folders?
     schema = ShowFolderSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
-    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.children.size)
-    render json: JSONAPI::Serializer.serialize(realizer.object.children, is_collection: true, meta: pagination_props), status: :ok
+    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.folders.size)
+    render json: JSONAPI::Serializer.serialize(realizer.object.folders, is_collection: true, meta: pagination_props), status: :ok
   end
 
   # GET /:identifier/folders/:id/documents

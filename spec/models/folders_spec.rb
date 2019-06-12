@@ -4,7 +4,7 @@ describe Folder do
   describe 'delete with subfolder' do
     let!(:folder) { create :subfolder }
     it 'deletes both folders' do
-      expect { folder.parent.destroy }.to change(Folder, :count).by(-2)
+      expect { folder.folder.destroy }.to change(Folder, :count).by(-2)
     end
   end
 
@@ -26,7 +26,7 @@ describe Folder do
     context 'with parent folder' do
       let!(:folder) { create :subfolder, name: 'Subfolder' }
       it 'prevents duplicate name' do
-        expect { folder.parent.children.create!(name: 'Subfolder') }.to raise_error(ActiveRecord::RecordInvalid)
+        expect { folder.folder.folders.create!(name: 'Subfolder') }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
 

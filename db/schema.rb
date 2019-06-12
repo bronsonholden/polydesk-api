@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_12_041053) do
+ActiveRecord::Schema.define(version: 2019_06_12_041514) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -52,16 +52,14 @@ ActiveRecord::Schema.define(version: 2019_06_12_041053) do
 
   create_table "folders", force: :cascade do |t|
     t.string "name", null: false
-    t.bigint "parent_id", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "unique_enforcer", limit: 2, default: 0
     t.datetime "discarded_at"
     t.bigint "folder_id"
     t.index ["discarded_at"], name: "index_folders_on_discarded_at"
+    t.index ["folder_id", "name", "unique_enforcer"], name: "index_folders_on_folder_id_and_name_and_unique_enforcer", unique: true
     t.index ["folder_id"], name: "index_folders_on_folder_id"
-    t.index ["parent_id", "name", "unique_enforcer"], name: "index_folders_on_parent_id_and_name_and_unique_enforcer"
-    t.index ["parent_id"], name: "index_folders_on_parent_id"
   end
 
   create_table "form_submission_transitions", force: :cascade do |t|
