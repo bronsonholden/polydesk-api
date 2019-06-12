@@ -65,7 +65,7 @@ class FolderPolicy < ApplicationPolicy
   end
 
   def allowed_relationships_for_create
-    [:parent]
+    [:folder]
   end
 
   def allowed_attributes_for_update
@@ -73,6 +73,6 @@ class FolderPolicy < ApplicationPolicy
   end
 
   def allowed_relationships_for_update
-    [:parent]
+    [:folder]
   end
 end
