@@ -6,6 +6,7 @@ module SmartParams
       compounding_params
       sorting_params
       sparse_params
+      filter_params
       pagination_params
     end
 
@@ -19,6 +20,10 @@ module SmartParams
 
     def sparse_params
       field :fields, type: Strict::Hash.optional
+    end
+
+    def filter_params
+      field :filter, type: Strict::Hash.optional
     end
 
     def pagination_params

@@ -4,6 +4,7 @@ class ShowFolderSchema
   schema type: Strict::Hash do
     compounding_params
     sparse_params
+    filter_params
     field :id, type: Strict::String
     field :controller, type: Strict::String.enum('folders')
     field :action, type: Strict::String.enum('show', 'destroy', 'restore', 'folders', 'documents')
