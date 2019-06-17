@@ -1,0 +1,7 @@
+.git
+.dockerignore
+tmp
+log
+storage/test
+storage/development
+storage/production
