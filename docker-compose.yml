@@ -2,8 +2,7 @@ version: '2'
 
 services:
   worker:
-    build: .
-    image: polydesk-api:0.1.0
+    image: polydesk-api:latest
     environment:
       - DATABASE_URL=postgres://postgres:postgres@host.docker.internal
       - DATABASE_PORT=5432
@@ -19,7 +18,7 @@ services:
       - '6379:6379'
   api:
     build: .
-    image: polydesk-api:0.1.0
+    image: polydesk-api:latest
     environment:
       - DATABASE_URL=postgres://postgres:postgres@host.docker.internal
       - DATABASE_PORT=5432
