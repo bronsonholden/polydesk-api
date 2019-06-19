@@ -2,35 +2,36 @@ version: '2'
 
 services:
   worker:
-    depends_on: [ host ]
+    depends_on: [ db, redis ]
     image: polydesk-api:latest
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@host
+      - DATABASE_URL=postgres://postgres:postgres@db
       - DATABASE_PORT=5432
-      - REDIS_URL=redis://host:6379
+      - REDIS_URL=redis://redis:6379
     command: bundle exec rake environment resque:work
     volumes:
       - storage:/polydesk-api/storage
-  host:
-    image: qoomon/docker-host
-    cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
-    restart: on-failure
+  db:
+    image: postgres
+    volumes:
+      - db-storage:/var/lib/postgresql/data
   redis:
-    depends_on: [ host ]
     image: redis:latest
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   api:
-    depends_on: [ host ]
+    depends_on: [ db, redis ]
     build: .
     image: polydesk-api:latest
     environment:
-      - DATABASE_URL=postgres://postgres:postgres@host
+      - DATABASE_URL=postgres://postgres:postgres@db
       - DATABASE_PORT=5432
-      - REDIS_URL=redis://host:6379
+      - REDIS_URL=redis://redis:6379
     volumes:
       - storage:/polydesk-api/storage
     ports:
       - '3000:3000'
 volumes:
   storage:
+  db-storage:
+    driver: local
