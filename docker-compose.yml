@@ -15,9 +15,6 @@ services:
     image: qoomon/docker-host
     cap_add: [ 'NET_ADMIN', 'NET_RAW' ]
     restart: on-failure
-    ports:
-      - '5432:5432'
-      - '6379:6379'
   redis:
     depends_on: [ host ]
     image: redis:latest
