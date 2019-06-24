@@ -34,7 +34,7 @@ environment env
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
 
-if env == 'production' || ENV.fetch('RAILS_DAEMONIZE') { false }
+if ENV.fetch('RAILS_DAEMONIZE') { false }
   daemonize true
 end
 
