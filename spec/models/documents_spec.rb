@@ -74,6 +74,11 @@ describe Document do
       it 'name validation still applies' do
         expect { discarded.update!(name: ' Invalid') }.to raise_error(ActiveRecord::RecordInvalid)
       end
+
+      it 'undiscard enumerates name' do
+        to_undiscard.undiscard!
+        expect(to_undiscard.reload.name).to eq('Undiscarded Document (1)')
+      end
     end
   end
 end
