@@ -52,7 +52,7 @@ describe Folder do
       end
 
       it 'name validation still applies' do
-        expect { discarded.update!(name: '.Invalid') }.to raise_error(ActiveRecord::RecordInvalid)
+        expect { discarded.update!(name: '<Invalid') }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
