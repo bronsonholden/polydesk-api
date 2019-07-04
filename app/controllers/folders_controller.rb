@@ -111,12 +111,13 @@ class FoldersController < ApplicationController
   end
 
   private
-    def set_folder
-      @folder = Folder.find(params[:id])
-    end
 
-    # Only allow a trusted parameter "white list" through.
-    def folder_params
-      params.permit(:name, :parent_folder)
-    end
+  def set_folder
+    @folder = Folder.find(params[:id])
+  end
+
+  # Only allow a trusted parameter "white list" through.
+  def folder_params
+    params.permit(:name, :parent_folder)
+  end
 end

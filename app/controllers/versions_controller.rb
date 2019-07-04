@@ -29,19 +29,20 @@ class VersionsController < ApplicationController
   end
 
   private
-    def set_version
-      @version = @object.versions.find(params[:version])
+
+  def set_version
+    @version = @object.versions.find(params[:version])
+  end
+
+  def set_data
+    versionable = %w(document folder)
+    @model_name = params[:model].singularize
+
+    if !versionable.include?(@model_name)
+      raise Polydesk::ApiExceptions::NotVersionable.new(@object)
     end
 
-    def set_data
-      versionable = %w(document folder)
-      @model_name = params[:model].singularize
-
-      if !versionable.include?(@model_name)
-        raise Polydesk::ApiExceptions::NotVersionable.new(@object)
-      end
-
-      @model = @model_name.classify.constantize
-      @object = @model.find(params[:id])
-    end
+    @model = @model_name.classify.constantize
+    @object = @model.find(params[:id])
+  end
 end

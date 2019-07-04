@@ -26,22 +26,23 @@ class PermissionsController < ApplicationController
   end
 
   private
-    def set_account
-      @account = Account.find_by_identifier!(params[:identifier])
-    end
 
-    def set_user
-      @user = Account.find(params[:id])
-    end
+  def set_account
+    @account = Account.find_by_identifier!(params[:identifier])
+  end
 
-    def set_account_user
-      @account_user = AccountUser.find_by!(account_id: @account.id,
-                                           user_id: @user.id)
-    end
+  def set_user
+    @user = Account.find(params[:id])
+  end
 
-    def permission_params
-      p = params.permit(:code)
-      p[:account_user_id] = @account_user.id
-      return p
-    end
+  def set_account_user
+    @account_user = AccountUser.find_by!(account_id: @account.id,
+                                         user_id: @user.id)
+  end
+
+  def permission_params
+    p = params.permit(:code)
+    p[:account_user_id] = @account_user.id
+    return p
+  end
 end

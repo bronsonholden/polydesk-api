@@ -31,8 +31,9 @@ module Overrides
     end
 
     private
-      def confirmation_params
-        params.permit(:confirmation_token, :password, :password_confirmation)
-      end
+
+    def confirmation_params
+      params.permit(:confirmation_token, :password, :password_confirmation)
+    end
   end
 end
