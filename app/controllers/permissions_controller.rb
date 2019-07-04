@@ -6,11 +6,13 @@ class PermissionsController < ApplicationController
 
   # POST /:identifier/users/:id/permissions
   def create
+    authorize Permission, :create?
     @permission = Permission.find_by_code(params[:code]) || Permission.create!(permission_params)
     render json: PermissionSerializer.new(@permission).serialized_json, status: :created
   end
 
   def destroy
+    authorize Permission, :destroy?
     @permission = Permission.find_by_code(params[:code])
     return if @permission.nil?
     @permission.destroy
@@ -18,6 +20,7 @@ class PermissionsController < ApplicationController
 
   # GET /:identifier/users/:id/permissions
   def index
+    authorize Permission, :index?
     @permissions = Permission.where(account_user_id: @account_user.user_id).order('id')
     render json: PermissionSerializer.new(@permissions).serialized_json, status: :ok
   end

@@ -3,6 +3,7 @@ class AccountsController < ApplicationController
 
   # GET /accounts
   def index
+    authorize Account, :index?
     schema = IndexAccountsSchema.new(request.params)
     payload = schema.to_hash
     realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(Account))
@@ -12,6 +13,7 @@ class AccountsController < ApplicationController
 
   # GET /account/:id
   def show
+    authorize Account, :show?
     schema = ShowAccountSchema.new(request.params)
     payload = schema.to_hash
     realizer = AccountRealizer.new(intent: :show, parameters: payload, headers: request.headers)
@@ -20,6 +22,7 @@ class AccountsController < ApplicationController
 
   # POST /accounts
   def create
+    authorize Account, :create?
     ActiveRecord::Base.transaction do
       schema = CreateAccountSchema.new(request.params)
       payload = sanitize_payload(schema.to_hash, Account)

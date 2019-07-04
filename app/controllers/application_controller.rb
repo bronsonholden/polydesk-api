@@ -6,6 +6,10 @@ class ApplicationController < ActionController::API
   before_action :set_tenant
   after_action :clear_tenant
 
+  if Rails.env.test?
+    after_action :verify_authorized, unless: :devise_controller?
+  end
+
   include DeviseTokenAuth::Concerns::SetUserByToken
   include Pundit
   include Polydesk

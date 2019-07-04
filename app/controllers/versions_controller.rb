@@ -4,6 +4,7 @@ class VersionsController < ApplicationController
   # GET /:identifier/:model/:id/versions
   def index
     set_data
+    authorize @model, :show?
     pagination_props = PaginationProperties.new(page_offset, page_limit, @object.versions.size)
     render json: JSONAPI::Serializer.serialize(@object.versions, is_collection: true, meta: pagination_props), status: :ok
   end
@@ -11,6 +12,7 @@ class VersionsController < ApplicationController
   # GET /:identifier/:model/:id/versions/:version
   def show
     set_data
+    authorize @model, :show?
     set_version
     render json: JSONAPI::Serializer.serialize(@version), status: :ok
   end
@@ -19,6 +21,7 @@ class VersionsController < ApplicationController
   # PUT /:identifier/:model/:id/versions/:version
   def restore
     set_data
+    authorize @model, :update?
     set_version
     @reified = @version.reify
     @reified.save!
