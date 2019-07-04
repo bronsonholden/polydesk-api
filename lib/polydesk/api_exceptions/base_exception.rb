@@ -19,9 +19,6 @@ module Polydesk
         },
         'ForbiddenRelationships' => Proc.new { |record|
         },
-        'FolderException::NoThankYou' => Proc.new { |record|
-          record.errors.add('no', 'thank you')
-        },
         'DocumentException::StorageLimitReached' => Proc.new { |record|
           record.errors.add('document', 'storage limit reached')
         },
