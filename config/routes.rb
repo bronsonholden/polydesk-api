@@ -24,7 +24,7 @@ Rails.application.routes.draw do
     resources :options
     resources :account_users, path: 'users'
 
-    post '/upload', to: 'documents#upload_new'
+    post '/documents/upload', to: 'documents#upload_new'
     post '/folders/:id/upload', to: 'folders#upload_document'
     patch '/documents/:id/upload', to: 'documents#upload_version'
 
