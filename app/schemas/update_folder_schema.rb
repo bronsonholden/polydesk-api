@@ -12,7 +12,7 @@ class UpdateFolderSchema
         field :name, type: Strict::String.optional
       end
       field :relationships, type: Strict::Hash.optional do
-        field :folder, type: Strict::Hash.optional do
+        field :folder, type: Strict::Hash.optional, nullable: true do
           field :data, type: Strict::Hash.optional do
             field :id, type: Strict::String.optional
             field :type, type: Strict::String.enum('folders').optional
