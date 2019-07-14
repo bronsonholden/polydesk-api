@@ -29,7 +29,7 @@ class Document < ApplicationRecord
   # Enumerate documents if there is one with an existing name
   def enumerate_name
     # Only enumerate if the name has changed
-    if self.name_changed? || self.discarded_at_changed?
+    if self.name_changed? || self.discarded_at_changed? || self.folder_id_changed?
       ActiveRecord::Base.transaction do
         desired_name = self.name
         ext_name = File.extname(desired_name)
