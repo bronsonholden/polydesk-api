@@ -8,8 +8,6 @@ class FormSubmission < ApplicationRecord
   attr_readonly :layout_snapshot
   attr_accessor :state
 
-  validates :data, presence: true
-  validates :flat_data, presence: true
   belongs_to :form
   belongs_to :submitter, class_name: 'User', foreign_key: 'submitter_id'
 
@@ -35,6 +33,7 @@ class FormSubmission < ApplicationRecord
   protected
 
   def flatten_data
+    self.data ||= {}
     self.flat_data = Smush.smush(data)
   end
 
