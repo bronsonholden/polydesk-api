@@ -51,16 +51,16 @@ RSpec.describe 'FormSubmissions', type: :request do
 
     it 'rejects invalid form submissions' do
       post '/rspec/form-submissions', headers: rspec_session,
-                                    params: {
-                                      data: {
-                                        type: 'form-submissions',
-                                        attributes: {},
-                                        relationships: {
-                                          form: {
-                                            data: {
-                                              id: form.id.to_s,
-                                              type: 'forms' } } } }
-                                    }.to_json
+                                      params: {
+                                        data: {
+                                          type: 'form-submissions',
+                                          attributes: {},
+                                          relationships: {
+                                            form: {
+                                              data: {
+                                                id: form.id.to_s,
+                                                type: 'forms' } } } }
+                                      }.to_json
       expect(response).to have_http_status(422)
     end
   end
