@@ -137,7 +137,7 @@ RSpec.describe 'Documents', type: :request do
 
   describe 'PATCH /rspec/documents/1' do
     let(:document) { create :document, content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt')) }
-  
+
     context 'with permission' do
       let!(:permission) { create :permission, code: :document_update, account_user: AccountUser.last }
 
@@ -167,16 +167,23 @@ RSpec.describe 'Documents', type: :request do
   end
 
   describe 'POST /rspec/documents' do
+    let(:params) {
+      {
+        data: {
+          type: 'documents',
+          attributes: {
+            name: 'No content document'
+          }
+        }
+      }
+    }
+
     context 'with permission' do
       let!(:permission) { create :permission, code: 'document_create', account_user: AccountUser.last }
       it 'uploads a top-level document' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session,
-                                 params: {
-                                   data: {
-                                     type: 'documents',
-                                     attributes: {
-                                       name: 'No content document' } } }.to_json
+                                 params: params.to_json
         expect(response).to have_http_status(201)
       end
     end
@@ -186,11 +193,7 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session(guest),
-                                 params: {
-                                   data: {
-                                     type: 'documents',
-                                     attributes: {
-                                       name: 'No content document' } } }.to_json
+                                 params: params.to_json
         expect(response).to have_http_status(403)
       end
     end
@@ -201,11 +204,7 @@ RSpec.describe 'Documents', type: :request do
       it 'creates a top-level document' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session(admin),
-                                 params: {
-                                   data: {
-                                     type: 'documents',
-                                     attributes: {
-                                       name: 'No content document' } } }.to_json
+                                 params: params.to_json
         expect(response).to have_http_status(201)
       end
     end
@@ -214,11 +213,7 @@ RSpec.describe 'Documents', type: :request do
       it 'returns authorization error' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/compressed.tracemonkey-pldi-09.pdf'))
         post '/rspec/documents', headers: rspec_session,
-                                 params: {
-                                   data: {
-                                     type: 'documents',
-                                     attributes: {
-                                       name: 'No content document' } } }.to_json
+                                 params: params.to_json
         expect(response).to have_http_status(403)
       end
     end
