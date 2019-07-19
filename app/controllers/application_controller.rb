@@ -21,6 +21,7 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
   rescue_from Polydesk::ApiExceptions::NotVersionable, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
+  rescue_from Polydesk::ApiExceptions::FormSchemaViolated, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
   rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
 

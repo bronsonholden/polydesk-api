@@ -12,7 +12,7 @@ class FormSubmission < ApplicationRecord
   belongs_to :submitter, class_name: 'User', foreign_key: 'submitter_id'
 
   before_validation :form_snapshot, on: :create
-  before_validation :flatten_data
+  before_validation :flatten_data, :validate_schema
 
   def state_machine
     @state_machine ||= FormSubmissionStateMachine.new(self, transition_class: FormSubmissionTransition)
@@ -31,6 +31,11 @@ class FormSubmission < ApplicationRecord
   delegate :can_transition_to?, :transition_to!, :transition_to, :current_state, to: :state_machine
 
   protected
+
+  def validate_schema
+    valid = JSON::Validator.validate(self.schema_snapshot, self.data)
+    raise Polydesk::ApiExceptions::FormSchemaViolated.new(self) if !valid
+  end
 
   def flatten_data
     self.data ||= {}

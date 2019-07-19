@@ -25,6 +25,9 @@ module Polydesk
         'UserException::NoAccountAccess' => Proc.new { |record|
           record.errors.add('user', 'does not have access to this account')
         },
+        'FormSchemaViolated' => Proc.new { |record|
+          record.errors.add('form_submission', 'violates form schema')
+        }
       }
 
       def initialize(record = nil)

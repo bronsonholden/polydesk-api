@@ -24,7 +24,11 @@ RSpec.describe 'FormSubmissions', type: :request do
             type: 'string'
           },
           email: {
-            type: 'string' } } } }
+            type: 'string' } },
+        required: [
+          'name',
+          'email'
+        ] } }
 
     it 'creates new form submission' do
       post '/rspec/form-submissions', headers: rspec_session,
@@ -42,6 +46,22 @@ RSpec.describe 'FormSubmissions', type: :request do
                                                 type: 'forms' } } } }
                                       }.to_json
       expect(response).to have_http_status(201)
+    end
+
+
+    it 'rejects invalid form submissions' do
+      post '/rspec/form-submissions', headers: rspec_session,
+                                    params: {
+                                      data: {
+                                        type: 'form-submissions',
+                                        attributes: {},
+                                        relationships: {
+                                          form: {
+                                            data: {
+                                              id: form.id.to_s,
+                                              type: 'forms' } } } }
+                                    }.to_json
+      expect(response).to have_http_status(422)
     end
   end
 end

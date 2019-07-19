@@ -16,6 +16,8 @@ class FormSubmissionsController < ApplicationController
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     realizer.object.submitter = current_user
+    realizer.object.schema_snapshot = realizer.object.form.schema
+    realizer.object.layout_snapshot = realizer.object.form.layout
     realizer.object.save!
     realizer.object.transition_to!(:published) if payload.dig('data', 'attributes', 'state') != 'draft'
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
