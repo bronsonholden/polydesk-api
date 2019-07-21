@@ -1,3 +1,6 @@
 class FormSerializer < TenantSerializer
-  attributes :name, :schema, :layout, :created_at, :updated_at, :discarded_at
+  attributes :name, :layout, :created_at, :updated_at, :discarded_at
+  attribute :schema do
+    JSON.parse(object.schema)
+  end
 end

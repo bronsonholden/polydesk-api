@@ -5,6 +5,10 @@ class Form < ApplicationRecord
   validate :check_schema
   validate :check_layout
 
+  before_save do
+    puts schema.class
+  end
+
   private
 
   def check_schema

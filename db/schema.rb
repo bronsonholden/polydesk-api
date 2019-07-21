@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_12_041514) do
+ActiveRecord::Schema.define(version: 2019_07_20_232937) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -77,7 +77,7 @@ ActiveRecord::Schema.define(version: 2019_06_12_041514) do
     t.bigint "submitter_id"
     t.jsonb "data", null: false
     t.jsonb "flat_data", null: false
-    t.jsonb "schema_snapshot", default: {}
+    t.text "schema_snapshot", default: "{}"
     t.jsonb "layout_snapshot", default: {}
     t.bigint "form_id", null: false
     t.datetime "created_at", null: false
@@ -90,7 +90,7 @@ ActiveRecord::Schema.define(version: 2019_06_12_041514) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.jsonb "schema", default: {}, null: false
+    t.text "schema", default: "{}", null: false
     t.jsonb "layout", default: {}, null: false
     t.datetime "discarded_at"
     t.index ["discarded_at"], name: "index_forms_on_discarded_at"

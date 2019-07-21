@@ -5,7 +5,8 @@ class FormsController < ApplicationController
   def create
     authorize Form, :create?
     schema = CreateFormSchema.new(request.params)
-    realizer = FormRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+    payload = get_payload(schema)
+    realizer = FormRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
@@ -31,7 +32,8 @@ class FormsController < ApplicationController
   def update
     authorize Form, :update?
     schema = UpdateFormSchema.new(request.params)
-    realizer = FormRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+    payload = get_payload(schema)
+    realizer = FormRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -42,5 +44,18 @@ class FormsController < ApplicationController
     schema = ShowFormSchema.new(request.params)
     realizer = FormRealizer.new(intent: :show, parameters: schema, headers: request.headers)
     realizer.object.discard!
+  end
+
+  private
+
+  # Helper to get payload but convert schema (the form schema) to a
+  # JSON string
+  def get_payload(schema)
+    payload = schema.to_hash
+    json = payload.dig("data", "attributes", "schema")
+    if !json.nil?
+      payload["data"]["attributes"]["schema"] = json.to_json
+    end
+    payload
   end
 end
