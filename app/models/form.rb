@@ -5,8 +5,8 @@ class Form < ApplicationRecord
   validate :check_schema
   validate :check_layout
 
-  before_save do
-    puts schema.class
+  def schema=(s)
+    super(s.to_json)
   end
 
   private
