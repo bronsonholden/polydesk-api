@@ -3,4 +3,6 @@ class FormSerializer < TenantSerializer
   attribute :schema do
     JSON.parse(object.schema)
   end
+
+  has_many :form_submissions
 end

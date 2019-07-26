@@ -8,7 +8,7 @@ class AccountsController < ApplicationController
     payload = schema.to_hash
     realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(Account))
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props)
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate)
   end
 
   # GET /account/:id

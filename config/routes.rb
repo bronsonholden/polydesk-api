@@ -49,5 +49,7 @@ Rails.application.routes.draw do
     get '/:model/:id/versions', to: 'versions#index', as: :versions
     get '/:model/:id/versions/:version', to: 'versions#show', as: :version
     put '/:model/:id/versions/:version', to: 'versions#restore', as: :version_restore
+
+    get '/forms/:id/form-submissions', to: 'forms#form_submissions', as: :form_form_submissions
   end
 end

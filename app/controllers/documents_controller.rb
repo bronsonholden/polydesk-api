@@ -53,7 +53,7 @@ class DocumentsController < ApplicationController
     realizer = DocumentRealizer.new(intent: :index, parameters: schema, headers: request.headers)
     documents = realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props.generate), status: :ok
   end
 
   # DELETE /:identifier/documents/:id

@@ -6,4 +6,13 @@ class PaginationProperties
     @item_count = item_count
     @total_pages = (item_count.to_f / page_limit).ceil
   end
+
+  def generate
+    {
+      'page-offset' => @page_offset,
+      'page-limit' => @page_limit,
+      'item-count' => @item_count,
+      'total-pages' => @total_pages
+    }
+  end
 end

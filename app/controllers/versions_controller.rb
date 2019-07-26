@@ -6,7 +6,7 @@ class VersionsController < ApplicationController
     set_data
     authorize @model, :show?
     pagination_props = PaginationProperties.new(page_offset, page_limit, @object.versions.size)
-    render json: JSONAPI::Serializer.serialize(@object.versions, is_collection: true, meta: pagination_props), status: :ok
+    render json: JSONAPI::Serializer.serialize(@object.versions, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   # GET /:identifier/:model/:id/versions/:version

@@ -1,6 +1,8 @@
 class Form < ApplicationRecord
   include Discard::Model
 
+  has_many :form_submissions
+
   validates :name, presence: true, uniqueness: true
   validate :check_schema
   validate :check_layout

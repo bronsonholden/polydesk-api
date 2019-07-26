@@ -13,8 +13,8 @@ class PaginationGenerator
     @hash = {
       links: {},
       meta: {
-        page_offset: paginated.page_offset,
-        total_pages: paginated.total_pages,
+        'page-offset' => paginated.page_offset,
+        'total-pages' => paginated.total_pages,
         count: count || paginated.count
       }
     }
