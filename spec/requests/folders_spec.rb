@@ -127,6 +127,17 @@ RSpec.describe 'Folders', type: :request do
         expect(response).to have_http_status(403)
       end
     end
+
+    it 'disallows client-generated ID' do
+      post '/rspec/folders', headers: rspec_session,
+                             params: {
+                               data: {
+                                 id: 1234,
+                                 type: 'folders',
+                                 attributes: {
+                                   name: 'RSpec Test' } } }.to_json
+      expect(response).to have_http_status(422)
+    end
   end
 
   describe 'PATCH /rspec/folders/1' do

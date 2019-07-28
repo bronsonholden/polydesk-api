@@ -3,6 +3,7 @@ require 'polydesk/auth_context'
 # TODO: For all POST requests that contain resource objects, need to check
 # type and return 409 if it doesn't match with the collection resource type.
 class ApplicationController < ActionController::API
+  before_action :forbid_client_generated_id, only: :create
   before_action :set_tenant
   after_action :clear_tenant
 
@@ -64,10 +65,13 @@ class ApplicationController < ActionController::API
 
   def sanitize_payload(payload, record_klass)
     _policy = policy(record_klass)
-    forbid_client_generated_id(payload)
     forbid_disallowed_attributes(payload, _policy)
     forbid_disallowed_relationships(payload, _policy)
     payload
+  end
+
+  def sanitize_request_payload(payload)
+    forbid_client_generated_id(payload)
   end
 
   def policy_restrictions(type, _policy)
@@ -96,9 +100,13 @@ class ApplicationController < ActionController::API
   end
 
   def client_generated_ids_forbidden_exception(exception)
-    errors = ActiveModel::Errors.new
-    errors.add('client generated IDs', 'are forbidden')
-    render_exception_for ({ errors: errors }), status_code: :forbidden
+    errors = [
+      {
+        id: 'Client generated IDs',
+        message: 'Client generated IDs are forbidden'
+      }
+    ]
+    render json: { errors: errors }, status: :unprocessable_entity
   end
 
   def user_not_authorized(exception)
@@ -127,8 +135,8 @@ class ApplicationController < ActionController::API
 
   # JSON:API allows clients to specify an ID when creating resources. This
   # is not supported, so return 403 Forbidden per the specification.
-  def forbid_client_generated_id(payload)
-    if action_name == 'create' && payload['data'].key?(:id)
+  def forbid_client_generated_id
+    if !request.params.fetch(:data, {}).fetch(:id, nil).nil?
       raise Polydesk::ApiExceptions::ClientGeneratedIdsForbidden.new
     end
   end
