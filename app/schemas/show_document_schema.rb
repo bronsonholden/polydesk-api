@@ -7,7 +7,7 @@ class ShowDocumentSchema
     filter_params
     field :id, type: Strict::String
     field :controller, type: Strict::String.enum('documents')
-    field :action, type: Strict::String.enum('show', 'destroy', 'restore', 'download', 'download_version')
+    field :action, type: Strict::String.enum('show', 'destroy', 'restore', 'download', 'download_version', 'folder')
     field :version, type: Strict::String.optional
     field :data, type: Strict::Nil
   end

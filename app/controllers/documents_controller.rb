@@ -79,7 +79,7 @@ class DocumentsController < ApplicationController
   def folder
     schema = ShowDocumentSchema.new(request.params)
     realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
-    authorize realizer.object
+    authorize realizer.object, :show?
     authorize realizer.object.folder, :show?, policy_class: FolderPolicy
     render json: JSONAPI::Serializer.serialize(realizer.object.folder)
   end

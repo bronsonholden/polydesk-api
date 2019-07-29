@@ -166,6 +166,58 @@ RSpec.describe 'Documents', type: :request do
     end
   end
 
+  describe 'GET /rspec/documents/1/folder' do
+    let!(:document) { create :document, content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt')) }
+
+    context 'with full permissions' do
+      let!(:document_permission) { create :permission, code: :document_show, account_user: AccountUser.last }
+      let!(:folder_permission) { create :permission, code: :folder_show, account_user: AccountUser.last }
+
+      it 'retrieves document folder' do
+        get "/rspec/documents/#{document.id}/folder", headers: rspec_session
+        expect(response).to have_http_status(200)
+      end
+    end
+
+    context 'without document permission' do
+      let!(:folder_permission) { create :permission, code: :folder_show, account_user: AccountUser.last }
+
+      it 'retrieves document folder' do
+        get "/rspec/documents/#{document.id}/folder", headers: rspec_session
+        expect(response).to have_http_status(403)
+      end
+    end
+
+    context 'without folder permission' do
+      let!(:document_permission) { create :permission, code: :document_show, account_user: AccountUser.last }
+
+      it 'retrieves document folder' do
+        get "/rspec/documents/#{document.id}/folder", headers: rspec_session
+        expect(response).to have_http_status(403)
+      end
+    end
+
+    context 'guest with full permissions' do
+      let!(:document_permission) { create :permission, code: :document_show, account_user: AccountUser.last }
+      let!(:folder_permission) { create :permission, code: :folder_show, account_user: AccountUser.last }
+      let!(:guest) { create :rspec_guest }
+
+      it 'retrieves document folder' do
+        get "/rspec/documents/#{document.id}/folder", headers: rspec_session(guest)
+        expect(response).to have_http_status(403)
+      end
+    end
+
+    context 'admin with no permissions' do
+      let!(:admin) { create :rspec_administrator }
+
+      it 'retrieves document folder' do
+        get "/rspec/documents/#{document.id}/folder", headers: rspec_session(admin)
+        expect(response).to have_http_status(200)
+      end
+    end
+  end
+
   describe 'POST /rspec/documents' do
     let(:params) {
       {
