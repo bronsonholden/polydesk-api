@@ -3,18 +3,18 @@ class FormSubmissionsController < ApplicationController
 
   # GET /:identifier/form-submissions
   def index
-    authorize FormSubmission, :index?
     schema = IndexFormSubmissionsSchema.new(request.params)
     realizer = FormSubmissionRealizer.new(intent: :index, parameters: schema.to_hash, headers: request.headers)
+    authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
   end
 
   # POST /:identifier/form-submissions
   def create
-    authorize FormSubmission, :create?
     schema = CreateFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :create, parameters: payload, headers: request.headers)
+    authorize realizer.object
     realizer.object.submitter = current_user
     realizer.object.schema_snapshot = realizer.object.form.schema
     realizer.object.layout_snapshot = realizer.object.form.layout
@@ -25,29 +25,29 @@ class FormSubmissionsController < ApplicationController
 
   # GET /:identifier/form-submissions/:id
   def show
-    authorize FormSubmission, :show?
     schema = ShowFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :show, parameters: payload, headers: request.headers)
+    authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
   # PATCH /:identifier/form-submissions/:id
   def update
-    authorize FormSubmission, :update?
     schema = UpdateFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :update, parameters: payload, headers: request.headers)
+    authorize realizer.object
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
   # DELETE /:identifier/form-submissions/:id
   def destroy
-    authorize FormSubmission, :destroy?
     schema = ShowFormSubmissionSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :show, parameters: payload, headers: request.headers)
+    authorize realizer.object
     realizer.object.destroy!
   end
 end

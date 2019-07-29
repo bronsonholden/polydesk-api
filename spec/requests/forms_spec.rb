@@ -88,6 +88,7 @@ RSpec.describe 'Forms', type: :request do
       it 'returns authorization error' do
         params = {
           data: {
+            type: 'forms',
             attributes: {
               name: 'RSpec Form',
               schema: {},

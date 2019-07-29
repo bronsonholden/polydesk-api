@@ -3,46 +3,46 @@ class FoldersController < ApplicationController
 
   # GET /:identifier/folders
   def index
-    authorize Folder, :index?
     schema = IndexFoldersSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :index, parameters: schema, headers: request.headers)
+    authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props.generate), status: :ok
   end
 
   # GET /:identifier/folders/:id
   def show
-    authorize Folder, :show?
     schema = ShowFolderSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object, include: (schema.include.split(',') if schema.key?('include'))), status: :ok
   end
 
   # POST /:identifier/folders
   def create
-    authorize Folder, :create?
     schema = CreateFolderSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, Folder)
     realizer = FolderRealizer.new(intent: :create, parameters: payload, headers: request.headers)
+    authorize realizer.object
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end
 
   # PATCH/PUT /:identifier/folders/:id
   def update
-    authorize Folder, :update?
     schema = UpdateFolderSchema.new(request.params)
     payload = sanitize_payload(schema.to_hash, Folder)
     realizer = FolderRealizer.new(intent: :update, parameters: payload, headers: request.headers)
+    authorize realizer.object
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
 
   # DELETE /:identifier/folders/:id
   def destroy
-    authorize Folder, :destroy?
     schema = ShowFolderSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    authorize realizer.object
     realizer.object.discard!
   end
 
@@ -50,15 +50,22 @@ class FoldersController < ApplicationController
   def restore
     schema = ShowFolderSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    authorize realizer.object, :restore?
     realizer.object.undiscard!
     render json: JSONAPI::Serializer.serialize(realizer.object.reload), status: :ok
   end
 
   def content
-    authorize Folder, :folders?
-    authorize Folder, :documents?
+    folder_id = params[:id]
+    if !folder_id.nil?
+      folder = Folder.find(folder_id)
+      authorize folder, :folders?
+      authorize folder, :documents?
+    end
     folders = Folder.kept.where(folder_id: params[:id] || 0)
+    authorize folders, :index?
     documents = Document.kept.where(folder_id: params[:id] || 0)
+    authorize documents, :index?
     # Save counts so we don't repeat the SQL query later
     folders_count = folders.count
     documents_count = documents.count
@@ -84,29 +91,30 @@ class FoldersController < ApplicationController
 
   # GET /:identifier/folders/:id/folders
   def folders
-    authorize Folder, :folders?
     schema = ShowFolderSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.folders.size)
     render json: JSONAPI::Serializer.serialize(realizer.object.folders, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   # GET /:identifier/folders/:id/documents
   def documents
-    authorize Document, :index?
-    authorize Folder, :documents?
     schema = ShowFolderSchema.new(request.params)
     realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    authorize realizer.object, :documents?
+    authorize realizer.object.documents, :index?
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.documents.size)
     render json: JSONAPI::Serializer.serialize(realizer.object.documents, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   # Non-JSON:API document create
   def upload_document
-    authorize Document, :create?
-    authorize Folder, :update?
     folder = Folder.find(params.permit(:id).fetch(:id))
-    document = folder.documents.create!(params.permit(:content, :name))
+    authorize folder, :update?
+    document = folder.documents.create(params.permit(:content, :name))
+    authorize document, :create?
+    document.save!
     render json: JSONAPI::Serializer.serialize(document), status: :created
   end
 

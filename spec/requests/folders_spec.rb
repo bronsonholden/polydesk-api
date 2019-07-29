@@ -32,8 +32,10 @@ RSpec.describe 'Folders', type: :request do
   describe 'GET /rspec/content' do
     context 'with full permissions' do
       let!(:document) { create :subdocument }
-      let!(:document_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
-      let!(:folder_permission) { create :permission, code: :folder_folders, account_user: AccountUser.last }
+      let!(:folder_documents_permission) { create :permission, code: :folder_documents, account_user: AccountUser.last }
+      let!(:folder_folders_permission) { create :permission, code: :folder_folders, account_user: AccountUser.last }
+      let!(:folder_index_permission) { create :permission, code: :folder_index, account_user: AccountUser.last }
+      let!(:document_index_permission) { create :permission, code: :document_index, account_user: AccountUser.last }
       it 'retrieves all content' do
         get '/rspec/content', headers: rspec_session
         expect(response).to have_http_status(200)
