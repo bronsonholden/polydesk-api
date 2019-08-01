@@ -54,7 +54,7 @@ class DocumentsController < ApplicationController
     realizer = DocumentRealizer.new(intent: :index, parameters: schema, headers: request.headers)
     authorize realizer.object
     documents = realizer.object
-    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
+    pagination_props = PaginationProperties.new(page_offset, page_limit, Document.all.count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props.generate), status: :ok
   end
 

@@ -16,7 +16,7 @@ class FormsController < ApplicationController
     schema = IndexFormsSchema.new(request.params)
     realizer = FormRealizer.new(intent: :index, parameters: schema, headers: request.headers)
     authorize realizer.object
-    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.size)
+    pagination_props = PaginationProperties.new(page_offset, page_limit, Form.all.count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
@@ -51,7 +51,9 @@ class FormsController < ApplicationController
     schema = ShowFormSchema.new(request.params)
     realizer = FormRealizer.new(intent: :show, parameters: schema, headers: request.headers)
     authorize realizer.object, :show?
-    render json: JSONAPI::Serializer.serialize(realizer.object.form_submissions, is_collection: true), status: :ok
+    authorize realizer.object.form_submissions, :index?
+    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.form_submissions.size)
+    render json: JSONAPI::Serializer.serialize(realizer.object.form_submissions, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   private
