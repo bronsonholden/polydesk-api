@@ -10,7 +10,7 @@ GIT
 
 GIT
   remote: https://github.com/paulholden2/smart_params.rb.git
-  revision: 8a9c906290087197ac03cf3c26bbaab09b3b539f
+  revision: 620044c8144b598996c205bd2b7bf792b836b58a
   branch: nullable-qol
   specs:
     smart_params (2.4.0)
