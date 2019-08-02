@@ -27,9 +27,9 @@ module SmartParams
     end
 
     def pagination_params
-      field :page, type: Strict::Hash.optional do
-        field :offset, type: Strict::String.optional
-        field :limit, type: Strict::String.optional
+      field :page, type: Strict::Hash.optional.default { {offset: '0', limit: '25'} } do
+        field :offset, type: Strict::String.optional.default { '0' }
+        field :limit, type: Strict::String.optional.default { '25' }
       end
     end
   end
