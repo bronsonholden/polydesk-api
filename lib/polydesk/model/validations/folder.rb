@@ -20,7 +20,9 @@ module Polydesk
           # We allow parent folder foreign key to be zero (indicating a
           # top-level folder).
           validates_each :folder_id do |record, attr, value|
-            record.errors.add('parent_folder', 'does not exist') unless value.zero? or ::Folder.find_by_id(value)
+            if !value.zero? && !::Folder.find_by_id(value)
+              record.errors.add('folder', 'does not exist')
+            end
 
             if value == record.id
               record.errors.add('folder', 'cannot contain itself')
