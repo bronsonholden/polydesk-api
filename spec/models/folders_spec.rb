@@ -28,6 +28,10 @@ describe Folder do
       it 'prevents duplicate name' do
         expect { folder.folder.folders.create!(name: 'Subfolder') }.to raise_error(ActiveRecord::RecordInvalid)
       end
+
+      it 'disallows being own parent' do
+        expect { folder.update!(folder: folder) }.to raise_error(ActiveRecord::RecordInvalid)
+      end
     end
 
     context 'without parent folder' do

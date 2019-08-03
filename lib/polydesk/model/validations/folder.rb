@@ -21,6 +21,10 @@ module Polydesk
           # top-level folder).
           validates_each :folder_id do |record, attr, value|
             record.errors.add('parent_folder', 'does not exist') unless value.zero? or ::Folder.find_by_id(value)
+
+            if value == record.id
+              record.errors.add('folder', 'cannot contain itself')
+            end
           end
         end
       end
