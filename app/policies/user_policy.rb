@@ -1,9 +1,34 @@
 class UserPolicy < ApplicationPolicy
   attr_reader :user, :user_subject
 
+  class Scope
+    attr_reader :auth, :scope
+
+    def initialize(auth, scope)
+      @auth = auth
+      @scope = scope
+    end
+
+    def resolve
+      if auth.account.nil?
+        if auth.user.email.ends_with?("@polydesk.io")
+          scope.all
+        else
+          scope.none
+        end
+      else
+        scope.includes(:account_users).where(account_users: { account_id: auth.account.id })
+      end
+    end
+  end
+
   def initialize(auth, user_subject)
     super
     @user_subject = user_subject
+  end
+
+  def index?
+    true
   end
 
   def create?

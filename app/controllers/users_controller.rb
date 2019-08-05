@@ -1,10 +1,11 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!, except: [:create]
+  after_action :verify_policy_scoped, only: :index
 
   # GET /users
   def index
     schema = IndexUsersSchema.new(request.params)
-    realizer = UserRealizer.new(intent: :index, parameters: schema, headers: request.headers)
+    realizer = UserRealizer.new(intent: :index, parameters: schema, headers: request.headers, scope: policy_scope(User))
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, User.all.count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
