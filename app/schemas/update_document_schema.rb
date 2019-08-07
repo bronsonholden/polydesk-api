@@ -1,24 +1,53 @@
-class UpdateDocumentSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    field :id, type: Strict::String
-    field :controller, type: Strict::String.enum('documents')
-    field :action, type: Strict::String.enum('update')
-    field :data, type: Strict::Hash do
-      field :id, type: Strict::String
-      field :type, type: Strict::String.enum('documents')
-      field :attributes, type: Strict::Hash.optional do
-        field :name, type: Strict::String.optional
-      end
-      field :relationships, type: Strict::Hash.optional do
-        field :folder, type: Strict::Hash, nullable: true do
-          field :data, type: Strict::Hash do
-            field :id, type: Strict::String
-            field :type, type: Strict::String.enum('folders')
-          end
-        end
-      end
-    end
+class UpdateDocumentSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      properties: {
+        id: {
+          type: 'string'
+        },
+        type: {
+          type: 'string',
+          enum: ['documents']
+        },
+        attributes: {
+          type: 'object',
+          properties: {
+            name: {
+              type: 'string'
+            }
+          }
+        },
+        relationships: {
+          type: 'object',
+          properties: {
+            folder: {
+              oneOf: [
+                {
+                  type: 'null'
+                },
+                {
+                  type: 'object',
+                  properties: {
+                    data: {
+                      type: 'object',
+                      properties: {
+                        id: {
+                          type: 'string'
+                        },
+                        type: {
+                          type: 'string',
+                          enum: ['folders']
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
   end
 end

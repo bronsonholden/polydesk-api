@@ -33,7 +33,7 @@ class DocumentsController < ApplicationController
   # PATCH/PUT /:identifier/documents/:id
   def update
     schema = UpdateDocumentSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, Document)
+    payload = sanitize_payload(schema.render, Document)
     realizer = DocumentRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!

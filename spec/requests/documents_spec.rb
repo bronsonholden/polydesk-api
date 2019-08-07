@@ -138,6 +138,30 @@ RSpec.describe 'Documents', type: :request do
   describe 'PATCH /rspec/documents/1' do
     let(:document) { create :document, content: Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/dog.txt')) }
 
+    context 'updating folder relationship' do
+      let!(:permission) { create :permission, code: :document_update, account_user: AccountUser.last }
+      let(:subdocument) { create :subdocument }
+      let(:remove_params) {
+        {
+          data: {
+            id: subdocument.id.to_s,
+            type: 'documents',
+            relationships: {
+              folder: nil
+            }
+          }
+        }
+      }
+
+      it 'removes document from folder' do
+        patch "/rspec/documents/#{subdocument.id}", headers: rspec_session, params: remove_params.to_json
+        expect(response).to have_http_status(200)
+        Apartment::Tenant.switch('rspec') do
+          expect(subdocument.reload.folder).to be_nil
+        end
+      end
+    end
+
     context 'with permission' do
       let!(:permission) { create :permission, code: :document_update, account_user: AccountUser.last }
 
