@@ -13,9 +13,9 @@ class CreateFormSubmissionSchema
       end
       field :relationships, type: Strict::Hash.optional do
         field :form, type: Strict::Hash.optional do
-          field :data, type: Strict::Hash.optional do
-            field :id, type: Strict::String.optional
-            field :type, type: Strict::String.enum('forms').optional
+          field :data, type: Strict::Hash do
+            field :id, type: Strict::String
+            field :type, type: Strict::String.enum('forms')
           end
         end
       end
