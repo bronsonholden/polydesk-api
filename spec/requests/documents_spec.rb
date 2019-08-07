@@ -141,13 +141,15 @@ RSpec.describe 'Documents', type: :request do
     context 'with permission' do
       let!(:permission) { create :permission, code: :document_update, account_user: AccountUser.last }
 
-      # it 'caches new file' do
-      #   file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
-      #   patch "/rspec/documents/#{document.id}", headers: rspec_session,
-      #                                            params: { content: file }
-      #   expect(response).to have_http_status(200)
-      #   expect(document.reload.content.data['storage']).to eq('cache')
-      # end
+      it 'caches new file' do
+        file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))
+        patch "/rspec/documents/#{document.id}/upload", headers: rspec_session,
+                                                 params: { content: file }
+        expect(response).to have_http_status(200)
+        Apartment::Tenant.switch('rspec') do
+          expect(document.reload.content.data['storage']).to eq('cache')
+        end
+      end
 
       it 'updates attributes' do
         file = Rack::Test::UploadedFile.new(Rails.root.join('spec/fixtures/fox.txt'))

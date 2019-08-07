@@ -25,7 +25,7 @@ class DocumentsController < ApplicationController
   def upload_version
     document = Document.find(params.permit(:id).fetch(:id))
     document.update(params.permit(:content, :name))
-    authorize document
+    authorize document, :update?
     document.save!
     render json: JSONAPI::Serializer.serialize(document), status: :ok
   end
