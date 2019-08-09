@@ -4,9 +4,10 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders
   def index
     schema = IndexFoldersSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :index, parameters: schema, headers: request.headers)
+    scope = policy_scope(Folder)
+    realizer = FolderRealizer.new(intent: :index, parameters: schema, headers: request.headers, scope: scope)
     authorize realizer.object
-    pagination_props = PaginationProperties.new(page_offset, page_limit, Folder.all.count)
+    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props.generate), status: :ok
   end
 

@@ -304,6 +304,18 @@ RSpec.describe 'Folders', type: :request do
   end
 
   describe 'DELETE /rspec/folders/:folder' do
+    context 'with subfolders' do
+      let!(:folder) { create :subfolder }
+      let!(:permission) { create :permission, code: :folder_destroy, account_user: AccountUser.last }
+      it 'deletes subfolder' do
+        delete "/rspec/folders/#{folder.folder.id}", headers: rspec_session
+        expect(response).to have_http_status(204)
+        Apartment::Tenant.switch('rspec') do
+          expect(folder.reload.discarded?).to eq(true)
+        end
+      end
+    end
+
     context 'with permission' do
       let!(:folder) { create :folder }
       let!(:permission) { create :permission, code: :folder_destroy, account_user: AccountUser.last }

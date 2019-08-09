@@ -11,4 +11,17 @@ class Folder < ApplicationRecord
   before_validation do
     self.folder_id ||= 0
   end
+
+  def discard!
+    ActiveRecord::Base.transaction do
+      super
+      subdiscard
+      folders.each { |folder| folder.subdiscard }
+    end
+  end
+
+  def subdiscard
+    folders.update_all(discarded_at: discarded_at)
+    documents.update_all(discarded_at: discarded_at)
+  end
 end

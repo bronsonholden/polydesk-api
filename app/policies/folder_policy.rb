@@ -1,4 +1,17 @@
 class FolderPolicy < ApplicationPolicy
+  class Scope
+    attr_reader :auth, :scope
+
+    def initialize(auth, scope)
+      @auth = auth
+      @scope = scope
+    end
+
+    def resolve
+      scope.kept
+    end
+  end
+
   attr_reader :user, :folder
 
   def initialize(auth, folder)

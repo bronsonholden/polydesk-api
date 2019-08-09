@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/paulholden2/jsonapi-realizer.rb.git
-  revision: e1397202728a19e623282112c3371147b1f9d13b
+  revision: d323fe9fb32f2756524a5e3105847dd02e77d373
   branch: core
   specs:
     jsonapi-realizer (6.0.0.rc3)
