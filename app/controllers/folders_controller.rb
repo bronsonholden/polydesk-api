@@ -21,7 +21,7 @@ class FoldersController < ApplicationController
   # POST /:identifier/folders
   def create
     schema = CreateFolderSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, Folder)
+    payload = sanitize_payload(schema.render, Folder)
     realizer = FolderRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
