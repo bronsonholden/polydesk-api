@@ -61,7 +61,7 @@ class FormsController < ApplicationController
   # Helper to get payload but convert schema (the form schema) to a
   # JSON string
   def get_payload(schema)
-    payload = schema.to_hash
+    payload = schema.render
     json = payload.dig("data", "attributes", "schema")
     if !json.nil?
       payload["data"]["attributes"]["schema"] = json.to_json
