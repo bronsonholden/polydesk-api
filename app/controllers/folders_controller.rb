@@ -31,7 +31,7 @@ class FoldersController < ApplicationController
   # PATCH/PUT /:identifier/folders/:id
   def update
     schema = UpdateFolderSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, Folder)
+    payload = sanitize_payload(schema.render, Folder)
     realizer = FolderRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
