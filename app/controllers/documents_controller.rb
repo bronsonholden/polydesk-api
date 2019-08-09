@@ -6,7 +6,7 @@ class DocumentsController < ApplicationController
   # POST /:identifier/documents
   def create
     schema = CreateDocumentSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, Document)
+    payload = sanitize_payload(schema.render, Document)
     realizer = DocumentRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
