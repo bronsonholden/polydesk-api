@@ -24,7 +24,7 @@ class AccountsController < ApplicationController
   def create
     ActiveRecord::Base.transaction do
       schema = CreateAccountSchema.new(request.params)
-      payload = sanitize_payload(schema.to_hash, Account)
+      payload = sanitize_payload(schema.render, Account)
       realizer = AccountRealizer.new(intent: :create, parameters: payload, headers: request.headers)
       authorize realizer.object
       realizer.object.save!
