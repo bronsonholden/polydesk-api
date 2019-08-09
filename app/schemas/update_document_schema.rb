@@ -36,6 +36,7 @@ class UpdateDocumentSchema < ApplicationSchema
                     },
                     {
                       type: 'object',
+                      required: ['data'],
                       properties: {
                         data: {
                           type: 'object',
