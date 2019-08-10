@@ -12,7 +12,7 @@ class FormSubmissionsController < ApplicationController
   # POST /:identifier/form-submissions
   def create
     schema = CreateFormSubmissionSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, FormSubmission)
+    payload = sanitize_payload(schema.render, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.submitter = current_user

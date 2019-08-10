@@ -27,6 +27,8 @@ module Polydesk
         },
         'FormSchemaViolated' => Proc.new { |record|
           record.errors.add('form_submission', 'violates form schema')
+        },
+        'MalformedRequest' => Proc.new { |record|
         }
       }
 

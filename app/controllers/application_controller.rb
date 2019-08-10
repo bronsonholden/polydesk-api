@@ -25,6 +25,7 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::ApiExceptions::FormSchemaViolated, with: :invalid_exception
   rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
   rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
+  rescue_from Polydesk::ApiExceptions::MalformedRequest, with: :malformed_request_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, current_account)
@@ -94,6 +95,16 @@ class ApplicationController < ActionController::API
   end
 
   private
+
+  def malformed_request_exception(exception)
+    errors = [
+      {
+        id: 'Malformed request',
+        message: 'The request is malformed'
+      }
+    ]
+    render json: { errors: errors }, status: :unprocessable_entity
+  end
 
   def invalid_confirmation_token_exception(exception)
     render_exception_for exception.record, status_code: :not_found
