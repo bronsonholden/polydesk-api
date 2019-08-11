@@ -1,15 +1,32 @@
-class CreateReportSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    field :id, type: Strict::Nil
-    field :controller, type: Strict::String.enum('reports')
-    field :action, type: Strict::String.enum('create')
-    field :data, type: Strict::Hash do
-      field :type, type: Strict::String.enum('reports')
-      field :attributes, type: Strict::Hash.optional do
-        field :name, type: Strict::String.optional
-      end
-    end
+class CreateReportSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      required: ['data'],
+      properties: {
+        data: {
+          type: 'object',
+          required: [
+            'type',
+            'attributes'
+          ],
+          properties: {
+            type: {
+              type: 'string',
+              enum: ['reports']
+            },
+            attributes: {
+              type: 'object',
+              required: ['name'],
+              properties: {
+                name: {
+                  type: 'string'
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   end
 end

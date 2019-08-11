@@ -21,7 +21,7 @@ class ReportsController < ApplicationController
   # POST /:identifier/reports
   def create
     schema = CreateReportSchema.new(request.params)
-    realizer = ReportRealizer.new(intent: :create, parameters: schema, headers: request.headers)
+    realizer = ReportRealizer.new(intent: :create, parameters: schema.render, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
