@@ -12,11 +12,11 @@ RSpec.describe 'Users', type: :request do
                        data: {
                          type: 'users',
                          attributes: {
-                           first_name: 'New',
-                           last_name: 'User',
+                           'first-name': 'New',
+                           'last-name': 'User',
                            email: 'new_user@polydesk.io',
                            password: 'password',
-                           password_confirmation: 'password' } } }.to_json
+                           'password-confirmation': 'password' } } }.to_json
       expect(response).to have_http_status(201)
     end
   end

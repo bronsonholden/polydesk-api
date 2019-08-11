@@ -1,27 +1,77 @@
-class CreateUserSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    field :id, type: Strict::Nil
-    field :controller, type: Strict::String.enum('users')
-    field :action, type: Strict::String.enum('create')
-    field :data, type: Strict::Hash do
-      field :type, type: Strict::String.enum('users')
-      field :attributes, type: Strict::Hash do
-        field :first_name, type: Strict::String.optional
-        field :last_name, type: Strict::String.optional
-        field :email, type: Strict::String
-        field :password, type: Strict::String
-        field :password_confirmation, type: Strict::String
-      end
-      field :relationships, type: Strict::Hash.optional do
-        field :accounts, type: Strict::Hash.optional do
-          field :data, type: Strict::Hash do
-            field :id, type: Strict::String
-            field :type, type: Strict::String.enum('accounts')
-          end
-        end
-      end
-    end
+class CreateUserSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      required: ['data'],
+      properties: {
+        data: {
+          type: 'object',
+          required: [
+            'type',
+            'attributes'
+          ],
+          properties: {
+            type: {
+              type: 'string',
+              enum: ['users']
+            },
+            attributes: {
+              type: 'object',
+              required: [
+                'first-name',
+                'last-name',
+                'email',
+                'password',
+                'password-confirmation'
+              ],
+              properties: {
+                'first-name': {
+                  type: 'string'
+                },
+                'last-name': {
+                  type: 'string'
+                },
+                email: {
+                  type: 'string'
+                },
+                password: {
+                  type: 'string'
+                },
+                'password-confirmation': {
+                  type: 'string'
+                }
+              }
+            },
+            relationships: {
+              accounts: {
+                type: 'object',
+                required: ['data'],
+                properties: {
+                  data: {
+                    type: 'array',
+                    items: {
+                      type: 'object',
+                      required: [
+                        'id',
+                        'type'
+                      ],
+                      properties: {
+                        id: {
+                          type: 'string'
+                        },
+                        type: {
+                          type: 'string',
+                          enum: ['accounts']
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   end
 end

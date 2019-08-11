@@ -56,11 +56,11 @@ class UserPolicy < ApplicationPolicy
   # Only applies when authenticated, i.e. creating a user for an invitee to
   # an existing account.
   def allowed_attributes_for_create
-    [:first_name, :last_name, :email, :password, :password_confirmation]
+    [:"first-name", :"last-name", :email, :password, :"password-confirmation"]
   end
 
   def allowed_attributes_for_update
-    [:first_name, :last_name, :password]
+    [:"first-name", :"last-name", :password]
   end
 
   def allowed_relationships_for_create

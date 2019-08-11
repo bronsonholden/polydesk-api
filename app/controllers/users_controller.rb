@@ -14,7 +14,7 @@ class UsersController < ApplicationController
   # POST /users
   def create
     schema = CreateUserSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, User)
+    payload = sanitize_payload(schema.render, User)
     realizer = UserRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
