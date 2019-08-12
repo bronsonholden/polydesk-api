@@ -4,7 +4,7 @@ class AccountsController < ApplicationController
   # GET /accounts
   def index
     schema = IndexAccountsSchema.new(request.params)
-    payload = schema.to_hash
+    payload = schema.render
     realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(Account))
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, Account.all.count)

@@ -45,6 +45,20 @@ RSpec.describe 'Accounts', type: :request do
     end
   end
 
+  describe 'GET /accounts' do
+    let!(:other_account) { create :account }
+
+    it 'returns all accessible accounts' do
+      get '/accounts', headers: rspec_session
+      expect(response).to have_http_status(200)
+      data = JSON.parse(response.body).fetch('data')
+      ids = data.map { |account| account.fetch('id') }
+      expect(ids).not_to include(other_account.id.to_s)
+    end
+
+    # TODO: test @polydesk.io user can index all accounts
+  end
+
   describe 'PATCH /accounts/:id' do
     let(:data) {
       {

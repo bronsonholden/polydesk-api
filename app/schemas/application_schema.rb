@@ -20,4 +20,38 @@ class ApplicationSchema
   def schema
     {}
   end
+
+  def include_schema
+    {
+      type: 'string',
+      minLength: 1
+    }
+  end
+
+  def sort_schema
+    {
+      type: 'string',
+      minLength: 1
+    }
+  end
+
+  def filter_schema
+    {
+      type: 'object'
+    }
+  end
+
+  def page_schema
+    {
+      type: 'object',
+      properties: {
+        offset: {
+          type: 'string'
+        },
+        limit: {
+          type: 'string'
+        }
+      }
+    }
+  end
 end
