@@ -51,11 +51,12 @@ class DocumentsController < ApplicationController
   # GET /:identifier/documents
   def index
     schema = IndexDocumentsSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :index, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :index, parameters: payload, headers: request.headers)
     authorize realizer.object
     documents = realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, Document.all.count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (schema.include.split(',') if schema.key?('include')), meta: pagination_props.generate), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (payload.include.split(',') if payload.key?('include')), meta: pagination_props.generate), status: :ok
   end
 
   # DELETE /:identifier/documents/:id
