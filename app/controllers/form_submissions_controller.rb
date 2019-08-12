@@ -4,7 +4,8 @@ class FormSubmissionsController < ApplicationController
   # GET /:identifier/form-submissions
   def index
     schema = IndexFormSubmissionsSchema.new(request.params)
-    realizer = FormSubmissionRealizer.new(intent: :index, parameters: schema.to_hash, headers: request.headers)
+    payload = schema.render
+    realizer = FormSubmissionRealizer.new(intent: :index, parameters: payload, headers: request.headers)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true), status: :ok
   end
