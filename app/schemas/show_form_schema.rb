@@ -1,13 +1,12 @@
-class ShowFormSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    compounding_params
-    sparse_params
-    filter_params
-    field :id, type: Strict::String
-    field :controller, type: Strict::String.enum('forms')
-    field :action, type: Strict::String.enum('show', 'destroy', 'restore', 'form_submissions')
-    field :data, type: Strict::Nil
+class ShowFormSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      properties: {
+        include: include_schema,
+        fields: fields_schema,
+        filter: filter_schema
+      }
+    }
   end
 end

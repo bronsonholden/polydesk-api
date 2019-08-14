@@ -24,7 +24,8 @@ class FormsController < ApplicationController
   # GET /:identifier/forms/:id
   def show
     schema = ShowFormSchema.new(request.params)
-    realizer = FormRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FormRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -42,7 +43,8 @@ class FormsController < ApplicationController
   # DELETE /:identifier/forms/:id
   def destroy
     schema = ShowFormSchema.new(request.params)
-    realizer = FormRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FormRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.discard!
   end
@@ -50,7 +52,8 @@ class FormsController < ApplicationController
   # GET /:identifier/forms/:id/form_submissions
   def form_submissions
     schema = ShowFormSchema.new(request.params)
-    realizer = FormRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FormRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :show?
     authorize realizer.object.form_submissions, :index?
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.form_submissions.size)
