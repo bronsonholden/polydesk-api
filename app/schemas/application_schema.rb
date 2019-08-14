@@ -35,6 +35,12 @@ class ApplicationSchema
     }
   end
 
+  def fields_schema
+    {
+      type: 'object'
+    }
+  end
+
   def filter_schema
     {
       type: 'object'
