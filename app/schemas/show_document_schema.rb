@@ -1,14 +1,12 @@
-class ShowDocumentSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    compounding_params
-    sparse_params
-    filter_params
-    field :id, type: Strict::String
-    field :controller, type: Strict::String.enum('documents')
-    field :action, type: Strict::String.enum('show', 'destroy', 'restore', 'download', 'download_version', 'folder')
-    field :version, type: Strict::String.optional
-    field :data, type: Strict::Nil
+class ShowDocumentSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      properties: {
+        include: include_schema,
+        fields: fields_schema,
+        filter: filter_schema
+      }
+    }
   end
 end

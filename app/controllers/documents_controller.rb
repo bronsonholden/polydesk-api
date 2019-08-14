@@ -43,9 +43,10 @@ class DocumentsController < ApplicationController
   # POST /:identifier/documents/:id
   def show
     schema = ShowDocumentSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
-    render json: JSONAPI::Serializer.serialize(realizer.object, include: (schema.include.split(',') if schema.key?('include'))), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, include: (payload.include.split(',') if payload.key?('include'))), status: :ok
   end
 
   # GET /:identifier/documents
@@ -62,7 +63,8 @@ class DocumentsController < ApplicationController
   # DELETE /:identifier/documents/:id
   def destroy
     schema = ShowDocumentSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.discard!
   end
@@ -70,7 +72,8 @@ class DocumentsController < ApplicationController
   # PUT /:identifier/documents/:id/restore
   def restore
     schema = ShowDocumentSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :update?
     realizer.object.undiscard!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
@@ -79,7 +82,8 @@ class DocumentsController < ApplicationController
   # GET /:identifier/documents/:id/folder
   def folder
     schema = ShowDocumentSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :show?
     authorize realizer.object.folder, :show?, policy_class: FolderPolicy
     render json: JSONAPI::Serializer.serialize(realizer.object.folder)
@@ -88,7 +92,8 @@ class DocumentsController < ApplicationController
   # GET /:identifier/documents/:id/download
   def download
     schema = ShowDocumentSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :show?
     serve_content(realizer.object)
   end
@@ -96,9 +101,10 @@ class DocumentsController < ApplicationController
   # GET /:identifier/documents/:id/versions/:version/download
   def download_version
     schema = ShowDocumentSchema.new(request.params)
-    realizer = DocumentRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = DocumentRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :show?
-    version = realizer.object.versions.find(schema.version)
+    version = realizer.object.versions.find(payload["version"])
     serve_content(version.reify)
   end
 
