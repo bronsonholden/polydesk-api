@@ -14,7 +14,7 @@ class AccountsController < ApplicationController
   # GET /account/:id
   def show
     schema = ShowAccountSchema.new(request.params)
-    payload = schema.to_hash
+    payload = schema.render
     realizer = AccountRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
