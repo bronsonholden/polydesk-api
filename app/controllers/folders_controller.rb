@@ -15,9 +15,10 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id
   def show
     schema = ShowFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
-    render json: JSONAPI::Serializer.serialize(realizer.object, include: (schema.include.split(',') if schema.key?('include'))), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, include: (payload.include.split(',') if payload.key?('include'))), status: :ok
   end
 
   # POST /:identifier/folders
@@ -43,7 +44,8 @@ class FoldersController < ApplicationController
   # DELETE /:identifier/folders/:id
   def destroy
     schema = ShowFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.discard!
   end
@@ -51,7 +53,8 @@ class FoldersController < ApplicationController
   # PUT /:identifier/folders/:id/restore
   def restore
     schema = ShowFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :restore?
     realizer.object.undiscard!
     render json: JSONAPI::Serializer.serialize(realizer.object.reload), status: :ok
@@ -94,7 +97,8 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id/folders
   def folders
     schema = ShowFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.folders.size)
     render json: JSONAPI::Serializer.serialize(realizer.object.folders, is_collection: true, meta: pagination_props.generate), status: :ok
@@ -103,7 +107,8 @@ class FoldersController < ApplicationController
   # GET /:identifier/folders/:id/documents
   def documents
     schema = ShowFolderSchema.new(request.params)
-    realizer = FolderRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object, :documents?
     authorize realizer.object.documents, :index?
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.documents.size)
