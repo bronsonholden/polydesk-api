@@ -35,7 +35,8 @@ class UsersController < ApplicationController
   # GET /users/:id
   def show
     schema = ShowUserSchema.new(request.params)
-    realizer = UserRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = UserRealizer.new(intent: :show, parameters: render, headers: request.headers)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
