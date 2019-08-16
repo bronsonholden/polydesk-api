@@ -65,7 +65,6 @@ gem 'paper_trail'
 gem 'discard', '~> 1.0'
 gem 'jsonapi-realizer', git: 'https://github.com/paulholden2/jsonapi-realizer.rb.git', branch: 'core'
 gem 'jsonapi-serializers'
-gem 'smart_params', git: 'https://github.com/paulholden2/smart_params.rb.git', branch: 'nullable-qol'
 gem 'smush'
 gem 'statesman', '~> 3.4.1'
 
