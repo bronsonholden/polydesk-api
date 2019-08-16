@@ -25,7 +25,7 @@ class UsersController < ApplicationController
   # PATCH /users/:id
   def update
     schema = UpdateUserSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, User)
+    payload = sanitize_payload(schema.render, User)
     realizer = UserRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
