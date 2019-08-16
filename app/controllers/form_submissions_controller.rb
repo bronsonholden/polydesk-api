@@ -27,7 +27,7 @@ class FormSubmissionsController < ApplicationController
   # GET /:identifier/form-submissions/:id
   def show
     schema = ShowFormSubmissionSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, FormSubmission)
+    payload = sanitize_payload(schema.render, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
@@ -46,7 +46,7 @@ class FormSubmissionsController < ApplicationController
   # DELETE /:identifier/form-submissions/:id
   def destroy
     schema = ShowFormSubmissionSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, FormSubmission)
+    payload = sanitize_payload(schema.render, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.destroy!
