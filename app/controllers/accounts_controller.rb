@@ -37,7 +37,7 @@ class AccountsController < ApplicationController
   # PATCH/PUT /accounts/:id
   def update
     schema = UpdateAccountSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, Account)
+    payload = sanitize_payload(schema.render, Account)
     realizer = AccountRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
