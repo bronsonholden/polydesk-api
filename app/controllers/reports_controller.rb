@@ -32,7 +32,8 @@ class ReportsController < ApplicationController
   # PATCH/PUT /:identifier/reports/:id
   def update
     schema = UpdateReportSchema.new(request.params)
-    realizer = ReportRealizer.new(intent: :update, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = ReportRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
