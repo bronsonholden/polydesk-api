@@ -1,8 +1,12 @@
-class UploadDocumentSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    field :content, type: Any
-    field :name, type: Strict::String
+class UploadDocumentSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string'
+        }
+      }
+    }
   end
 end
