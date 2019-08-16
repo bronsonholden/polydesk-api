@@ -14,7 +14,8 @@ class ReportsController < ApplicationController
   # GET /:identifier/reports/:id
   def show
     schema = ShowReportSchema.new(request.params)
-    realizer = ReportRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = ReportRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
@@ -40,7 +41,8 @@ class ReportsController < ApplicationController
   # DELETE /:identifier/reports/:id
   def destroy
     schema = ShowReportSchema.new(request.params)
-    realizer = ReportRealizer.new(intent: :show, parameters: schema, headers: request.headers)
+    payload = schema.render
+    realizer = ReportRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.discard!
   end
