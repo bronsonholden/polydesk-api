@@ -36,7 +36,7 @@ class FormSubmissionsController < ApplicationController
   # PATCH /:identifier/form-submissions/:id
   def update
     schema = UpdateFormSubmissionSchema.new(request.params)
-    payload = sanitize_payload(schema.to_hash, FormSubmission)
+    payload = sanitize_payload(schema.render, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :update, parameters: payload, headers: request.headers)
     authorize realizer.object
     realizer.object.save!

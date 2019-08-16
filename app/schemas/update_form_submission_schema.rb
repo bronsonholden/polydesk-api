@@ -1,17 +1,41 @@
-class UpdateFormSubmissionSchema
-  include SmartParams
-
-  schema type: Strict::Hash do
-    field :id, type: Strict::String
-    field :controller, type: Strict::String.enum('form_submissions')
-    field :action, type: Strict::String.enum('update')
-    field :data, type: Strict::Hash do
-      field :id, type: Strict::String
-      field :type, type: Strict::String.enum('form-submissions')
-      field :attributes, type: Strict::Hash.optional do
-        field :data, type: Strict::Hash.optional
-        field :state, type: Strict::String.enum('draft', 'published').optional
-      end
-    end
+class UpdateFormSubmissionSchema < ApplicationSchema
+  def schema
+    {
+      type: 'object',
+      required: ['data'],
+      properties: {
+        data: {
+          type: 'object',
+          required: [
+            'id',
+            'type'
+          ],
+          properties: {
+            id: {
+              type: 'string'
+            },
+            type: {
+              type: 'string',
+              enum: 'form-submissions'
+            },
+            attributes: {
+              type: 'object',
+              properties: {
+                data: {
+                  type: 'object'
+                },
+                state: {
+                  type: 'string',
+                  enum: [
+                    'draft',
+                    'published'
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   end
 end
