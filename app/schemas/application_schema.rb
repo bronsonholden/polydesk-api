@@ -11,7 +11,7 @@ class ApplicationSchema
 
   def render
     if !validate
-      raise Polydesk::ApiExceptions::MalformedRequest.new
+      raise Polydesk::Errors::MalformedRequest.new
     else
       data
     end

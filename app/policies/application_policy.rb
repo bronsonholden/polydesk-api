@@ -7,7 +7,7 @@ class ApplicationPolicy
     @account_user = AccountUser.find_by(user: @user, account: @account)
     @record = record
     # TODO
-    # raise Polydesk::ApiExceptions::AccountIsDisabled.new(auth.account) if auth.account.discarded?
+    # raise Polydesk::Errors::AccountIsDisabled.new(auth.account) if auth.account.discarded?
   end
 
   def has_role?(role)

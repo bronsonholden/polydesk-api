@@ -7,7 +7,7 @@ module Polydesk
       return if self.file_size.nil?
       # Verify within storage limit
       if Document.sum(:file_size) + self.file_size > limit
-        raise Polydesk::ApiExceptions::DocumentException::StorageLimitReached.new(self)
+        raise Polydesk::DocumentException::StorageLimitReached.new(self)
       end
     end
   end

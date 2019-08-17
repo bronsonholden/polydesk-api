@@ -39,7 +39,7 @@ class VersionsController < ApplicationController
     @model_name = params[:model].singularize
 
     if !versionable.include?(@model_name)
-      raise Polydesk::ApiExceptions::NotVersionable.new(@object)
+      raise Polydesk::Errors::NotVersionable.new(@object)
     end
 
     @model = @model_name.classify.constantize

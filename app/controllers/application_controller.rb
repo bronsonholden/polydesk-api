@@ -18,14 +18,14 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  rescue_from Polydesk::ApiExceptions::AccountIsDisabled, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::InvalidConfirmationToken, with: :invalid_confirmation_token_exception
-  rescue_from Polydesk::ApiExceptions::NotVersionable, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::DocumentException::StorageLimitReached, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::FormSchemaViolated, with: :invalid_exception
-  rescue_from Polydesk::ApiExceptions::UserException::NoAccountAccess, with: :forbidden_exception
-  rescue_from Polydesk::ApiExceptions::ClientGeneratedIdsForbidden, with: :client_generated_ids_forbidden_exception
-  rescue_from Polydesk::ApiExceptions::MalformedRequest, with: :malformed_request_exception
+  rescue_from Polydesk::Errors::AccountIsDisabled, with: :api_exception
+  rescue_from Polydesk::Errors::InvalidConfirmationToken, with: :api_exception
+  rescue_from Polydesk::Errors::NotVersionable, with: :api_exception
+  rescue_from Polydesk::Errors::StorageLimitReached, with: :api_exception
+  rescue_from Polydesk::Errors::FormSchemaViolated, with: :api_exception
+  rescue_from Polydesk::Errors::NoAccountAccess, with: :api_exception
+  rescue_from Polydesk::Errors::ClientGeneratedIdsForbidden, with: :api_exception
+  rescue_from Polydesk::Errors::MalformedRequest, with: :api_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, current_account)
@@ -96,28 +96,9 @@ class ApplicationController < ActionController::API
 
   private
 
-  def malformed_request_exception(exception)
-    errors = [
-      {
-        id: 'Malformed request',
-        message: 'The request is malformed'
-      }
-    ]
-    render json: { errors: errors }, status: :unprocessable_entity
-  end
-
-  def invalid_confirmation_token_exception(exception)
-    render_exception_for exception.record, status_code: :not_found
-  end
-
-  def client_generated_ids_forbidden_exception(exception)
-    errors = [
-      {
-        id: 'Client generated IDs',
-        message: 'Client generated IDs are forbidden'
-      }
-    ]
-    render json: { errors: errors }, status: :unprocessable_entity
+  def api_exception(exception)
+    errors = [{ title: exception.message }]
+    render json: { errors: errors }, status: exception.status
   end
 
   def user_not_authorized(exception)
@@ -148,7 +129,7 @@ class ApplicationController < ActionController::API
   # is not supported, so return 403 Forbidden per the specification.
   def forbid_client_generated_id
     if !request.params.fetch(:data, {}).fetch(:id, nil).nil?
-      raise Polydesk::ApiExceptions::ClientGeneratedIdsForbidden.new
+      raise Polydesk::Errors::ClientGeneratedIdsForbidden.new
     end
   end
 
@@ -160,7 +141,7 @@ class ApplicationController < ActionController::API
     return if !attributes.respond_to?(:keys) || attributes.keys.empty?
     restricted = payload['data']['attributes'].keys - allowed.map { |k| k.to_s }
     if restricted.any?
-      raise Polydesk::ApiExceptions::ForbiddenAttributes.new
+      raise Polydesk::Errors::ForbiddenAttributes.new
     end
   end
 
@@ -170,7 +151,7 @@ class ApplicationController < ActionController::API
     return if !relationships.respond_to?(:keys) || relationships.keys.empty?
     restricted = relationships.keys - allowed.map { |k| k.to_s }
     if restricted.any?
-      raise Polydesk::ApiExceptions::ForbiddenRelationships.new
+      raise Polydesk::Errors::ForbiddenRelationships.new
     end
   end
 end
