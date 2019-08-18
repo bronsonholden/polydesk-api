@@ -133,8 +133,7 @@ class ApplicationController < ActionController::API
     end
   end
 
-  # Return 403 Forbidden if any restricted attributes or relationships are
-  # created or modified.
+  # Return 403 if any restricted attributes are created or modified
   def forbid_disallowed_attributes(payload, record_klass)
     allowed = allowed_attributes(record_klass)
     attributes = payload.dig('data', 'attributes')
@@ -145,6 +144,7 @@ class ApplicationController < ActionController::API
     end
   end
 
+  # Return 403 if any restricted relationships are created or modified
   def forbid_disallowed_relationships(payload, _policy)
     allowed = allowed_relationships(_policy)
     relationships = payload.dig('data', 'relationships')
