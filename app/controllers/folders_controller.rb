@@ -9,7 +9,7 @@ class FoldersController < ApplicationController
     realizer = FolderRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (payload.include.split(',') if payload.key?('include')), meta: pagination_props.generate), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, include: (payload['include'].split(',') if payload.key?('include')), meta: pagination_props.generate), status: :ok
   end
 
   # GET /:identifier/folders/:id
@@ -18,7 +18,7 @@ class FoldersController < ApplicationController
     payload = schema.render
     realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
     authorize realizer.object
-    render json: JSONAPI::Serializer.serialize(realizer.object, include: (payload.include.split(',') if payload.key?('include'))), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object, include: (payload['include'].split(',') if payload.key?('include'))), status: :ok
   end
 
   # POST /:identifier/folders
