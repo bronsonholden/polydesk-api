@@ -139,9 +139,7 @@ class ApplicationController < ActionController::API
     attributes = payload.dig('data', 'attributes')
     return if !attributes.respond_to?(:keys) || attributes.keys.empty?
     restricted = payload['data']['attributes'].keys - allowed.map { |k| k.to_s }
-    if restricted.any?
-      raise Polydesk::Errors::ForbiddenAttributes.new
-    end
+    raise Polydesk::Errors::ForbiddenAttributes.new if restricted.any?
   end
 
   # Return 403 if any restricted relationships are created or modified
@@ -150,8 +148,6 @@ class ApplicationController < ActionController::API
     relationships = payload.dig('data', 'relationships')
     return if !relationships.respond_to?(:keys) || relationships.keys.empty?
     restricted = relationships.keys - allowed.map { |k| k.to_s }
-    if restricted.any?
-      raise Polydesk::Errors::ForbiddenRelationships.new
-    end
+    raise Polydesk::Errors::ForbiddenRelationships.new if restricted.any?
   end
 end
