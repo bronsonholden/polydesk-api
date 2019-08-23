@@ -1,4 +1,4 @@
-class FormSubmissionSerializer < ApplicationSerializer
+class FormSubmissionSerializer < TenantSerializer
   attribute :state do
     object.current_state
   end
