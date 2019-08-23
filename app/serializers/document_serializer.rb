@@ -6,5 +6,9 @@ class DocumentSerializer < TenantSerializer
     nil
   end
 
+  attribute :version do
+    object.versions.size + 1
+  end
+
   has_one :folder
 end
