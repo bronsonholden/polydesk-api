@@ -15,8 +15,8 @@ class DocumentsController < ApplicationController
 
   # Non-JSON:API create
   def upload_new
-    document = Document.create(params.permit(:content, :name))
-    authorize document
+    document = Document.new(params.permit(:content, :name))
+    authorize document, :create?
     document.save!
     render json: JSONAPI::Serializer.serialize(document), status: :created
   end
