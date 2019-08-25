@@ -34,7 +34,7 @@ class FormSubmission < ApplicationRecord
 
   def validate_schema
     valid = JSON::Validator.validate(JSON.parse(self.schema_snapshot), self.data)
-    raise Polydesk::Errors::FormSchemaViolated.new(self) if !valid
+    raise Polydesk::Errors::FormSchemaViolated.new if !valid
   end
 
   def flatten_data
