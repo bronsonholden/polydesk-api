@@ -9,7 +9,7 @@ FactoryBot.define do
             type: 'string' },
           email: {
             type: 'string' } }
-      }
+      }.to_json
     }
   end
 end

@@ -33,7 +33,7 @@ class FormSubmission < ApplicationRecord
   protected
 
   def validate_schema
-    valid = JSON::Validator.validate(self.schema_snapshot, self.data)
+    valid = JSON::Validator.validate(JSON.parse(self.schema_snapshot), self.data)
     raise Polydesk::Errors::FormSchemaViolated.new(self) if !valid
   end
 
@@ -43,7 +43,7 @@ class FormSubmission < ApplicationRecord
   end
 
   def form_snapshot
-    self.schema_snapshot = form.schema.deep_dup
+    self.schema_snapshot = form.schema
     self.layout_snapshot = form.layout.deep_dup
   end
 end

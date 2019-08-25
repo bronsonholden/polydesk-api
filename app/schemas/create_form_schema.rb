@@ -19,8 +19,7 @@ class CreateFormSchema < ApplicationSchema
               type: 'object',
               required: [
                 'name',
-                'schema',
-                'layout'
+                'schema'
               ],
               properties: {
                 name: {

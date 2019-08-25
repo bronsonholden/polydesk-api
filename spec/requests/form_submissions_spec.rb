@@ -9,7 +9,7 @@ RSpec.describe 'FormSubmissions', type: :request do
         email: { type: 'string' }
       },
       required: [ 'name', 'email' ]
-    }
+    }.to_json
   }
 
   let!(:form) { create :form, schema: schema }

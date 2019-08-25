@@ -7,10 +7,6 @@ class Form < ApplicationRecord
   validate :check_schema
   validate :check_layout
 
-  def schema=(s)
-    super(s.to_json)
-  end
-
   private
 
   def check_schema
