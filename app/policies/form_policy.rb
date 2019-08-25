@@ -10,8 +10,7 @@ class FormPolicy < ApplicationPolicy
     end
 
     def resolve
-      #scope.kept
-      scope
+      scope.kept
     end
   end
 
