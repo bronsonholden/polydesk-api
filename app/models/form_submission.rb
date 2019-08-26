@@ -11,7 +11,7 @@ class FormSubmission < ApplicationRecord
   belongs_to :form
   belongs_to :submitter, class_name: 'User', foreign_key: 'submitter_id'
 
-  before_validation :form_snapshot, on: :create
+  before_validation :form_snapshot
   before_validation :flatten_data, :validate_schema
 
   def state_machine
