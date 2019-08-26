@@ -51,13 +51,17 @@ class FormsController < ApplicationController
 
   # GET /:identifier/forms/:id/form_submissions
   def form_submissions
-    schema = ShowFormSchema.new(request.params)
-    payload = schema.render
-    realizer = FormRealizer.new(intent: :show, parameters: payload, headers: request.headers)
-    authorize realizer.object, :show?
-    authorize realizer.object.form_submissions, :index?
-    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.object.form_submissions.size)
-    render json: JSONAPI::Serializer.serialize(realizer.object.form_submissions, is_collection: true, meta: pagination_props.generate), status: :ok
+    form_schema = ShowFormSchema.new(request.params)
+    form_payload = form_schema.render
+    puts form_payload.inspect
+    submissions_schema = IndexFormSubmissionsSchema.new(request.params)
+    submissions_payload = submissions_schema.render
+    form_realizer = FormRealizer.new(intent: :show, parameters: form_payload, headers: request.headers)
+    authorize form_realizer.object, :show?
+    submissions_realizer = FormSubmissionRealizer.new(intent: :index, parameters: submissions_payload, headers: request.headers, scope: FormSubmission.where(form: form_realizer.object))
+    authorize submissions_realizer.object, :index?
+    pagination_props = PaginationProperties.new(page_offset, page_limit, submissions_realizer.total_count)
+    render json: JSONAPI::Serializer.serialize(submissions_realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   private
