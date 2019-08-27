@@ -3,7 +3,6 @@ class IndexAccountsSchema < ApplicationSchema
     {
       type: 'object',
       properties: {
-        include: include_schema,
         filter: filter_schema,
         page: page_schema,
         sort: sort_schema

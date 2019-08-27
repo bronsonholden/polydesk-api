@@ -3,7 +3,6 @@ class IndexReportsSchema < ApplicationSchema
     {
       type: 'object',
       properties: {
-        include: include_schema,
         fields: fields_schema,
         filter: filter_schema,
         page: page_schema,

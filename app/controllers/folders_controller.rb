@@ -94,6 +94,19 @@ class FoldersController < ApplicationController
     render json: JSONAPI::Serializer.serialize(content, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
+  # GET /:identifier/folders/:id/folder
+  def folder
+    schema = ShowFolderSchema.new(request.params)
+    payload = schema.render
+    realizer = FolderRealizer.new(intent: :show, parameters: payload, headers: request.headers)
+    authorize realizer.object, :show?
+    parent = realizer.object.folder
+    if !parent.nil?
+      authorize parent, :show?
+    end
+    render json: JSONAPI::Serializer.serialize(parent), status: :ok
+  end
+
   # GET /:identifier/folders/:id/folders
   def folders
     schema = ShowFolderSchema.new(request.params)
