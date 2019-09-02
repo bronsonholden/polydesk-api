@@ -9,7 +9,7 @@ class FormSubmissionSorting
     }
     # Remove attributes from payload
     sort = sort - ext_sort
-    if sort.size > 1
+    if sort.size > 0
       @payload['sort'] = sort.join(',')
     else
       @payload.delete('sort')
