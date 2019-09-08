@@ -1,8 +1,4 @@
 class FormSubmissionSerializer < TenantSerializer
-  attribute :state do
-    object.current_state
-  end
-
   attribute :schema_snapshot do
     JSON.parse(object.schema_snapshot)
   end
