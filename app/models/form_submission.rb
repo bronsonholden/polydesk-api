@@ -1,4 +1,5 @@
 class FormSubmission < ApplicationRecord
+  include Discard::Model
   include Statesman::Adapters::ActiveRecordQueries
 
   has_many :form_submission_transitions, autosave: false

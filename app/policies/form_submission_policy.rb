@@ -1,22 +1,32 @@
 class FormSubmissionPolicy < ApplicationPolicy
   def create?
-    true
+    allowed = super
+    return allowed unless allowed.nil?
+    has_permission?(:form_submission_create)
   end
 
   def index?
-    true
+    allowed = super
+    return allowed unless allowed.nil?
+    has_permission?(:form_submission_index)
   end
 
   def show?
-    true
+    allowed = super
+    return allowed unless allowed.nil?
+    has_permission?(:form_submission_show)
   end
 
   def update?
-    true
+    allowed = super
+    return allowed unless allowed.nil?
+    has_permission?(:form_submission_update)
   end
 
   def destroy?
-    false
+    allowed = super
+    return allowed unless allowed.nil?
+    has_permission?(:form_submission_destroy)
   end
 
   def allowed_attributes_for_create

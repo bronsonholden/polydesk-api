@@ -24,7 +24,12 @@ class Permission < ApplicationRecord
     :report_index,
     :report_update,
     :report_destroy,
-    :account_update
+    :account_update,
+    :form_submission_create,
+    :form_submission_show,
+    :form_submission_index,
+    :form_submission_update,
+    :form_submission_destroy
   ]
 
   validates :code, presence: true, uniqueness: { scope: :account_user_id }
