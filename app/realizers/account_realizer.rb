@@ -4,6 +4,4 @@ class AccountRealizer
   has_many :users, class_name: 'UserRealizer'
   has :name
   has :identifier
-  has :password
-  has :password_confirmation
 end
