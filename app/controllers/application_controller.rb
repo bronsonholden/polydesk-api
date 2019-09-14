@@ -7,6 +7,54 @@ class ApplicationController < ActionController::API
   before_action :set_tenant
   after_action :clear_tenant
 
+  # Thoughts
+  # class ShowFoo < ShowResource
+  #   def initialize(params, scope)
+  #   end
+  #
+  #   def entify
+  #     @scope.find(params.fetch('id', 0))
+  #   end
+  # end
+  #
+  # def foo_show
+  #   show_foo = ShowFoo.new(request.params)
+  #   object = show_foo.entify
+  #   authorize object
+  #   render object
+  # end
+  #
+  # def foo_update
+  #   update_foo = UpdateFoo.new(request.params)
+  #   object = update_foo.entify
+  #   authorize object
+  #   object.save!
+  #   render object
+  # end
+  #
+  # def foo_index
+  #   index_foos = IndexFoos.new(request.params)
+  #   index_foos.filter
+  #   index_foos.sort
+  #   index_foos.paginate
+  #   objects = index_foos.entify
+  #   authorize objects
+  #   render objects
+  # end
+  #
+  # def foo_bars
+  #   foo = ShowFoo.new(request.params).entify
+  #   authorize foo
+  #   scope = policy_scope(Bar).where(foo: foo)
+  #   index_bars = IndexBars.new(request.params, scope)
+  #   index_bars.filter
+  #   index_bars.sort
+  #   index_bars.paginate
+  #   objects = index_bars.entify
+  #   authorize objects
+  #   render objects
+  # end
+
   if Rails.env.test?
     after_action :verify_authorized, unless: :devise_controller?
   end

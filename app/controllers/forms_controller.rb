@@ -61,6 +61,8 @@ class FormsController < ApplicationController
     sorter = FormSubmissionSorting.new(submissions_payload)
     submissions_scope = sorter.apply(submissions_scope)
     submissions_payload = sorter.payload
+    filter = FormSubmissionFiltering.new(submissions_payload)
+    submissions_scope = filter.apply(submissions_scope)
     submissions_realizer = FormSubmissionRealizer.new(intent: :index, parameters: submissions_payload, headers: request.headers, scope: submissions_scope)
     authorize submissions_realizer.object, :index?
     pagination_props = PaginationProperties.new(page_offset, page_limit, submissions_realizer.total_count)
