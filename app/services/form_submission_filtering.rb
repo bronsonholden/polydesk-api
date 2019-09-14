@@ -33,7 +33,6 @@ class FormSubmissionFiltering
       col = parts.reduce('data') { |sql, part|
         "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
       }
-      # Append order
       @json_filters[col] = val
     }
   end
