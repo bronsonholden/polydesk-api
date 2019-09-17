@@ -3,12 +3,25 @@ class FormSubmissionsController < ApplicationController
 
   # GET /:identifier/form-submissions
   def index
-    schema = IndexFormSubmissionsSchema.new(request.params)
-    payload = schema.render
-    realizer = FormSubmissionRealizer.new(intent: :index, parameters: payload, headers: request.headers)
-    authorize realizer.object
-    pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
+    submissions_schema = IndexFormSubmissionsSchema.new(request.params)
+    submissions_payload = submissions_schema.render
+    submissions_scope = policy_scope(FormSubmission)
+    filter = FormSubmissionFiltering.new(submissions_payload)
+    submissions_scope = filter.apply(submissions_scope)
+    sorter = FormSubmissionSorting.new(submissions_payload)
+    submissions_scope = sorter.apply(submissions_scope)
+    submissions_payload = sorter.payload
+    submissions_realizer = FormSubmissionRealizer.new(intent: :index, parameters: submissions_payload, headers: request.headers, scope: submissions_scope)
+    authorize submissions_realizer.object, :index?
+    pagination_props = PaginationProperties.new(page_offset, page_limit, submissions_realizer.total_count)
+    render json: JSONAPI::Serializer.serialize(submissions_realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
+    #
+    # schema = IndexFormSubmissionsSchema.new(request.params)
+    # payload = schema.render
+    # realizer = FormSubmissionRealizer.new(intent: :index, parameters: payload, headers: request.headers)
+    # authorize realizer.object
+    # pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
+    # render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   # POST /:identifier/form-submissions

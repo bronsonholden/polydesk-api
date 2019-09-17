@@ -20,7 +20,7 @@ class FormSubmissionFiltering
 
     # Pick the attributes we will sort with generated SQL
     ext_filter = @filters.select { |key, val|
-      true
+      key.starts_with?('data.')
     }
     @filters = @filters.reject { |f| ext_filter.key?(f) }
 
@@ -67,7 +67,7 @@ class FormSubmissionFiltering
     @filters.each { |attr, conditions|
       conditions.each { |c|
         if c.size == 2
-          scope = apply_condition(Arel.sql(attr), c, scope)
+          scope = apply_condition(attr.underscore, c, scope)
         end
       }
     }
