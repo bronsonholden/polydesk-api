@@ -61,15 +61,15 @@ class FoldersController < ApplicationController
   end
 
   def content
-    folder_id = params[:id]
-    if !folder_id.nil?
+    folder_id = params[:id] || params.dig(:filter, :"folder-id")
+    if !folder_id.nil? && folder_id.to_i != 0
       folder = Folder.find(folder_id)
       authorize folder, :folders?
       authorize folder, :documents?
     end
-    folders = Folder.kept.where(folder_id: params[:id] || 0)
+    folders = Folder.kept.where(folder_id: folder_id || 0)
     authorize folders, :index?
-    documents = Document.kept.where(folder_id: params[:id] || 0)
+    documents = Document.kept.where(folder_id: folder_id || 0)
     authorize documents, :index?
     # Save counts so we don't repeat the SQL query later
     folders_count = folders.count
