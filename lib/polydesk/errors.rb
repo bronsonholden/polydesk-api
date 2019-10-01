@@ -77,5 +77,11 @@ module Polydesk
         super("Unique field violation: #{key}")
       end
     end
+
+    class InvalidFormSchemaKey < Polydesk::Errors::Base
+      def initialize(key)
+        super("Invalid characters in form key: #{key} (alphanumerics, _ and - only)")
+      end
+    end
   end
 end
