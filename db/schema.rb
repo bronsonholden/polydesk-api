@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_09_08_235624) do
+ActiveRecord::Schema.define(version: 2019_10_01_011248) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,6 +93,7 @@ ActiveRecord::Schema.define(version: 2019_09_08_235624) do
     t.text "schema", default: "{}", null: false
     t.jsonb "layout", default: {}, null: false
     t.datetime "discarded_at"
+    t.string "unique_fields", array: true
     t.index ["discarded_at"], name: "index_forms_on_discarded_at"
     t.index ["name"], name: "index_forms_on_name", unique: true
   end

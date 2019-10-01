@@ -71,5 +71,11 @@ module Polydesk
         super('File storage limit reached')
       end
     end
+
+    class UniqueFieldViolation < Polydesk::Errors::Base
+      def initialize(key)
+        super("Unique field violation: #{key}")
+      end
+    end
   end
 end

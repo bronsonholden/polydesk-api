@@ -4,4 +4,5 @@ class FormRealizer
   has :name
   has :schema
   has :layout
+  has :unique_fields
 end

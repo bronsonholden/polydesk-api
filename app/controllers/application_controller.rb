@@ -74,6 +74,7 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::Errors::NoAccountAccess, with: :api_exception
   rescue_from Polydesk::Errors::ClientGeneratedIdsForbidden, with: :api_exception
   rescue_from Polydesk::Errors::MalformedRequest, with: :api_exception
+  rescue_from Polydesk::Errors::UniqueFieldViolation, with: :api_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, current_account)

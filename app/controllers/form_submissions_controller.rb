@@ -30,6 +30,20 @@ class FormSubmissionsController < ApplicationController
     payload = sanitize_payload(schema.render, FormSubmission)
     realizer = FormSubmissionRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     authorize realizer.object
+    form = realizer.object.form
+    authorize form, :show?
+    # Verify no unique fields are violated
+    form.unique_fields.each { |key|
+      parts = key.split('.')
+      val = payload.dig('data', 'attributes', 'data', *parts)
+      # Build and sanitize order SQL
+      col = parts.reduce('data') { |sql, part|
+        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+      }
+      if FormSubmission.where("#{col} = ?", Arel.sql(val.to_s)).any?
+        raise Polydesk::Errors::UniqueFieldViolation.new(key)
+      end
+    }
     realizer.object.submitter = current_user
     realizer.object.schema_snapshot = realizer.object.form.schema
     realizer.object.layout_snapshot = realizer.object.form.layout

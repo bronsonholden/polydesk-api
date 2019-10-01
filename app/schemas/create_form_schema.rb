@@ -30,6 +30,12 @@ class CreateFormSchema < ApplicationSchema
                 },
                 layout: {
                   type: 'object'
+                },
+                'unique-fields' => {
+                  type: 'array',
+                  items: {
+                    type: 'string'
+                  }
                 }
               }
             }
