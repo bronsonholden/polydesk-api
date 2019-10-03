@@ -12,6 +12,7 @@ class FormSubmissionsController < ApplicationController
     submissions_scope = sorter.apply(submissions_scope)
     submissions_payload = sorter.payload
     submissions_realizer = FormSubmissionRealizer.new(intent: :index, parameters: submissions_payload, headers: request.headers, scope: submissions_scope)
+    # TODO: Authorize forms & submissions used in refsum, refcount, and other aggregate functions
     authorize submissions_realizer.object, :index?
     pagination_props = PaginationProperties.new(page_offset, page_limit, submissions_realizer.total_count)
     render json: JSONAPI::Serializer.serialize(submissions_realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
