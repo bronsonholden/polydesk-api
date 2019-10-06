@@ -10,8 +10,9 @@ class FormSubmissionSorting
     ext_sort = sort.select { |col|
       col.starts_with?('data') || col.starts_with?('-data')
     }
-    agg_sort = sort.select { |col|
-      col.starts_with?('refsum') || col.starts_with?('-refsum') || col.starts_with?('refcount') || col.starts_with?('-refcount')
+    agg_sort = sort.reject { |col|
+      m = col.match(/^-?(refcount|refdistinct|refsum|refavg|refmin|refmax)/)
+      m.nil?
     }
     # Remove attributes from payload
     sort = sort - ext_sort - agg_sort
@@ -44,7 +45,7 @@ class FormSubmissionSorting
         col = col[1..-1]
         order = 'DESC'
       end
-      m = col.match(/^(refcount|refsum)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
+      m = col.match(/^(refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
 
       if !m.nil?
         rel_form_id = m[2]
@@ -100,11 +101,40 @@ class FormSubmissionSorting
         scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
         @custom_selects.push(col_name)
       end
+      if sort[:op] == 'refdistinct'
+        col_name = "distinct_#{sort[:local_alias]}"
+        rel_idx = @meta_aggregates.index(sort[:expr])
+        col_name = "rel#{rel_idx}.#{col_name}"
+        #select("#{FormSubmission.table_name}.*, rel.#{col_name} AS #{col_name}").joins("left join (select count(id) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
+        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
+        @custom_selects.push(col_name)
+      end
       if sort[:op] == 'refsum'
         col_name = "sum_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
         rel_idx = @meta_aggregates.index(sort[:expr])
         col_name = "rel#{rel_idx}.#{col_name}"
         #select("#{FormSubmission.table_name}.*, rel.#{col_name} as #{col_name}").joins("left join (select sum((#{Arel.sql(sort[:dimension])})::numeric) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
+        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
+        @custom_selects.push(col_name)
+      end
+      if sort[:op] == 'refavg'
+        col_name = "avg_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
+        rel_idx = @meta_aggregates.index(sort[:expr])
+        col_name = "rel#{rel_idx}.#{col_name}"
+        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
+        @custom_selects.push(col_name)
+      end
+      if sort[:op] == 'refmin'
+        col_name = "min_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
+        rel_idx = @meta_aggregates.index(sort[:expr])
+        col_name = "rel#{rel_idx}.#{col_name}"
+        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
+        @custom_selects.push(col_name)
+      end
+      if sort[:op] == 'refmax'
+        col_name = "max_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
+        rel_idx = @meta_aggregates.index(sort[:expr])
+        col_name = "rel#{rel_idx}.#{col_name}"
         scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
         @custom_selects.push(col_name)
       end

@@ -21,7 +21,7 @@ class FormSubmissionExtensions
     @payload['meta-aggregate'] = @meta_aggregates.join(',')
 
     @aggregate_ops = @meta_aggregates.map { |col|
-      m = col.match(/^(refcount|refsum)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
+      m = col.match(/^(refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
 
       if !m.nil?
         rel_form_id = m[2]
@@ -66,9 +66,25 @@ class FormSubmissionExtensions
         col_name = "count_#{agg[:local_alias]}"
         scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0) AS #{col_name}").joins("left join (select count(id) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
       end
+      if agg[:op] == 'refdistinct'
+        col_name = "distinct_#{agg[:local_alias]}"
+        scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0) AS #{col_name}").joins("left join (select count(distinct #{Arel.sql(agg[:dimension])}) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
+      end
       if agg[:op] == 'refsum'
         col_name = "sum_#{agg[:local_alias]}_#{agg[:dimension_alias]}"
         scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0.0) as #{col_name}").joins("left join (select sum((#{Arel.sql(agg[:dimension])})::numeric) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
+      end
+      if agg[:op] == 'refavg'
+        col_name = "avg_#{agg[:local_alias]}_#{agg[:dimension_alias]}"
+        scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0.0) as #{col_name}").joins("left join (select avg((#{Arel.sql(agg[:dimension])})::numeric) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
+      end
+      if agg[:op] == 'refmin'
+        col_name = "min_#{agg[:local_alias]}_#{agg[:dimension_alias]}"
+        scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0.0) as #{col_name}").joins("left join (select min((#{Arel.sql(agg[:dimension])})::numeric) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
+      end
+      if agg[:op] == 'refmax'
+        col_name = "max_#{agg[:local_alias]}_#{agg[:dimension_alias]}"
+        scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0.0) as #{col_name}").joins("left join (select max((#{Arel.sql(agg[:dimension])})::numeric) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
       end
     }
     return scope
