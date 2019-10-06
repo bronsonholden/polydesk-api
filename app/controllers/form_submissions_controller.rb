@@ -8,6 +8,9 @@ class FormSubmissionsController < ApplicationController
     submissions_scope = policy_scope(FormSubmission)
     filter = FormSubmissionFiltering.new(submissions_payload)
     submissions_scope = filter.apply(submissions_scope)
+    extensions = FormSubmissionExtensions.new(submissions_payload)
+    submissions_scope = extensions.apply(submissions_scope)
+    submissions_payload = extensions.payload
     sorter = FormSubmissionSorting.new(submissions_payload)
     submissions_scope = sorter.apply(submissions_scope)
     submissions_payload = sorter.payload
@@ -15,7 +18,8 @@ class FormSubmissionsController < ApplicationController
     # TODO: Authorize forms & submissions used in refsum, refcount, and other aggregate functions
     authorize submissions_realizer.object, :index?
     pagination_props = PaginationProperties.new(page_offset, page_limit, submissions_realizer.total_count)
-    render json: JSONAPI::Serializer.serialize(submissions_realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
+    json = JSONAPI::Serializer.serialize(submissions_realizer.object, is_collection: true, meta: pagination_props.generate)
+    render json: json, status: :ok
     #
     # schema = IndexFormSubmissionsSchema.new(request.params)
     # payload = schema.render
@@ -34,17 +38,19 @@ class FormSubmissionsController < ApplicationController
     form = realizer.object.form
     authorize form, :show?
     # Verify no unique fields are violated
-    form.unique_fields.each { |key|
-      parts = key.split('.')
-      val = payload.dig('data', 'attributes', 'data', *parts)
-      # Build and sanitize order SQL
-      col = parts.reduce('data') { |sql, part|
-        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+    if !form.unique_fields.nil?
+      form.unique_fields.each { |key|
+        parts = key.split('.')
+        val = payload.dig('data', 'attributes', 'data', *parts)
+        # Build and sanitize order SQL
+        col = parts.reduce('data') { |sql, part|
+          "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+        }
+        if FormSubmission.where("#{col} = ?", Arel.sql(val.to_s)).any?
+          raise Polydesk::Errors::UniqueFieldViolation.new(key)
+        end
       }
-      if FormSubmission.where("#{col} = ?", Arel.sql(val.to_s)).any?
-        raise Polydesk::Errors::UniqueFieldViolation.new(key)
-      end
-    }
+    end
     realizer.object.submitter = current_user
     realizer.object.schema_snapshot = realizer.object.form.schema
     realizer.object.layout_snapshot = realizer.object.form.layout

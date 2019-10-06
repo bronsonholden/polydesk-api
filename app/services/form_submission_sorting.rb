@@ -1,5 +1,8 @@
 class FormSubmissionSorting
+  attr_reader :custom_selects
+
   def initialize(payload)
+    @meta_aggregates = payload.fetch('meta-aggregate', '').split(',')
     @payload = payload.deep_dup
     # Get sorting param
     sort = @payload.fetch('sort', '').split(',')
@@ -41,29 +44,47 @@ class FormSubmissionSorting
         col = col[1..-1]
         order = 'DESC'
       end
-      m = col.match(/^(refcount|refsum)\(([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
+      m = col.match(/^(refcount|refsum)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
 
-      return nil if m.nil?
+      if !m.nil?
+        rel_form_id = m[2]
+        local_alias = m[3].split('.').join('__')
+        external_alias = m[4].split('.').join('__')
 
-      local = m[2].split('.').reduce('data') { |sql, part|
-        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
-      }
-      external = m[3].split('.').reduce('data') { |sql, part|
-        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
-      }
-
-      res = { order: order, op: m[1], local: external, external: external }
-
-      if !m[4].nil?
-        dimension = m[4].split('.').reduce('data') { |sql, part|
+        local = m[3].split('.').reduce('data') { |sql, part|
           "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
         }
-        res[:dimension] = dimension
-      end
+        external = m[4].split('.').reduce('data') { |sql, part|
+          "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+        }
 
-      res
-    }
-    puts @agg_sorting.inspect
+        res = {
+          expr: col,
+          order: order,
+          rel_form_id: rel_form_id,
+          op: m[1],
+          local: local,
+          local_alias: local_alias,
+          external: external,
+          external_alias: external_alias
+        }
+
+        if !m[5].nil?
+          dimension = m[5].split('.').reduce('data') { |sql, part|
+            "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+          }
+          dimension_alias = m[5].split('.').join('__')
+          res[:dimension] = dimension
+          res[:dimension_alias] = dimension_alias
+        end
+
+        res
+      else
+        nil
+      end
+    }.reject(&:nil?)
+
+    @custom_selects = []
   end
 
   def apply(scope)
@@ -72,20 +93,22 @@ class FormSubmissionSorting
     }
     @agg_sorting.each { |sort|
       if sort[:op] == 'refcount'
-        scope = scope.joins("left join (select count(id) as rel_count, #{sort[:external]} as rel_dim from form_submissions group by #{sort[:external]}) as rel on rel.rel_dim = id::text").order("rel_count #{sort[:order]}")
+        col_name = "count_#{sort[:local_alias]}"
+        rel_idx = @meta_aggregates.index(sort[:expr])
+        col_name = "rel#{rel_idx}.#{col_name}"
+        #select("#{FormSubmission.table_name}.*, rel.#{col_name} AS #{col_name}").joins("left join (select count(id) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
+        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
+        @custom_selects.push(col_name)
       end
       if sort[:op] == 'refsum'
-        scope = scope.joins("left join (select sum((#{sort[:dimension]})::numeric) as rel_sum, #{sort[:external]} as rel_dim from form_submissions group by #{sort[:external]}) as rel on rel.rel_dim = id::text").order("rel_sum #{sort[:order]}")
+        col_name = "sum_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
+        rel_idx = @meta_aggregates.index(sort[:expr])
+        col_name = "rel#{rel_idx}.#{col_name}"
+        #select("#{FormSubmission.table_name}.*, rel.#{col_name} as #{col_name}").joins("left join (select sum((#{Arel.sql(sort[:dimension])})::numeric) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
+        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
+        @custom_selects.push(col_name)
       end
     }
-    # FormSubmission
-    #   .where(form_id: 2)
-    #   .joins("left join (select count(id) as rel_count, data->>'ranch' as rel_dim from form_submissions group by data->>'ranch') as rel on rel.rel_dim = id::text")
-    #   .order("rel_count ASC")
-    # FormSubmission
-    #   .where(form_id: 2)
-    #   .joins("left join (select sum((data->>'acres')::float) as rel_count, data->>'ranch' as rel_dim from form_submissions group by data->>'ranch') as rel on rel.rel_dim = id::text")
-    #   .order("rel_count ASC")
     return scope
   end
 

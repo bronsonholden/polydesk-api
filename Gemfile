@@ -67,6 +67,7 @@ gem 'jsonapi-realizer', git: 'https://github.com/paulholden2/jsonapi-realizer.rb
 gem 'jsonapi-serializers'
 gem 'smush'
 gem 'statesman', '~> 3.4.1'
+gem 'rails_select_on_includes', '~> 5.2.1'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

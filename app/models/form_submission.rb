@@ -8,6 +8,7 @@ class FormSubmission < ApplicationRecord
   attr_readonly :schema_snapshot
   attr_readonly :layout_snapshot
   attr_accessor :state
+  attr_accessor :custom_attributes
 
   belongs_to :form
   belongs_to :submitter, class_name: 'User', foreign_key: 'submitter_id'
