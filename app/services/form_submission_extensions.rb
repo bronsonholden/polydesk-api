@@ -2,6 +2,8 @@ class FormSubmissionExtensions
   def initialize(payload)
     @payload = payload.deep_dup
     @meta_aggregates = @payload.fetch('meta-aggregate', '').split(',')
+
+    # If any aggregates are being sorted, include them
     @agg_sorting = @payload.fetch('sort', '').split(',').select { |col|
       col.match(/^-?(refcount|refsum)\(([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
     }
@@ -15,6 +17,7 @@ class FormSubmissionExtensions
       end
     }
 
+    # Modify payload to include any aggregates pulled form sort query param
     @payload['meta-aggregate'] = @meta_aggregates.join(',')
 
     @aggregate_ops = @meta_aggregates.map { |col|
