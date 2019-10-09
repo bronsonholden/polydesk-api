@@ -97,6 +97,10 @@ class FormSubmissionExtensions
       external = m[3].split('.').reduce('data') { |sql, part|
         "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
       }
+      # TODO: Unique key based on local path & external path
+      # Maybe: my__local__key->the__external__key
+      # Need to restrict schema properties from having double underscores,
+      # though. Or use a different string for subkeys instead of __
       external_alias = m[3].split('.').unshift(m[2]).join('__')
       scope = scope.select_append("incl#{i}.incl_dim as #{external_alias}").joins("left join (select id as incl_id, #{external} as incl_dim from form_submissions where form_id = #{form_id}) as incl#{i} on #{local} = incl_id::text")
     }
