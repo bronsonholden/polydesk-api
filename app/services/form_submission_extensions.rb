@@ -2,6 +2,7 @@ class FormSubmissionExtensions
   def initialize(payload)
     @payload = payload.deep_dup
     @meta_aggregates = @payload.fetch('meta-aggregate', '').split(',')
+    @meta_includes = @payload.fetch('meta-include', '').split(',')
 
     # If any aggregates are being sorted, include them
     @agg_sorting = @payload.fetch('sort', '').split(',').select { |col|
@@ -86,6 +87,18 @@ class FormSubmissionExtensions
         col_name = "max_#{agg[:local_alias]}_#{agg[:dimension_alias]}"
         scope = scope.select("#{FormSubmission.table_name}.*, coalesce(rel#{i}.#{col_name}, 0.0) as #{col_name}").joins("left join (select max((#{Arel.sql(agg[:dimension])})::numeric) as #{col_name}, #{Arel.sql(agg[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(agg[:rel_form_id])} group by #{Arel.sql(agg[:external])}) as rel#{i} on rel#{i}.rel_dim = id::text")
       end
+    }
+    @meta_includes.each_with_index { |incl, i|
+      m = incl.match(/^select\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+)\)$/)
+      form_id = m[1]
+      local = m[2].split('.').reduce('data') { |sql, part|
+        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+      }
+      external = m[3].split('.').reduce('data') { |sql, part|
+        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+      }
+      external_alias = m[3].split('.').unshift(m[2]).join('__')
+      scope = scope.select_append("incl#{i}.incl_dim as #{external_alias}").joins("left join (select id as incl_id, #{external} as incl_dim from form_submissions where form_id = #{form_id}) as incl#{i} on #{local} = incl_id::text")
     }
     return scope
   end

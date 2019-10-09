@@ -10,9 +10,9 @@ class FormSubmissionSorting
     ext_sort = sort.select { |col|
       col.starts_with?('data') || col.starts_with?('-data')
     }
-    agg_sort = sort.reject { |col|
-      m = col.match(/^-?(refcount|refdistinct|refsum|refavg|refmin|refmax)/)
-      m.nil?
+    agg_sort = sort.select { |col|
+      m = col.match(/^-?(select|refcount|refdistinct|refsum|refavg|refmin|refmax)/)
+      !m.nil?
     }
     # Remove attributes from payload
     sort = sort - ext_sort - agg_sort
@@ -45,7 +45,7 @@ class FormSubmissionSorting
         col = col[1..-1]
         order = 'DESC'
       end
-      m = col.match(/^(refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
+      m = col.match(/^(select|refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
 
       if !m.nil?
         rel_form_id = m[2]
@@ -93,6 +93,10 @@ class FormSubmissionSorting
       scope = scope.order(Arel.sql(sort))
     }
     @agg_sorting.each { |sort|
+      if sort[:op] == 'select'
+        col_name = "#{sort[:local_alias]}__#{sort[:external_alias]}"
+        scope = scope.order("#{col_name} #{sort[:order]}")
+      end
       if sort[:op] == 'refcount'
         col_name = "count_#{sort[:local_alias]}"
         rel_idx = @meta_aggregates.index(sort[:expr])
