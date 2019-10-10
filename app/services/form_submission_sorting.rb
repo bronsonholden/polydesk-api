@@ -1,146 +1,123 @@
 class FormSubmissionSorting
-  attr_reader :custom_selects
-
   def initialize(payload)
     @meta_aggregates = payload.fetch('meta-aggregate', '').split(',')
     @payload = payload.deep_dup
     # Get sorting param
-    sort = @payload.fetch('sort', '').split(',')
-    # Pick the attributes we will sort with generated SQL
-    ext_sort = sort.select { |col|
-      col.starts_with?('data') || col.starts_with?('-data')
-    }
-    agg_sort = sort.select { |col|
-      m = col.match(/^-?(select|refcount|refdistinct|refsum|refavg|refmin|refmax)/)
-      !m.nil?
-    }
-    # Remove attributes from payload
-    sort = sort - ext_sort - agg_sort
-    if sort.size > 0
-      @payload['sort'] = sort.join(',')
-    else
+    @sort = payload.fetch('sort', '').split(',')
+    if @payload.key?('sort')
       @payload.delete('sort')
     end
-    @sorting = ext_sort.map { |col|
-      # Sorting order
-      order = 'ASC'
-      if col.starts_with?('-')
-        # Remove dash
-        col = col[1..-1]
-        order = 'DESC'
-      end
-      parts = col.split('.')
-      # Remove "data"
-      parts = parts[1..-1]
-      # Build and sanitize order SQL
-      col = parts.reduce('data') { |sql, part|
-        "#{sql}->#{ActiveRecord::Base.connection.quote(part)}"
-      }
-      # Append order
-      "#{col} #{order}"
+  end
+
+  def apply_data_sort(scope, sort)
+    # Sorting order
+    order = 'ASC'
+    if sort.starts_with?('-')
+      # Remove dash
+      sort = sort[1..-1]
+      order = 'DESC'
+    end
+    parts = sort.split('.')
+    # Remove "data"
+    parts = parts[1..-1]
+    # Build and sanitize order SQL
+    sort = parts.reduce('data') { |sql, part|
+      "#{sql}->#{ActiveRecord::Base.connection.quote(part)}"
     }
-    @agg_sorting = agg_sort.map { |col|
-      order = 'ASC'
-      if col.starts_with?('-')
-        col = col[1..-1]
-        order = 'DESC'
-      end
-      m = col.match(/^(select|refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
+    scope.order("#{sort} #{order}")
+  end
 
-      if !m.nil?
-        rel_form_id = m[2]
-        local_alias = m[3].split('.').join('__')
-        external_alias = m[4].split('.').join('__')
+  def apply_aggregate_sort(scope, sort, rel_idx)
+    order = 'ASC'
+    if sort.starts_with?('-')
+      sort = sort[1..-1]
+      order = 'DESC'
+    end
+    m = sort.match(/^(select|refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
 
-        local = m[3].split('.').reduce('data') { |sql, part|
-          "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
-        }
-        external = m[4].split('.').reduce('data') { |sql, part|
-          "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
-        }
+    return scope if m.nil?
 
-        res = {
-          expr: col,
-          order: order,
-          rel_form_id: rel_form_id,
-          op: m[1],
-          local: local,
-          local_alias: local_alias,
-          external: external,
-          external_alias: external_alias
-        }
+    rel_form_id = m[2]
+    local_alias = m[3].split('.').join('__')
+    external_alias = m[4].split('.').join('__')
+    # col_name = "rel#{rel_idx}.#{col_name}"
 
-        if !m[5].nil?
-          dimension = m[5].split('.').reduce('data') { |sql, part|
-            "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
-          }
-          dimension_alias = m[5].split('.').join('__')
-          res[:dimension] = dimension
-          res[:dimension_alias] = dimension_alias
-        end
+    local = m[3].split('.').reduce('data') { |sql, part|
+      "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+    }
+    external = m[4].split('.').reduce('data') { |sql, part|
+      "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+    }
 
-        res
-      else
-        nil
-      end
-    }.reject(&:nil?)
+    expr = sort,
+    op = m[1]
+    dimension = nil
+    dimension_alias = nil
 
-    @custom_selects = []
+    if !m[5].nil?
+      dimension = m[5].split('.').reduce('data') { |sql, part|
+        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
+      }
+      dimension_alias = m[5].split('.').join('__')
+    end
+
+    if op == 'select'
+      col_name = "#{local_alias}__#{external_alias}"
+      scope = scope.order("#{col_name} #{order}")
+    end
+    if op == 'refcount'
+      col_name = "count_#{local_alias}"
+      rel_idx = @meta_aggregates.index(expr)
+      scope = scope.order("coalesce(#{col_name}, 0) #{order}")
+    end
+    if op == 'refdistinct'
+      col_name = "distinct_#{local_alias}"
+      rel_idx = @meta_aggregates.index(expr)
+      scope = scope.order("coalesce(#{col_name}, 0) #{order}")
+    end
+    if op == 'refsum'
+      col_name = "sum_#{local_alias}_#{dimension_alias}"
+      rel_idx = @meta_aggregates.index(expr)
+      scope = scope.order("coalesce(#{col_name}, 0) #{order}")
+    end
+    if op == 'refavg'
+      col_name = "avg_#{local_alias}_#{dimension_alias}"
+      rel_idx = @meta_aggregates.index(expr)
+      scope = scope.order("coalesce(#{col_name}, 0) #{order}")
+    end
+    if op == 'refmin'
+      col_name = "min_#{local_alias}_#{dimension_alias}"
+      rel_idx = @meta_aggregates.index(expr)
+      scope = scope.order("coalesce(#{col_name}, 0) #{order}")
+    end
+    if op == 'refmax'
+      col_name = "max_#{local_alias}_#{dimension_alias}"
+      rel_idx = @meta_aggregates.index(expr)
+      scope = scope.order("coalesce(#{col_name}, 0) #{order}")
+    end
+
+    return scope
+  end
+
+  def apply_standard_sort(scope, sort)
+    order = :asc
+    if sort.starts_with?('-')
+      sort = sort[1..-1]
+      order = :desc
+    end
+    col = sort.underscore
+    return scope.order(:"#{col}" => order)
   end
 
   def apply(scope)
-    @sorting.each { |sort|
-      scope = scope.order(Arel.sql(sort))
-    }
-    @agg_sorting.each { |sort|
-      if sort[:op] == 'select'
-        col_name = "#{sort[:local_alias]}__#{sort[:external_alias]}"
-        scope = scope.order("#{col_name} #{sort[:order]}")
-      end
-      if sort[:op] == 'refcount'
-        col_name = "count_#{sort[:local_alias]}"
-        rel_idx = @meta_aggregates.index(sort[:expr])
-        col_name = "rel#{rel_idx}.#{col_name}"
-        #select("#{FormSubmission.table_name}.*, rel.#{col_name} AS #{col_name}").joins("left join (select count(id) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
-        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
-        @custom_selects.push(col_name)
-      end
-      if sort[:op] == 'refdistinct'
-        col_name = "distinct_#{sort[:local_alias]}"
-        rel_idx = @meta_aggregates.index(sort[:expr])
-        col_name = "rel#{rel_idx}.#{col_name}"
-        #select("#{FormSubmission.table_name}.*, rel.#{col_name} AS #{col_name}").joins("left join (select count(id) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
-        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
-        @custom_selects.push(col_name)
-      end
-      if sort[:op] == 'refsum'
-        col_name = "sum_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
-        rel_idx = @meta_aggregates.index(sort[:expr])
-        col_name = "rel#{rel_idx}.#{col_name}"
-        #select("#{FormSubmission.table_name}.*, rel.#{col_name} as #{col_name}").joins("left join (select sum((#{Arel.sql(sort[:dimension])})::numeric) as #{col_name}, #{Arel.sql(sort[:external])} as rel_dim from form_submissions where form_id = #{Arel.sql(sort[:rel_form_id])} group by #{Arel.sql(sort[:external])}) as rel on rel.rel_dim = id::text")
-        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
-        @custom_selects.push(col_name)
-      end
-      if sort[:op] == 'refavg'
-        col_name = "avg_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
-        rel_idx = @meta_aggregates.index(sort[:expr])
-        col_name = "rel#{rel_idx}.#{col_name}"
-        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
-        @custom_selects.push(col_name)
-      end
-      if sort[:op] == 'refmin'
-        col_name = "min_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
-        rel_idx = @meta_aggregates.index(sort[:expr])
-        col_name = "rel#{rel_idx}.#{col_name}"
-        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
-        @custom_selects.push(col_name)
-      end
-      if sort[:op] == 'refmax'
-        col_name = "max_#{sort[:local_alias]}_#{sort[:dimension_alias]}"
-        rel_idx = @meta_aggregates.index(sort[:expr])
-        col_name = "rel#{rel_idx}.#{col_name}"
-        scope = scope.order("coalesce(#{col_name}, 0) #{sort[:order]}")
-        @custom_selects.push(col_name)
+    @sort.each_with_index { |sort, i|
+      if sort.starts_with?('data') || sort.starts_with?('-data')
+        scope = apply_data_sort(scope, sort)
+      elsif !sort.match(/^-?(select|refcount|refdistinct|refsum|refavg|refmin|refmax)\(.+\)$/).nil?
+        scope = apply_aggregate_sort(scope, sort, i)
+      else
+        puts sort
+        scope = apply_standard_sort(scope, sort)
       end
     }
     return scope

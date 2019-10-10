@@ -6,7 +6,7 @@ class FormSubmissionExtensions
 
     # If any aggregates are being sorted, include them
     @agg_sorting = @payload.fetch('sort', '').split(',').select { |col|
-      col.match(/^-?(refcount|refsum)\(([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
+      col.match(/^-?(refcount|refsum|refmin|refmax|refavg|refdistinct)\(([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
     }
     @agg_sorting.each { |sort|
       s = sort
@@ -15,6 +15,18 @@ class FormSubmissionExtensions
       end
       if !@meta_aggregates.include?(s)
         @meta_aggregates.push(s)
+      end
+    }
+
+    @payload.fetch('sort', '').split(',').select { |col|
+      col.match(/^-?select\(.+\)$/)
+    }.each { |col|
+      c = col
+      if c.starts_with?('-')
+        c = c[1..-1]
+      end
+      if !@meta_includes.include?(c)
+        @meta_includes.push(c)
       end
     }
 
