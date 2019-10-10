@@ -27,7 +27,7 @@ class FormSubmissionSorting
     scope.order("#{sort} #{order}")
   end
 
-  def apply_aggregate_sort(scope, sort, rel_idx)
+  def apply_aggregate_sort(scope, sort)
     order = 'ASC'
     if sort.starts_with?('-')
       sort = sort[1..-1]
@@ -40,7 +40,6 @@ class FormSubmissionSorting
     rel_form_id = m[2]
     local_alias = m[3].split('.').join('__')
     external_alias = m[4].split('.').join('__')
-    # col_name = "rel#{rel_idx}.#{col_name}"
 
     local = m[3].split('.').reduce('data') { |sql, part|
       "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
@@ -67,32 +66,26 @@ class FormSubmissionSorting
     end
     if op == 'refcount'
       col_name = "count_#{local_alias}"
-      rel_idx = @meta_aggregates.index(expr)
       scope = scope.order("coalesce(#{col_name}, 0) #{order}")
     end
     if op == 'refdistinct'
       col_name = "distinct_#{local_alias}"
-      rel_idx = @meta_aggregates.index(expr)
       scope = scope.order("coalesce(#{col_name}, 0) #{order}")
     end
     if op == 'refsum'
       col_name = "sum_#{local_alias}_#{dimension_alias}"
-      rel_idx = @meta_aggregates.index(expr)
       scope = scope.order("coalesce(#{col_name}, 0) #{order}")
     end
     if op == 'refavg'
       col_name = "avg_#{local_alias}_#{dimension_alias}"
-      rel_idx = @meta_aggregates.index(expr)
       scope = scope.order("coalesce(#{col_name}, 0) #{order}")
     end
     if op == 'refmin'
       col_name = "min_#{local_alias}_#{dimension_alias}"
-      rel_idx = @meta_aggregates.index(expr)
       scope = scope.order("coalesce(#{col_name}, 0) #{order}")
     end
     if op == 'refmax'
       col_name = "max_#{local_alias}_#{dimension_alias}"
-      rel_idx = @meta_aggregates.index(expr)
       scope = scope.order("coalesce(#{col_name}, 0) #{order}")
     end
 
@@ -110,11 +103,11 @@ class FormSubmissionSorting
   end
 
   def apply(scope)
-    @sort.each_with_index { |sort, i|
+    @sort.each { |sort|
       if sort.starts_with?('data') || sort.starts_with?('-data')
         scope = apply_data_sort(scope, sort)
       elsif !sort.match(/^-?(select|refcount|refdistinct|refsum|refavg|refmin|refmax)\(.+\)$/).nil?
-        scope = apply_aggregate_sort(scope, sort, i)
+        scope = apply_aggregate_sort(scope, sort)
       else
         puts sort
         scope = apply_standard_sort(scope, sort)
