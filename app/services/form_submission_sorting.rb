@@ -48,7 +48,7 @@ class FormSubmissionSorting
       "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
     }
 
-    expr = sort,
+    expr = sort
     op = m[1]
     dimension = nil
     dimension_alias = nil
