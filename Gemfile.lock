@@ -63,6 +63,9 @@ GEM
       activesupport
       apartment
     arel (9.0.0)
+    auto_increment (1.5.1)
+      activerecord (>= 4.0, < 6.1)
+      activesupport (>= 4.0, < 6.1)
     aws-eventstream (1.0.3)
     aws-partitions (1.158.0)
     aws-sdk-core (3.49.0)
@@ -287,6 +290,7 @@ PLATFORMS
 DEPENDENCIES
   apartment
   apartment-activejob
+  auto_increment
   aws-sdk-s3 (~> 1.2)
   bootsnap (>= 1.1.0)
   byebug
@@ -325,4 +329,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   1.16.2
+   1.17.3
