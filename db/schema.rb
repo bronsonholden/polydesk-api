@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_30_064241) do
+ActiveRecord::Schema.define(version: 2019_12_02_051611) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -124,6 +124,17 @@ ActiveRecord::Schema.define(version: 2019_11_30_064241) do
     t.index ["code", "account_user_id"], name: "index_permissions_on_code_and_account_user_id", unique: true
   end
 
+  create_table "prefabs", force: :cascade do |t|
+    t.bigint "blueprint_id"
+    t.string "namespace", null: false
+    t.integer "tag", null: false
+    t.json "schema", null: false
+    t.json "view", null: false
+    t.jsonb "data", null: false
+    t.index ["blueprint_id"], name: "index_prefabs_on_blueprint_id"
+    t.index ["namespace", "tag"], name: "index_prefabs_on_namespace_and_tag", unique: true
+  end
+
   create_table "reports", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -177,5 +188,6 @@ ActiveRecord::Schema.define(version: 2019_11_30_064241) do
   add_foreign_key "account_users", "users"
   add_foreign_key "form_submission_transitions", "form_submissions"
   add_foreign_key "form_submissions", "forms"
+  add_foreign_key "prefabs", "blueprints"
   add_foreign_key "users", "accounts", column: "default_account_id"
 end
