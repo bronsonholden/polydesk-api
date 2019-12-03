@@ -42,5 +42,7 @@ module Polydesk
 
     # Load code in lib/
     config.autoload_paths << "#{Rails.root}/lib"
+
+    JSON::Validator.schema_reader = JSON::Schema::Reader.new(accept_uri: false, accept_file: false)
   end
 end
