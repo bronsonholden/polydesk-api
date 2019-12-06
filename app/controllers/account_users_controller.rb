@@ -12,7 +12,7 @@ class AccountUsersController < ApplicationController
     realizer = UserRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(User))
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, User.all.count)
-    render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
+    render json: JSONAPI::Serializer.serialize(realizer.object.except(:order).order('users.id'), is_collection: true, meta: pagination_props.generate), status: :ok
   end
 
   # GET /:identifier/users/:id
