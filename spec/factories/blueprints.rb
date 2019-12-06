@@ -13,7 +13,7 @@ FactoryBot.define do
           },
           prefab: {
             type: 'string',
-            prefab: {
+            prefab: { # Prefab schema can be passed to POST /prefabs/query to get list of prefabs that match this schema
               namespace: 'employees',
               condition: {
                 operation: 'and',

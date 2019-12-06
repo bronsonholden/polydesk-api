@@ -10,6 +10,14 @@ class BlueprintPolicy < ApplicationPolicy
     true
   end
 
+  def index?
+    true
+  end
+
+  def show?
+    true
+  end
+
   def allowed_attributes_for_create
     [:name, :namespace, :schema, :view]
   end

@@ -24,6 +24,21 @@ RSpec.describe 'Blueprints', type: :request do
     }
   }
 
+  describe 'GET /rspec/blueprints' do
+    it 'lists all blueprints' do
+      get '/rspec/blueprints', headers: rspec_session
+      expect(response).to have_http_status(200)
+    end
+  end
+
+  describe 'GET /rspec/blueprints/:id' do
+    let(:blueprint) { create :blueprint }
+    it 'shows blueprint' do
+      get "/rspec/blueprints/#{blueprint.id}", headers: rspec_session
+      expect(response).to have_http_status(200)
+    end
+  end
+
   describe 'POST /rspec/blueprints' do
     it 'creates new blueprint' do
       post '/rspec/blueprints', headers: rspec_session,
