@@ -23,6 +23,8 @@ Rails.application.routes.draw do
     resources :form_submissions, path: 'form-submissions'
     resources :options
     resources :account_users, path: 'users'
+    resources :blueprints
+    resources :prefabs
 
     post '/documents/upload', to: 'documents#upload_new'
     post '/folders/:id/upload', to: 'folders#upload_document'
