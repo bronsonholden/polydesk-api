@@ -51,27 +51,27 @@ FactoryBot.define do
     #   string: "A String",
     #   prefab: "employees/1"
     # }
-    view {
-      {
-        rows: [
-          {
-            columns: [
-              {
-                key: 'string',
-                type: 'input'
-              }
-            ]
-          },
-          {
-            columns: [
-              {
-                key: 'prefab',
-                type: 'prefab'
-              }
-            ]
-          }
-        ]
-      }
-    }
+    # view {
+    #   {
+    #     rows: [
+    #       {
+    #         columns: [
+    #           {
+    #             key: 'string',
+    #             type: 'input'
+    #           }
+    #         ]
+    #       },
+    #       {
+    #         columns: [
+    #           {
+    #             key: 'prefab',
+    #             type: 'prefab'
+    #           }
+    #         ]
+    #       }
+    #     ]
+    #   }
+    # }
   end
 end
