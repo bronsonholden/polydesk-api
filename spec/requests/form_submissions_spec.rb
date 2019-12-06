@@ -64,6 +64,7 @@ RSpec.describe 'FormSubmissions', type: :request do
   describe 'POST /rspec/form-submissions' do
     context 'with valid form data' do
       let!(:permission) { create :permission, code: :form_submission_create, account_user: AccountUser.last }
+      let!(:form_permission) { create :permission, code: :form_show, account_user: AccountUser.last }
       it 'creates new form submission' do
         post '/rspec/form-submissions', headers: rspec_session,
                                         params: params.to_json
