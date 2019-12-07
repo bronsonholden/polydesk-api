@@ -83,5 +83,11 @@ module Polydesk
         super("Invalid characters in form key: #{key} (alphanumerics, _ and - only)")
       end
     end
+
+    class InvalidBlueprintSchema < Polydesk::Errors::Base
+      def initialize(reason)
+        super("Invalid blueprint schema: #{reason}")
+      end
+    end
   end
 end

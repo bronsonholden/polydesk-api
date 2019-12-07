@@ -6,6 +6,8 @@ class BlueprintsController < ApplicationController
     payload = schema.render
     realizer = BlueprintRealizer.new(intent: :create, parameters: payload, headers: request.headers)
     authorize realizer.object
+    valid = Polydesk::Blueprints::PrefabMetaschema.validate(realizer.object.schema)
+    raise Polydesk::Errors::InvalidBlueprintSchema.new('prefab criteria schema is invalid') if !valid
     realizer.object.save!
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
   end

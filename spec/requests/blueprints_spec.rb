@@ -1,18 +1,21 @@
 require 'rails_helper'
 
 RSpec.describe 'Blueprints', type: :request do
+  let(:schema) {
+    {
+      type: 'object',
+      properties: {
+        field: {
+          type: 'string'
+        }
+      }
+    }
+  }
   let(:attributes) {
     {
       name: 'A Blueprint',
       namespace: 'objects',
-      schema: {
-        type: 'object',
-        properties: {
-          field: {
-            type: 'string'
-          }
-        }
-      }
+      schema: schema
     }
   }
   let(:params) {
@@ -23,6 +26,19 @@ RSpec.describe 'Blueprints', type: :request do
       }
     }
   }
+  let(:blueprint) { create :blueprint }
+
+  describe 'blueprint schema' do
+    let(:data) {
+      {
+        string: 'A string',
+        prefab: 'employees/1'
+      }
+    }
+    it 'validates' do
+      expect { JSON::Validator.validate(blueprint.schema, data) }.not_to raise_error
+    end
+  end
 
   describe 'GET /rspec/blueprints' do
     it 'lists all blueprints' do
@@ -44,6 +60,46 @@ RSpec.describe 'Blueprints', type: :request do
       post '/rspec/blueprints', headers: rspec_session,
                                 params: params.to_json
       expect(response).to have_http_status(201)
+    end
+
+    context 'with valid prefab schema attribute' do
+      let(:schema) {
+        {
+          type: 'object',
+          properties: {
+            field: {
+              type: 'string',
+              prefab: {
+                namespace: 'employees'
+              }
+            }
+          }
+        }
+      }
+      it 'creates new blueprint' do
+        post '/rspec/blueprints', headers: rspec_session,
+                                  params: params.to_json
+        expect(response).to have_http_status(201)
+      end
+    end
+
+    context 'with invalid prefab schema attribute' do
+      let(:schema) {
+        {
+          type: 'object',
+          properties: {
+            field: {
+              type: 'string',
+              prefab: 'not-prefab-schema'
+            }
+          }
+        }
+      }
+      it 'creates new blueprint' do
+        post '/rspec/blueprints', headers: rspec_session,
+                                  params: params.to_json
+        expect(response).to have_http_status(422)
+      end
     end
   end
 end

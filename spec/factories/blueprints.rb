@@ -6,6 +6,7 @@ FactoryBot.define do
     # /prefabs?scope[<namespace>]=<schema key for prefab ref>
     schema {
       {
+        :$schema => 'https://polydesk.io/blueprint-schema.json',
         type: 'object',
         properties: {
           string: {
