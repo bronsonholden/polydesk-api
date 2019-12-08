@@ -126,6 +126,10 @@ GEM
       addressable (>= 2.4)
     jsonapi-serializers (1.0.1)
       activesupport
+    jsonb_accessor (1.0.0)
+      activerecord (>= 5.0)
+      activesupport (>= 5.0)
+      pg (>= 0.18.1)
     kaminari (1.1.1)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.1.1)
@@ -302,6 +306,7 @@ DEPENDENCIES
   json-schema
   jsonapi-realizer!
   jsonapi-serializers
+  jsonb_accessor (~> 1.0.0)
   kaminari
   listen (>= 3.0.5, < 3.2)
   omniauth
