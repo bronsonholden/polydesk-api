@@ -11,6 +11,7 @@ class ApplicationSchema
 
   def render
     if !validate
+      # TODO: return validation errors as part of response...
       raise Polydesk::Errors::MalformedRequest.new
     else
       data
