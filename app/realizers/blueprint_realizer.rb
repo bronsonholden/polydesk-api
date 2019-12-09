@@ -4,4 +4,5 @@ class BlueprintRealizer
   has :name
   has :namespace
   has :schema
+  has :view
 end

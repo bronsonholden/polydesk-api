@@ -14,7 +14,7 @@ class CreateBlueprintSchema < ApplicationSchema
             },
             attributes: {
               type: 'object',
-              required: ['name', 'namespace', 'schema'],
+              required: ['name', 'namespace', 'schema', 'view'],
               properties: {
                 name: {
                   type: 'string'
@@ -23,6 +23,9 @@ class CreateBlueprintSchema < ApplicationSchema
                   type: 'string'
                 },
                 schema: {
+                  type: 'object'
+                },
+                view: {
                   type: 'object'
                 }
               }

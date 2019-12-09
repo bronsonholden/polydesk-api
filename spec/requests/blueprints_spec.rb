@@ -11,11 +11,17 @@ RSpec.describe 'Blueprints', type: :request do
       }
     }
   }
+  let(:view) {
+    {
+      stub: true
+    }
+  }
   let(:attributes) {
     {
       name: 'A Blueprint',
       namespace: 'objects',
-      schema: schema
+      schema: schema,
+      view: view
     }
   }
   let(:params) {
