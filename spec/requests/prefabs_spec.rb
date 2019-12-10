@@ -61,6 +61,17 @@ RSpec.describe 'Prefabs', type: :request do
       }
     }
   }
+  # Invalid because we specify adhoc schema, view, etc. as well as
+  # a Blueprint relationship
+  let(:invalid_params) {
+    {
+      data: {
+        type: 'prefabs',
+        attributes: attributes,
+        relationships: relationships
+      }
+    }
+  }
   let(:prefab) { create :prefab }
 
   describe 'GET /rspec/prefabs' do
@@ -89,6 +100,12 @@ RSpec.describe 'Prefabs', type: :request do
       post '/rspec/prefabs', headers: rspec_session,
                              params: adhoc_params.to_json
       expect(response).to have_http_status(201)
+    end
+
+    it 'does not create invalid prefab' do
+      post '/rspec/prefabs', headers: rspec_session,
+                             params: invalid_params.to_json
+      expect(response).to have_http_status(422)
     end
   end
 end
