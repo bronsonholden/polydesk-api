@@ -42,12 +42,22 @@ RSpec.describe 'Prefabs', type: :request do
       }
     }
   }
-  let(:params) {
+  let(:constructed_params) {
     {
       data: {
         type: 'prefabs',
-        attributes: attributes,
+        attributes: {
+          data: data
+        },
         relationships: relationships
+      }
+    }
+  }
+  let(:adhoc_params) {
+    {
+      data: {
+        type: 'prefabs',
+        attributes: attributes
       }
     }
   }
@@ -69,10 +79,15 @@ RSpec.describe 'Prefabs', type: :request do
   end
 
   describe 'POST /rspec/prefabs' do
-    it 'creates new prefab' do
+    it 'creates constructed prefab' do
       post '/rspec/prefabs', headers: rspec_session,
-                             params: params.to_json
-      # puts response.inspect
+                             params: constructed_params.to_json
+      expect(response).to have_http_status(201)
+    end
+
+    it 'creates adhoc prefab' do
+      post '/rspec/prefabs', headers: rspec_session,
+                             params: adhoc_params.to_json
       expect(response).to have_http_status(201)
     end
   end

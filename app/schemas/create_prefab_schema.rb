@@ -5,49 +5,77 @@ class CreatePrefabSchema < ApplicationSchema
       required: ['data'],
       properties: {
         data: {
-          type: 'object',
-          required: ['type', 'attributes'],
-          properties: {
-            type: {
-              type: 'string',
-              enum: ['prefabs']
-            },
-            attributes: {
+          oneOf: [
+            {
               type: 'object',
-              required: ['namespace', 'schema', 'view', 'data'],
+              additionalProperties: false,
+              required: ['type', 'attributes'],
               properties: {
-                namespace: {
-                  type: 'string'
+                type: {
+                  type: 'string',
+                  enum: ['prefabs']
                 },
-                schema: {
-                  type: 'object'
-                },
-                view: {
-                  type: 'object'
-                },
-                data: {
-                  type: 'object'
+                attributes: {
+                  type: 'object',
+                  additionalProperties: false,
+                  required: ['namespace', 'schema', 'view', 'data'],
+                  properties: {
+                    namespace: {
+                      type: 'string'
+                    },
+                    schema: {
+                      type: 'object'
+                    },
+                    view: {
+                      type: 'object'
+                    },
+                    data: {
+                      type: 'object'
+                    }
+                  }
                 }
               }
             },
-            relationships: {
+            {
               type: 'object',
-              required: ['blueprint'],
+              additionalProperties: false,
+              required: ['type', 'attributes'],
               properties: {
-                blueprint: {
+                type: {
+                  type: 'string',
+                  enum: ['prefabs']
+                },
+                attributes: {
                   type: 'object',
+                  additionalProperties: false,
                   required: ['data'],
                   properties: {
                     data: {
+                      type: 'object'
+                    }
+                  }
+                },
+                relationships: {
+                  type: 'object',
+                  additionalProperties: false,
+                  required: ['blueprint'],
+                  properties: {
+                    blueprint: {
                       type: 'object',
-                      required: ['id', 'type'],
+                      required: ['data'],
                       properties: {
-                        id: {
-                          type: 'string',
-                        },
-                        type: {
-                          type: 'string',
-                          enum: ['blueprints']
+                        data: {
+                          type: 'object',
+                          required: ['id', 'type'],
+                          properties: {
+                            id: {
+                              type: 'string',
+                            },
+                            type: {
+                              type: 'string',
+                              enum: ['blueprints']
+                            }
+                          }
                         }
                       }
                     }
@@ -55,7 +83,7 @@ class CreatePrefabSchema < ApplicationSchema
                 }
               }
             }
-          }
+          ]
         }
       }
     }
