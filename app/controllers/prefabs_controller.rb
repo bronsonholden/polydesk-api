@@ -5,16 +5,17 @@ class PrefabsController < ApplicationController
     schema = CreatePrefabSchema.new(request.params)
     payload = schema.render
     realizer = PrefabRealizer.new(intent: :create, parameters: payload, headers: request.headers)
-    authorize realizer.object
+    prefab = realizer.object
+    authorize prefab
     # If constructing (blueprint ref provided), assign everything except data
-    if !realizer.object.blueprint.nil?
+    if !prefab.blueprint.nil?
       blueprint = realizer.object.blueprint
-      realizer.object.schema = blueprint.schema
-      realizer.object.view = blueprint.view
-      realizer.object.namespace = blueprint.namespace
+      prefab.schema = blueprint.schema
+      prefab.view = blueprint.view
+      prefab.namespace = blueprint.namespace
     end
-    realizer.object.save!
-    render json: JSONAPI::Serializer.serialize(realizer.object), status: :created
+    prefab.save!
+    render json: JSONAPI::Serializer.serialize(prefab), status: :created
   end
 
   def show
