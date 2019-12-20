@@ -29,7 +29,6 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
 
   describe 'scoping' do
     it 'locates matching prefab' do
-      puts scope.to_sql
       expect(scope.size).to eq(1)
     end
 
