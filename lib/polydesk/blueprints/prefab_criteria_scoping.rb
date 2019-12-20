@@ -1,6 +1,6 @@
 module Polydesk
   module Blueprints
-    class PrefabCriteriaScoping
+    module PrefabCriteriaScoping
       def self.apply(criteria, scope)
         criteria = JSON.parse(criteria)
         self.apply_condition(criteria['condition'], scope)
