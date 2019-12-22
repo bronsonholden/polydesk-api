@@ -20,8 +20,15 @@ module Polydesk
         if type == 'literal'
           ActiveRecord::Base.connection.quote(value)
         elsif type == 'property'
-          # TODO: Fix to handle arrays
-          "data\#>>'{#{operand['key'].gsub(/\./, ',')}}'"
+          path = operand['key'].split('.').map { |part|
+            m = part.match(/^([A-Za-z0-9_]+)\[(-?\d+)\]$/)
+            if m.nil?
+              part
+            else
+              [m[1], m[2]]
+            end
+          }.flatten
+          "data\#>>'{#{path.join(',')}}'"
         else
           nil
         end
