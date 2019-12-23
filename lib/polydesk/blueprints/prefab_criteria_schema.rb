@@ -29,6 +29,7 @@ module Polydesk
                 },
                 eq_neq: {
                   type: 'object',
+                  required: ['operator', 'operands'],
                   properties: {
                     operator: {
                       type: 'string',
@@ -45,15 +46,38 @@ module Polydesk
                   }
                 }
               },
+              arithmetic: {
+                '$one' => {
+                  oneOf: [
+                    { '$ref' => '#/definitions/operators/arithmetic/add' }
+                  ]
+                },
+                add: {
+                  type: 'object',
+                  required: ['operator', 'operands'],
+                  properties: {
+                    operator: {
+                      type: 'string',
+                      enum: ['add']
+                    },
+                    operands: {
+                      type: 'array',
+                      items: {
+                        '$ref' => '#/definitions/operands/$one'
+                      }
+                    }
+                  }
+                }
+              },
               logical: {
                 '$one' => {
                   oneOf: [
-                    { '$ref' => '#/definitions/operators/logical/and_or' },
-                    { '$ref' => '#/definitions/operators/logical/not' }
+                    { '$ref' => '#/definitions/operators/logical/and_or' }
                   ]
                 },
                 and_or: {
                   type: 'object',
+                  required: ['operator', 'operands'],
                   properties: {
                     operator: {
                       type: 'string',
@@ -66,18 +90,6 @@ module Polydesk
                       }
                     }
                   }
-                },
-                not: {
-                  type: 'object',
-                  properties: {
-                    operator: {
-                      type: 'string',
-                      enum: ['not']
-                    },
-                    operand: {
-                      '$ref' => '#/definitions/operands/conditionals/$one'
-                    }
-                  }
                 }
               }
             },
@@ -86,11 +98,13 @@ module Polydesk
                 oneOf: [
                   { '$ref' => '#/definitions/operands/literal' },
                   { '$ref' => '#/definitions/operands/reference' },
-                  { '$ref' => '#/definitions/operands/property' }
+                  { '$ref' => '#/definitions/operands/property' },
+                  { '$ref' => '#/definitions/operators/arithmetic/$one' }
                 ]
               },
               literal: {
                 type: 'object',
+                required: ['type', 'value'],
                 properties: {
                   type: {
                     type: 'string',
@@ -107,6 +121,7 @@ module Polydesk
               },
               reference: {
                 type: 'object',
+                required: ['type', 'uid'],
                 properties: {
                   type: {
                     type: 'string',
@@ -119,6 +134,7 @@ module Polydesk
               },
               property: {
                 type: 'object',
+                required: ['type', 'key', 'cast', 'object'],
                 properties: {
                   type: {
                     type: 'string',
@@ -126,6 +142,10 @@ module Polydesk
                   },
                   key: {
                     type: 'string'
+                  },
+                  cast: {
+                    type: 'string',
+                    enum: ['numeric', 'text']
                   },
                   object: {
                     oneOf: [

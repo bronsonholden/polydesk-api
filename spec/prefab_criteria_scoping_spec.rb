@@ -2,20 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
   let(:condition) {
-    {
-      operator: 'eq',
-      operands: [
-        {
-          type: 'property',
-          key: 'name',
-          object: 'self'
-        },
-        {
-          type: 'literal',
-          value: 'John'
-        }
-      ]
-    }
+    {}
   }
 
   let(:criteria) {
@@ -26,19 +13,164 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
 
   let(:data) {
     {
-      name: 'John'
+      stub: true
     }
   }
 
   let(:prefab) { create :prefab, data: data }
   let(:scope) { Polydesk::Blueprints::PrefabCriteriaScoping.apply(criteria, Prefab.where(id: prefab.id)) }
 
-  describe 'scoping' do
-    it 'locates matching prefab' do
+  before(:each) do
+    Polydesk::Blueprints::PrefabCriteriaSchema.validate!(criteria)
+  end
+
+  shared_examples 'scoping match' do
+    it 'returns a match' do
       expect(scope.size).to eq(1)
     end
+  end
 
-    context 'with arbitrary condition' do
+  shared_examples 'scoping mismatch' do
+    it 'returns no match' do
+      expect(scope.size).to eq(0)
+    end
+  end
+
+  describe 'operands' do
+    describe 'property' do
+      context 'integer key' do
+        let(:data) {
+          {
+            '1' => 1
+          }
+        }
+
+        let(:condition) {
+          {
+            operator: 'eq',
+            operands: [
+              {
+                type: 'property',
+                key: '1',
+                cast: 'numeric',
+                object: 'self'
+              },
+              {
+                type: 'literal',
+                value: 1
+              }
+            ]
+          }
+        }
+
+        include_examples 'scoping match'
+      end
+
+      context 'array property' do
+        let(:data) {
+          {
+            people: ['John', 'Jane', 'Rob']
+          }
+        }
+
+        let(:condition) {
+          {
+            operator: 'eq',
+            operands: [
+              {
+                type: 'property',
+                key: 'people[0]',
+                cast: 'text',
+                object: 'self'
+              },
+              {
+                type: 'literal',
+                value: 'John'
+              }
+            ]
+          }
+        }
+
+        include_examples 'scoping match'
+      end
+    end
+  end
+
+  describe 'operators' do
+    describe 'arithmetic' do
+      describe 'add' do
+        let(:data) {
+          {
+            left: 2,
+            right: 2
+          }
+        }
+        let(:condition) {
+          {
+            operator: 'eq',
+            operands: [
+              {
+                operator: 'add',
+                operands: [
+                  {
+                    type: 'property',
+                    key: 'left',
+                    cast: 'numeric',
+                    object: 'self'
+                  },
+                  {
+                    type: 'property',
+                    key: 'right',
+                    cast: 'numeric',
+                    object: 'self'
+                  }
+                ]
+              },
+              {
+                type: 'literal',
+                value: 4
+              }
+            ]
+          }
+        }
+
+        include_examples 'scoping match'
+      end
+    end
+
+    describe 'logical' do
+      describe 'eq' do
+        context 'string property' do
+          let(:data) {
+            {
+              name: 'John'
+            }
+          }
+          let(:condition) {
+            {
+              operator: 'eq',
+              operands: [
+                {
+                  type: 'property',
+                  key: 'name',
+                  cast: 'text',
+                  object: 'self'
+                },
+                {
+                  type: 'literal',
+                  value: 'John'
+                }
+              ]
+            }
+          }
+          include_examples 'scoping match'
+        end
+      end
+    end
+  end
+
+  describe 'static condition' do
+    context 'when true' do
       let(:condition) {
         {
           operator: 'eq',
@@ -55,49 +187,27 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
         }
       }
 
-      it 'is unaffected' do
-        expect(scope.size).to eq(1)
-      end
+      include_examples 'scoping match'
     end
-  end
 
-  context 'with property mismatch' do
-    let(:data) {
-      {
-        name: 'Jane'
+    context 'when false' do
+      let(:condition) {
+        {
+          operator: 'eq',
+          operands: [
+            {
+              type: 'literal',
+              value: 5
+            },
+            {
+              type: 'literal',
+              value: 0
+            }
+          ]
+        }
       }
-    }
 
-    it 'returns no results' do
-      expect(scope.size).to eq(0)
-    end
-  end
-
-  context 'with array key' do
-    let(:data) {
-      {
-        people: ['John', 'Jane', 'Rob']
-      }
-    }
-
-    let(:condition) {
-      {
-        operator: 'eq',
-        operands: [
-          {
-            type: 'property',
-            key: 'people[0]'
-          },
-          {
-            type: 'literal',
-            value: 'John'
-          }
-        ]
-      }
-    }
-
-    it 'returns single result' do
-      expect(scope.size).to eq(1)
+      include_examples 'scoping mismatch'
     end
   end
 end

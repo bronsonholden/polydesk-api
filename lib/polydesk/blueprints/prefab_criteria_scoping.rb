@@ -15,9 +15,17 @@ module Polydesk
       end
 
       def self.operand_expression(operand)
+        operator = operand['operator']
+        operands = operand['operands']
         type = operand['type']
         value = operand['value']
-        if type == 'literal'
+        cast = operand['cast']
+        if !operator.nil?
+          if operator == 'add'
+            expr = operands.map { |operand| "#{self.operand_expression(operand)}::numeric" }.join('+')
+            "#{expr}"
+          end
+        elsif type == 'literal'
           ActiveRecord::Base.connection.quote(value)
         elsif type == 'property'
           path = operand['key'].split('.').map { |part|
@@ -28,7 +36,7 @@ module Polydesk
               [m[1], m[2]]
             end
           }.flatten
-          "data\#>>'{#{path.join(',')}}'"
+          "(data\#>>'{#{path.join(',')}}')::#{cast}"
         else
           nil
         end
