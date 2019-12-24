@@ -49,7 +49,8 @@ module Polydesk
               arithmetic: {
                 '$one' => {
                   oneOf: [
-                    { '$ref' => '#/definitions/operators/arithmetic/add' }
+                    { '$ref' => '#/definitions/operators/arithmetic/add' },
+                    { '$ref' => '#/definitions/operators/arithmetic/sub' }
                   ]
                 },
                 add: {
@@ -59,6 +60,22 @@ module Polydesk
                     operator: {
                       type: 'string',
                       enum: ['add']
+                    },
+                    operands: {
+                      type: 'array',
+                      items: {
+                        '$ref' => '#/definitions/operands/$one'
+                      }
+                    }
+                  }
+                },
+                sub: {
+                  type: 'object',
+                  required: ['operator', 'operands'],
+                  properties: {
+                    operator: {
+                      type: 'string',
+                      enum: ['sub']
                     },
                     operands: {
                       type: 'array',

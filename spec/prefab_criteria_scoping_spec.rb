@@ -136,6 +136,45 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
 
         include_examples 'scoping match'
       end
+
+      describe 'sub' do
+        let(:data) {
+          {
+            left: 10,
+            right: 20
+          }
+        }
+        let(:condition) {
+          {
+            operator: 'eq',
+            operands: [
+              {
+                operator: 'sub',
+                operands: [
+                  {
+                    type: 'property',
+                    key: 'left',
+                    cast: 'numeric',
+                    object: 'self'
+                  },
+                  {
+                    type: 'property',
+                    key: 'right',
+                    cast: 'numeric',
+                    object: 'self'
+                  }
+                ]
+              },
+              {
+                type: 'literal',
+                value: -10
+              }
+            ]
+          }
+        }
+
+        include_examples 'scoping match'
+      end
     end
 
     describe 'logical' do
