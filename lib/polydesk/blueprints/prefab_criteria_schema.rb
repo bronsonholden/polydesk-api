@@ -104,7 +104,8 @@ module Polydesk
                       type: 'array',
                       items: {
                         '$ref' => '#/definitions/operators/$boolean_expression'
-                      }
+                      },
+                      minItems: 2
                     }
                   }
                 }
