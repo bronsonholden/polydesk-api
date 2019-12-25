@@ -178,6 +178,79 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
     end
 
     describe 'logical' do
+      describe 'and' do
+        let(:data) { { one: 1, two: 2 } }
+        let(:and1) {
+          {
+            operator: 'eq',
+            operands: [
+              { type: 'literal', value: 1 },
+              { type: 'property', key: 'one', cast: 'numeric', object: 'self' }
+            ]
+          }
+        }
+        let(:and2) {
+          {
+            operator: 'eq',
+            operands: [
+              { type: 'literal', value: 2 },
+              { type: 'property', key: 'two', cast: 'numeric', object: 'self' }
+            ]
+          }
+        }
+        let(:condition) {
+          {
+            operator: 'and',
+            operands: [ and1, and2 ]
+          }
+        }
+
+        context "with matching data" do
+          include_examples "scoping match"
+        end
+
+        context "with no matching data" do
+          let(:data) { { one: 2, two: 1 } }
+          include_examples "scoping mismatch"
+        end
+
+        context "with parenthetical or" do
+          let(:value) { 1 }
+          let(:and1) {
+            {
+              operator: 'or',
+              operands: [
+                {
+                  operator: 'eq',
+                  operands: [
+                    { type: 'literal', value: value },
+                    { type: 'literal', value: 1 }
+                  ]
+                },
+                {
+                  operator: 'eq',
+                  operands: [
+                    { type: 'literal', value: 0 },
+                    { type: 'literal', value: 1 }
+                  ]
+                }
+              ]
+            }
+          }
+
+          context "falsey or" do
+            let(:value) { 0 }
+            include_examples "scoping mismatch"
+          end
+
+          context "truthy or" do
+            include_examples "scoping match"
+          end
+        end
+      end
+    end
+
+    describe 'relational' do
       describe 'eq' do
         context 'string property' do
           let(:data) {
