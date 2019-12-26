@@ -178,30 +178,31 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
     end
 
     describe 'logical' do
+      let(:data) { { one: 1, two: 2 } }
+      let(:cond1) {
+        {
+          operator: 'eq',
+          operands: [
+            { type: 'literal', value: 1 },
+            { type: 'property', key: 'one', cast: 'numeric', object: 'self' }
+          ]
+        }
+      }
+      let(:cond2) {
+        {
+          operator: 'eq',
+          operands: [
+            { type: 'literal', value: 2 },
+            { type: 'property', key: 'two', cast: 'numeric', object: 'self' }
+          ]
+        }
+      }
+
       describe 'and' do
-        let(:data) { { one: 1, two: 2 } }
-        let(:and1) {
-          {
-            operator: 'eq',
-            operands: [
-              { type: 'literal', value: 1 },
-              { type: 'property', key: 'one', cast: 'numeric', object: 'self' }
-            ]
-          }
-        }
-        let(:and2) {
-          {
-            operator: 'eq',
-            operands: [
-              { type: 'literal', value: 2 },
-              { type: 'property', key: 'two', cast: 'numeric', object: 'self' }
-            ]
-          }
-        }
         let(:condition) {
           {
             operator: 'and',
-            operands: [ and1, and2 ]
+            operands: [ cond1, cond2 ]
           }
         }
 
@@ -216,7 +217,7 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
 
         context "with parenthetical or" do
           let(:value) { 1 }
-          let(:and1) {
+          let(:cond1) {
             {
               operator: 'or',
               operands: [
@@ -244,6 +245,63 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
           end
 
           context "truthy or" do
+            include_examples "scoping match"
+          end
+        end
+      end
+
+      describe 'or' do
+        let(:condition) {
+          {
+            operator: 'or',
+            operands: [ cond1, cond2 ]
+          }
+        }
+
+        context "with both matching conditions" do
+          include_examples "scoping match"
+        end
+
+        context "with one matching condition" do
+          let(:data) { { one: 1, two: 0 } }
+          include_examples "scoping match"
+        end
+
+        context "with no matching condition" do
+          let(:data) { { one: 0, two: 0 } }
+          include_examples "scoping mismatch"
+        end
+
+        context "with parenthetical and" do
+          let(:data) { { one: 0, two: 0 } }
+          let(:value) { 1 }
+          let(:cond1) {
+            {
+              operator: 'and',
+              operands: [
+                {
+                  operator: 'eq',
+                  operands: [
+                    { type: 'literal', value: value },
+                    { type: 'literal', value: 1 }
+                  ]
+                },
+                {
+                  operator: 'eq',
+                  operands: [
+                    { type: 'literal', value: value },
+                    { type: 'literal', value: 1 }
+                  ]
+                }
+              ]
+            }
+          }
+          context "falsey and" do
+            let(:value) { 0 }
+            include_examples "scoping mismatch"
+          end
+
+          context "truthy and" do
             include_examples "scoping match"
           end
         end
