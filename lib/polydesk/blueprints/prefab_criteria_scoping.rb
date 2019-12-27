@@ -7,10 +7,26 @@ module Polydesk
       end
 
       def self.apply_condition(condition, scope)
-        scope.where(self.expand_operand(condition))
+        scope.where(self.evaluate_expression(condition))
       end
 
-      def self.expand_operand(operand)
+      def self.unary_expression(expression)
+        operator = expression['operator']
+        operand = expression['operand']
+        if operator == 'not'
+          "(NOT #{self.evaluate_expression(operand)})"
+        end
+      end
+
+      def self.evaluate_expression(operand)
+        if operand.key?('operand')
+          self.unary_expression(operand)
+        else
+          self.binary_expression(operand)
+        end
+      end
+
+      def self.binary_expression(operand)
         operator = operand['operator']
         operands = operand['operands']
         operator_symbol = ''
@@ -26,7 +42,7 @@ module Polydesk
         elsif operator == 'eq'
           operator_symbol = '='
         end
-        operands.map { |operand|
+        expr = operands.map { |operand|
           expr = self.operand_expression(operand)
           if !cast_as.nil?
             "#{expr}::#{cast_as}"
@@ -34,11 +50,12 @@ module Polydesk
             expr
           end
         }.join(operator_symbol)
+        "(#{expr})"
       end
 
       def self.operand_expression(operand)
         # TODO: Better way to check if operand needs to be expanded
-        return self.expand_operand(operand) if operand.key?('operator')
+        return self.evaluate_expression(operand) if operand.key?('operator')
 
         type = operand['type']
         value = operand['value']

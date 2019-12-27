@@ -198,6 +198,39 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
         }
       }
 
+      describe 'not' do
+        let(:data) { { value: 1 } }
+        let(:condition) {
+          {
+            operator: 'not',
+            operand: {
+              operator: 'eq',
+              operands: [
+                {
+                  type: 'property',
+                  key: 'value',
+                  cast: 'numeric',
+                  object: 'self'
+                },
+                {
+                  type: 'literal',
+                  value: 0
+                }
+              ]
+            }
+          }
+        }
+
+        context 'with matching data' do
+          include_examples 'scoping match'
+        end
+
+        context 'with no matching data' do
+          let(:data) { { value: 0 } }
+          include_examples 'scoping mismatch'
+        end
+      end
+
       describe 'and' do
         let(:condition) {
           {

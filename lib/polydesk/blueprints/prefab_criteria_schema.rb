@@ -89,8 +89,22 @@ module Polydesk
               logical: {
                 '$one' => {
                   oneOf: [
-                    { '$ref' => '#/definitions/operators/logical/and_or' }
+                    { '$ref' => '#/definitions/operators/logical/and_or' },
+                    { '$ref' => '#/definitions/operators/logical/not' }
                   ]
+                },
+                not: {
+                  type: 'object',
+                  required: ['operator', 'operand'],
+                  properties: {
+                    operator: {
+                      type: 'string',
+                      enum: ['not']
+                    },
+                    operand: {
+                      '$ref' => '#/definitions/operators/$boolean_expression'
+                    }
+                  }
                 },
                 and_or: {
                   type: 'object',

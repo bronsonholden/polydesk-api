@@ -61,6 +61,13 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaSchema do
     }
   }
 
+  let(:not_condition) {
+    {
+      operator: 'not',
+      operand: and_condition
+    }
+  }
+
   describe 'logical' do
     context 'valid and condition' do
       let(:condition) { and_condition }
@@ -71,6 +78,13 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaSchema do
 
     context 'valid or condition' do
       let(:condition) { or_condition }
+      it 'validates' do
+        expect(valid?).to eq(true)
+      end
+    end
+
+    context 'valid not condition' do
+      let(:condition) { not_condition }
       it 'validates' do
         expect(valid?).to eq(true)
       end
