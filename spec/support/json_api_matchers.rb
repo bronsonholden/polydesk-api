@@ -42,6 +42,8 @@ RSpec::Matchers.define :have_changed_attributes do
     Apartment::Tenant.switch('rspec') do
       before = record.attributes.except('updated_at')
       after = record.reload.attributes.except('updated_at')
+      puts before
+      puts after
       return before != after
     end
   end
