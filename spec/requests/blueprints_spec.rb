@@ -44,6 +44,33 @@ RSpec.describe 'Blueprints', type: :request do
     it 'validates' do
       expect { JSON::Validator.validate(blueprint.schema, data) }.not_to raise_error
     end
+
+    describe 'validations' do
+      let(:blueprint) { create :blueprint, schema: schema }
+      let(:schema) {
+        {
+          type: 'object',
+          properties: {
+            "#{key}" => {
+              type: 'string'
+            }
+          }
+        }
+      }
+      context 'with invalid character(s)' do
+        let(:key) { "invalid'key'name" }
+        it 'raises error' do
+          expect { blueprint }.to raise_error(Polydesk::Errors::InvalidBlueprintSchema)
+        end
+      end
+
+      context 'with valid characters' do
+        let(:key) { "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" }
+        it 'does not raise error' do
+          expect { blueprint }.not_to raise_error
+        end
+      end
+    end
   end
 
   describe 'GET /rspec/blueprints' do
