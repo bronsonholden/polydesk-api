@@ -1,7 +1,7 @@
 module Polydesk
   module Blueprints
-    # This validates a prefab criteria subschema (specified as "prefab" in
-    # the blueprint schema).
+    # Validates "prefab" property in blueprint schemas. This subschema defines
+    # criteria used for selecting related elements.
     class PrefabCriteriaSchema
       def self.validate(schema)
         JSON::Validator.validate(self.schema, schema)
