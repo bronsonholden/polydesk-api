@@ -5,4 +5,5 @@ class BlueprintRealizer
   has :namespace
   has :schema
   has :view
+  has :construction_view
 end

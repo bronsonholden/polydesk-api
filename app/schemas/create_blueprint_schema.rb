@@ -27,6 +27,9 @@ class CreateBlueprintSchema < ApplicationSchema
                 },
                 view: {
                   type: 'object'
+                },
+                construction_view: {
+                  type: 'object'
                 }
               }
             }
