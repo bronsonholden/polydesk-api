@@ -30,6 +30,9 @@ class CreateBlueprintSchema < ApplicationSchema
                 },
                 'construction-view' => {
                   type: 'object'
+                },
+                'list-view' => {
+                  type: 'object'
                 }
               }
             }
