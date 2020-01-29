@@ -28,4 +28,13 @@ class BlueprintsController < ApplicationController
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end
+
+  def update
+    schema = UpdateBlueprintSchema.new(request.params)
+    payload = schema.render
+    realizer = BlueprintRealizer.new(intent: :update, parameters: payload, headers: request.headers)
+    authorize realizer.object
+    realizer.object.save!
+    render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
+  end
 end
