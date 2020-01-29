@@ -30,9 +30,7 @@ class FormSubmissionFiltering
       # Remove "data"
       parts = parts[1..-1]
       # Build and sanitize order SQL
-      col = parts.reduce('data') { |sql, part|
-        "#{sql}->>#{ActiveRecord::Base.connection.quote(part)}"
-      }
+      col = "(data\#>>'{#{parts.join(',')}}')"
       @json_filters[col] = val
     }
   end
