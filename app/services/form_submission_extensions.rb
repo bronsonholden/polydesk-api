@@ -30,7 +30,7 @@ class FormSubmissionExtensions
       end
     }
 
-    # Modify payload to include any aggregates pulled form sort query param
+    # Modify payload to include any aggregates pulled from sort query param
     @payload['meta-aggregate'] = @meta_aggregates.join(',')
 
     @aggregate_ops = @meta_aggregates.map { |col|
