@@ -4,7 +4,16 @@ class FormSubmissionExtensions
     @meta_aggregates = @payload.fetch('meta-aggregate', '').split(',')
     @meta_includes = @payload.fetch('meta-include', '').split(',')
 
+    # meta-generate[full_name_and_assigned_jobs]=concat(data.name.first,' ',data.name.last,' - ',refcount(jobs:assignee))
+    # @meta_generate = @payload.fetch('meta-generate', '')
+
+    # REFMETHODS
     # If any aggregates are being sorted, include them
+    # TODO: local key isn't necessary for refmethods
+    # <refmethod>(<namespace>:<local key>:<external key>:<dimension>)
+    # refsum(jobs:<snip>:assignee:potentialRevenue) - total potential revenue for all jobs where this employee is the assignee
+    #    ^-- TODO: consider case where assignee is an array of refs 
+
     @agg_sorting = @payload.fetch('sort', '').split(',').select { |col|
       col.match(/^-?(refcount|refsum|refmin|refmax|refavg|refdistinct)\(([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
     }
@@ -37,7 +46,7 @@ class FormSubmissionExtensions
       m = col.match(/^(refcount|refdistinct|refsum|refavg|refmin|refmax)\((\d+):([a-zA-Z0-9_\-\.]+):([a-zA-Z0-9_\-\.]+):?([a-zA-Z0-9_\-\.]+)?\)$/)
 
       if !m.nil?
-        rel_form_id = m[2]
+        rel_form_id = m[2] # TODO: namespace instead of form ID
         local_alias = m[3].split('.').join('__')
         external_alias = m[4].split('.').join('__')
 
