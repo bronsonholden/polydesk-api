@@ -39,7 +39,7 @@ class FormSubmissionFiltering
 
   def apply_condition(attr, cond, scope)
     operator = cond[0]
-    operand = cond[1]
+    operand = URI.decode(cond[1])
     if operand.is_a?(String)
       operand = Arel.sql(operand)
     else
