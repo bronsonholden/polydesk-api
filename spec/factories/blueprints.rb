@@ -16,32 +16,7 @@ FactoryBot.define do
             type: 'string',
             prefab: { # Prefab schema can be passed to POST /prefabs/query to get list of prefabs that match this schema
               namespace: 'employees',
-              condition: {
-                operation: 'and',
-                operands: [
-                  {
-                    operation: 'eq',
-                    operands: [
-                      {
-                        type: 'ref_property', # own_property
-                        key: 'string'
-                      },
-                      {
-                        type: 'literal',
-                        value: 'John'
-                      }
-                    ]
-                  },
-                  {
-                    key: 'name.last',
-                    operation: 'in',
-                    operands: [
-                      type: 'literal',
-                      value: ['Doe', 'Deer', 'Smith']
-                    ]
-                  }
-                ]
-              }
+              condition: {}
             }
           }
         }

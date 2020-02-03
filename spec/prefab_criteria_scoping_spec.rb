@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
+RSpec.describe PrefabCriteriaScoping do
   let(:condition) {
     {}
   }
@@ -18,10 +18,10 @@ RSpec.describe Polydesk::Blueprints::PrefabCriteriaScoping do
   }
 
   let(:prefab) { create :prefab, data: data }
-  let(:scope) { Polydesk::Blueprints::PrefabCriteriaScoping.apply(criteria, Prefab.where(id: prefab.id)) }
+  let(:scope) { PrefabCriteriaScoping.apply(criteria, Prefab.where(id: prefab.id)) }
 
   before(:each) do
-    Polydesk::Blueprints::PrefabCriteriaSchema.validate!(criteria)
+    PrefabCriteriaValidator.validate!(criteria)
   end
 
   shared_examples 'scoping match' do

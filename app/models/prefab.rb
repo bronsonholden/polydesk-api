@@ -1,9 +1,36 @@
 class Prefab < ApplicationRecord
-  auto_increment :tag, scope: [:namespace], lock: true, force: true, before: :validation
   validates :data, presence: true
   validates :namespace, presence: true
   validates :tag, uniqueness: { scope: [:namespace] }, presence: true
   validates :schema, presence: true
   validates :view, presence: true
   belongs_to :blueprint, optional: true
+  validate :check_schema
+
+  before_validation :construction, :defer_data
+  # Since namespace can be changed during Blueprint construction, the
+  # auto_increment call must come after declaring the construction
+  # lifecycle callback. This way the tag field is incremented after the
+  # namespace has been modified.
+  auto_increment :tag, scope: [:namespace], lock: true, force: true, before: :validation
+
+  def check_schema
+    valid = JSON::Validator.validate(self.schema, self.data)
+    raise Polydesk::Errors::FormSchemaViolated.new if !valid
+  end
+
+  def construction
+    # If constructing (blueprint ref provided), assign everything except data
+    if !self.blueprint.nil? && new_record?
+      self.schema = self.blueprint.schema
+      self.view = self.blueprint.view
+      self.namespace = self.blueprint.namespace
+    end
+  end
+
+  def defer_data
+    if new_record?
+      self.data = PrefabDefer.new(self).apply
+    end
+  end
 end

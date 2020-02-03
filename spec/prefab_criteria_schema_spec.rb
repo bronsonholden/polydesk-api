@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe Polydesk::Blueprints::PrefabCriteriaSchema do
-  let(:valid?) { Polydesk::Blueprints::PrefabCriteriaSchema.validate(criteria) }
+RSpec.describe PrefabCriteriaValidator do
+  let(:valid?) { PrefabCriteriaValidator.validate(criteria) }
 
   let(:criteria) {
     {
