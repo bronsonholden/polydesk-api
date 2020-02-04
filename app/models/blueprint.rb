@@ -6,19 +6,30 @@ class Blueprint < ApplicationRecord
   validate :check_schema
 
   def check_schema
-    validate_schema_keys(schema)
+    validate_subschema(schema)
   end
 
-  def validate_schema_keys(schema)
-    return if schema['type'] != 'object'
-    props = schema.fetch('properties', nil)
-    return if props.nil?
-    props.each { |prop, prop_schema|
-      m = prop.match(/\A[-_a-zA-Z0-9]+\z/)
-      if m.nil?
-        raise Polydesk::Errors::InvalidBlueprintSchema.new("#{prop} contains invalid characters; may only contain alphanumerics, -, or _")
+  def validate_subschema(subschema, path = '$')
+    type = subschema['type']
+    if type == 'object'
+      props = schema.fetch('properties', nil)
+      if !props.nil?
+        props.each { |prop, prop_schema|
+          subpath = [path, prop].join('.')
+          if prop.match(/\A[-_a-zA-Z0-9]+\z/).nil?
+            raise Polydesk::Errors::InvalidBlueprintSchema.new("'#{subpath}' contains invalid characters; may only contain alphanumerics, -, or _")
+          end
+          validate_subschema(prop_schema, subpath)
+        }
       end
-      validate_schema_keys(prop_schema)
-    }
+    end
+    defer = subschema['defer']
+    if !defer.nil?
+      # validate_defer_subschema(prop_schema)
+    end
+    prefab = subschema['prefab']
+    if !prefab.nil?
+      # validate_prefab_schema
+    end
   end
 end
