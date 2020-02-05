@@ -12,7 +12,7 @@ class Blueprint < ApplicationRecord
   def validate_subschema(subschema, path = '$')
     type = subschema['type']
     if type == 'object'
-      props = schema.fetch('properties', nil)
+      props = subschema.fetch('properties', nil)
       if !props.nil?
         props.each { |prop, prop_schema|
           subpath = [path, prop].join('.')
