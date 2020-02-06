@@ -89,5 +89,8 @@ module Polydesk
         super("Invalid blueprint schema: #{reason}")
       end
     end
+
+    class PrefabCriteriaNotMet < Polydesk::Errors::Base
+    end
   end
 end

@@ -77,6 +77,7 @@ class ApplicationController < ActionController::API
   rescue_from Polydesk::Errors::UniqueFieldViolation, with: :api_exception
   rescue_from Polydesk::Errors::InvalidFormSchemaKey, with: :api_exception
   rescue_from Polydesk::Errors::InvalidBlueprintSchema, with: :api_exception
+  rescue_from Polydesk::Errors::PrefabCriteriaNotMet, with: :api_exception
 
   def pundit_user
     Polydesk::AuthContext.new(current_user, current_account)
