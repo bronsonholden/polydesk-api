@@ -6,7 +6,7 @@ class FormSubmissionFiltering
     @filters.each { |key, value|
       v = value
       if v.is_a?(String)
-        v = [v]
+        v = v.split(',')
       end
       @filters[key] = v.map { |expr|
         res = expr.scan(/\A(!?ge|!?gt|!?le|!?lt|!?in|!?has|!?eq)\:([^\:].*)\z/)
