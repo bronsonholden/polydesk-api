@@ -83,6 +83,8 @@ class ApplicationController < ActionController::API
     Polydesk::AuthContext.new(current_user, current_account)
   end
 
+  # Allow authentication by providing a persistent, manually generated
+  # authentication token via the 'auth-token' header.
   def current_user
     auth_token = request.headers["auth-token"]
     if auth_token.nil?
