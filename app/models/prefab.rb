@@ -7,7 +7,7 @@ class Prefab < ApplicationRecord
   belongs_to :blueprint, optional: true
   validate :check_schema
 
-  before_validation :construction, :defer_data
+  before_validation :construction
   # Since namespace can be changed during Blueprint construction, the
   # auto_increment call must come after declaring the construction
   # lifecycle callback. This way the tag field is incremented after the
@@ -24,12 +24,6 @@ class Prefab < ApplicationRecord
       self.schema = self.blueprint.schema
       self.view = self.blueprint.view
       self.namespace = self.blueprint.namespace
-    end
-  end
-
-  def defer_data
-    if new_record?
-      self.data = PrefabDefer.new(self).apply
     end
   end
 end
