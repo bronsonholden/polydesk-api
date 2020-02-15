@@ -83,6 +83,16 @@ class ApplicationController < ActionController::API
     Polydesk::AuthContext.new(current_user, current_account)
   end
 
+  def current_user
+    auth_token = request.headers["auth-token"]
+    if auth_token.nil?
+      super
+    else
+      super
+      # TODO: find user by auth token
+    end
+  end
+
   def current_account
     Account.find_by_identifier(params[:identifier])
   end
