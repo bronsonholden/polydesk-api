@@ -66,6 +66,7 @@ class ApplicationController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  rescue_from JSON::Schema::ValidationError, with: :prefab_schema_violation_exception
   rescue_from Polydesk::Errors::AccountIsDisabled, with: :api_exception
   rescue_from Polydesk::Errors::InvalidConfirmationToken, with: :api_exception
   rescue_from Polydesk::Errors::NotVersionable, with: :api_exception
@@ -183,6 +184,11 @@ class ApplicationController < ActionController::API
     record = exception.model.singularize.classify.constantize.new
     record.errors.add(model, 'does not exist')
     render_exception_for record, status_code: :not_found
+  end
+
+  def prefab_schema_violation_exception(exception)
+    errors = [{ title: 'Prefab schema violated' }]
+    render json: { errors: errors }, status: :unprocessable_entity
   end
 
   def render_exception_for(record, status_code:)
