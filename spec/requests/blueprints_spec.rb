@@ -53,7 +53,7 @@ RSpec.describe 'Blueprints', type: :request do
     }
     let(:employee_prefab) { create :prefab, blueprint: blueprint }
     it 'validates' do
-      employee_prefab
+      employee_prefab # Create the prefab that is being referenced
       expect { JSON::Validator.validate(blueprint.schema, data) }.not_to raise_error
     end
 
