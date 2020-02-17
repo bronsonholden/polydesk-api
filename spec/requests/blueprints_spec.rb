@@ -1,6 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Blueprints', type: :request do
+  let(:name) { 'A Blueprint' }
+  let(:namespace) { 'objects' }
   let(:schema) {
     {
       type: 'object',
@@ -23,8 +25,8 @@ RSpec.describe 'Blueprints', type: :request do
   }
   let(:attributes) {
     {
-      name: 'A Blueprint',
-      namespace: 'objects',
+      name: name,
+      namespace: namespace,
       schema: schema,
       view: view,
       construction_view: construction_view
@@ -38,21 +40,24 @@ RSpec.describe 'Blueprints', type: :request do
       }
     }
   }
-  let(:blueprint) { create :blueprint }
+  let(:blueprint) { create :blueprint, name: name, namespace: namespace, schema: schema, view: view, construction_view: construction_view }
 
   describe 'blueprint schema' do
+    let(:name) { 'Employees' }
+    let(:namespace) { 'employees' }
     let(:data) {
       {
         string: 'A string',
         prefab: 'employees/1'
       }
     }
+    let(:employee_prefab) { create :prefab, blueprint: blueprint }
     it 'validates' do
+      employee_prefab
       expect { JSON::Validator.validate(blueprint.schema, data) }.not_to raise_error
     end
 
     describe 'validations' do
-      let(:blueprint) { create :blueprint, schema: schema }
       let(:schema) {
         {
           type: 'object',

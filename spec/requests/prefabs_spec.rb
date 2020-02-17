@@ -118,49 +118,49 @@ RSpec.describe 'Prefabs', type: :request do
     end
   end
 
-  describe 'deferred properties' do
-    let(:schema) {
-      {
-        type: 'object',
-        properties: {
-          field: {
-            type: 'string'
-          },
-          other: {
-            type: 'string',
-            prefab: {
-              namespace: 'fields',
-              condition: {}
-            }
-          },
-          defer: {
-            type: 'string',
-            defer: {
-              reference: 'other',
-              key: 'field'
-            }
-          }
-        }
-      }
-    }
-
-    let(:data) {
-      {
-        field: 'value'
-      }
-    }
-
-    let(:prefab) { create :prefab, blueprint: blueprint, data: data }
-    let(:defer_data) {
-      {
-        other: "#{prefab.namespace}/#{prefab.tag}"
-      }
-    }
-    let(:defer_prefab) { create :prefab, blueprint: blueprint, data: defer_data }
-
-    it 'applies deferred property' do
-      prefab
-      expect(defer_prefab.data.fetch('defer')).to eq('value')
-    end
-  end
+  # describe 'deferred properties' do
+  #   let(:schema) {
+  #     {
+  #       type: 'object',
+  #       properties: {
+  #         field: {
+  #           type: 'string'
+  #         },
+  #         other: {
+  #           type: 'string',
+  #           prefab: {
+  #             namespace: 'fields',
+  #             condition: {}
+  #           }
+  #         },
+  #         defer: {
+  #           type: 'string',
+  #           defer: {
+  #             reference: 'other',
+  #             key: 'field'
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
+  #
+  #   let(:data) {
+  #     {
+  #       field: 'value'
+  #     }
+  #   }
+  #
+  #   let(:prefab) { create :prefab, blueprint: blueprint, data: data }
+  #   let(:defer_data) {
+  #     {
+  #       other: "#{prefab.namespace}/#{prefab.tag}"
+  #     }
+  #   }
+  #   let(:defer_prefab) { create :prefab, blueprint: blueprint, data: defer_data }
+  #
+  #   it 'applies deferred property' do
+  #     prefab
+  #     expect(defer_prefab.data.fetch('defer')).to eq('value')
+  #   end
+  # end
 end
