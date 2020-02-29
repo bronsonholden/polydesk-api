@@ -44,14 +44,14 @@ Rails.application.configure do
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
 
+  config.x.mail_from = "Polydesk <donotreply@polydesk.io>"
+  config.action_mailer.default_url_options = { host: "polydesk.io" }
   config.action_mailer.smtp_settings = {
-    address: 'smtp.gmail.com',
+    address: 'email-smtp.us-west-2.amazonaws.com',
     port: 587,
-    domain: Rails.application.credentials[Rails.env.to_sym][:gmail][:domain],
-    authentication: :login,
-    enable_starttls_auto: true,
-    user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:username],
-    password: Rails.application.credentials[Rails.env.to_sym][:gmail][:password]
+    domain: Rails.application.credentials[Rails.env.to_sym][:ses][:domain],
+    user_name: Rails.application.credentials[Rails.env.to_sym][:ses][:username],
+    password: Rails.application.credentials[Rails.env.to_sym][:ses][:password]
   }
 
   # Raises error for missing translations

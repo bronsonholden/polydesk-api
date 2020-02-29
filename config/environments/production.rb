@@ -70,14 +70,14 @@ Rails.application.configure do
   # Use default logging formatter so that PID and timestamp are not suppressed.
   config.log_formatter = ::Logger::Formatter.new
 
+  config.x.mail_from = "Polydesk <donotreply@polydesk.io>"
+  config.action_mailer.default_url_options = { host: "polydesk.io" }
   config.action_mailer.smtp_settings = {
-    address: 'smtp.gmail.com',
+    address: 'email-smtp.us-west-2.amazonaws.com',
     port: 587,
-    domain: Rails.application.credentials[Rails.env.to_sym][:gmail][:domain],
-    authentication: :login,
-    enable_starttls_auto: true,
-    user_name: Rails.application.credentials[Rails.env.to_sym][:gmail][:username],
-    password: Rails.application.credentials[Rails.env.to_sym][:gmail][:password]
+    domain: Rails.application.credentials[Rails.env.to_sym][:ses][:domain],
+    user_name: Rails.application.credentials[Rails.env.to_sym][:ses][:username],
+    password: Rails.application.credentials[Rails.env.to_sym][:ses][:password]
   }
 
   # Use a different logger for distributed setups.
