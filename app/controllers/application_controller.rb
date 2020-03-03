@@ -102,7 +102,7 @@ class ApplicationController < ActionController::API
 
   # GET /
   def show
-    render json: {}, status: :ok
+    render json: { api: 'v1' }, status: :ok
   end
 
   def render_authenticate_error
