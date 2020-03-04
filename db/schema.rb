@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_01_29_015950) do
+ActiveRecord::Schema.define(version: 2020_03_04_054342) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -109,6 +109,13 @@ ActiveRecord::Schema.define(version: 2020_01_29_015950) do
     t.string "unique_fields", array: true
     t.index ["discarded_at"], name: "index_forms_on_discarded_at"
     t.index ["name"], name: "index_forms_on_name", unique: true
+  end
+
+  create_table "groups", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_groups_on_name", unique: true
   end
 
   create_table "options", force: :cascade do |t|

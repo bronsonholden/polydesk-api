@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     resources :account_users, path: 'users'
     resources :blueprints
     resources :prefabs
+    resources :groups
 
     post '/documents/upload', to: 'documents#upload_new'
     post '/folders/:id/upload', to: 'folders#upload_document'
