@@ -16,7 +16,11 @@ class User < ActiveRecord::Base
   belongs_to :default_account, class_name: 'Account', optional: true
 
   before_create :send_confirmation_email, if: -> {
-    User.devise_modules.include?(:confirmable)
+    Rails.env.production? && User.devise_modules.include?(:confirmable)
+  }
+
+  after_create :bypass_confirmation, if: -> {
+    !Rails.env.production?
   }
 
   def has_password?
@@ -30,6 +34,10 @@ class User < ActiveRecord::Base
   end
 
   private
+
+  def bypass_confirmation
+    self.confirm
+  end
 
   def send_confirmation_email
     self.send_confirmation_instructions
