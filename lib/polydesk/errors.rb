@@ -92,5 +92,26 @@ module Polydesk
 
     class PrefabCriteriaNotMet < Polydesk::Errors::Base
     end
+
+    class RestrictedGeneratedColumnIdentifier < Polydesk::Errors::Base
+      def initialize(identifier)
+        super("Restricted generated column identifier (matches native attribute): #{identifier}")
+      end
+    end
+
+    class InvalidGeneratedColumnIdentifier < Polydesk::Errors::Base
+      def initialize(identifier)
+        super("Invalid generated column identifier (alphanumerics and _ only, must not start with a number): #{identifier}")
+      end
+    end
+
+    class GeneratorFunctionArgumentError < Polydesk::Errors::Base
+    end
+
+    class GeneratorSyntaxError < Polydesk::Errors::Base
+      def initialize(generator)
+        super("Invalid syntax for generator expression: #{generator}")
+      end
+    end
   end
 end
