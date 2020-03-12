@@ -98,7 +98,7 @@ class PrefabQueryGenerate
   # returned by the lookup.
   def apply_lookup(scope, identifier, cast, local, remote)
     remote_table_alias = "lookup#{next_lookup_id}___#{remote.gsub('.', '__')}"
-    remote_uid = "concat(#{remote_table_alias}.namespace, '/', #{remote_table_alias}.tag)"
+    remote_uid = "(#{remote_table_alias}.namespace || '/' || #{remote_table_alias}.tag)"
     scope = scope.joins(
       <<-SQL
         left join prefabs as #{remote_table_alias}
