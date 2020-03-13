@@ -151,12 +151,23 @@ class PrefabQueryGenerate
     apply_lookup(scope, identifier, cast, local, remote)
   end
 
+  def apply_function_concat(scope, identifier, ast)
+    args = ast.children.map { |arg|
+      scope, sql = apply_ast(scope, identifier, arg)
+      "(#{sql}::text)"
+    }
+
+    return scope, "(concat(#{args.join(',')}))"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, identifier, ast)
     case ast.name
     when 'lookup_s'
       apply_function_lookup(scope, 'text', identifier, ast)
+    when 'concat'
+      apply_function_concat(scope, identifier, ast)
     else
       return scope, 'null'
     end
@@ -178,6 +189,8 @@ class PrefabQueryGenerate
     when Keisan::AST::String
       sql = "#{ActiveRecord::Base.connection.quote(ast.value)}"
     when Keisan::AST::Number
+      sql = "#{ast.value}"
+    when Keisan::AST::Boolean
       sql = "#{ast.value}"
     else
       puts ast.inspect
