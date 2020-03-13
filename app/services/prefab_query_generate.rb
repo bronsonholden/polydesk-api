@@ -193,7 +193,6 @@ class PrefabQueryGenerate
     when Keisan::AST::Boolean
       sql = "#{ast.value}"
     else
-      puts ast.inspect
       sql = 'null'
     end
     return scope, sql
