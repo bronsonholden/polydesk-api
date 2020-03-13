@@ -38,6 +38,17 @@ RSpec.describe PrefabQueryGenerate do
     end
 
     describe 'functions' do
+      describe 'concat' do
+        let(:identifier) { 'concat_column' }
+        let(:generator) { "concat(concat('a', 'b'), 1, true)" }
+        let(:referrer) { create :prefab, blueprint: blueprint, data: { prefab: "prefabs/#{prefab.id}" } }
+        let(:scope) { Prefab.where(id: referrer.id) }
+
+        it 'applies concat' do
+          expect(generated_scope.first.concat_column).to eq("ab1true")
+        end
+      end
+
       describe 'lookups' do
         let(:identifier) { 'lookup_column' }
         let(:referent) { create :prefab, blueprint: blueprint, data: data }
