@@ -24,3 +24,6 @@ n.times do |i|
     value: SecureRandom.hex
   })
 end
+
+# expr = 'lookup_s("data.prefab", "data.value")'
+# generate = { 'generate' => { 'lookup_value' => expr } }
