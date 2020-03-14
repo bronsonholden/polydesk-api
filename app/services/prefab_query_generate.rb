@@ -160,6 +160,19 @@ class PrefabQueryGenerate
     return scope, "(concat(#{args.join(',')}))"
   end
 
+  def apply_function_prop(scope, identifier, ast)
+    arg = ast.children.first
+    if arg.is_a?(Keisan::AST::String)
+      if !arg.value.match(/^[-_.a-zA-Z0-9]+$/)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
+      end
+      col = column_name('prefabs', arg.value)
+    else
+      scope, col = apply_ast(scope, identifier, arg)
+    end
+    return scope, col
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, identifier, ast)
@@ -168,6 +181,8 @@ class PrefabQueryGenerate
       apply_function_lookup(scope, 'text', identifier, ast)
     when 'concat'
       apply_function_concat(scope, identifier, ast)
+    when 'prop'
+      apply_function_prop(scope, identifier, ast)
     else
       return scope, 'null'
     end
