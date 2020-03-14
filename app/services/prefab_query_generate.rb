@@ -217,7 +217,7 @@ class PrefabQueryGenerate
     calculator = Keisan::Calculator.new
     ast = calculator.ast(generator)
     scope, sql = apply_ast(scope, identifier, ast)
-    scope.select_append("(#{sql}) as #{identifier}")
+    scope.select_append("(#{sql}) as \"#{identifier}\"")
   end
 
   def load
