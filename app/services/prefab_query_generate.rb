@@ -206,10 +206,10 @@ class PrefabQueryGenerate
   end
 
   def load
-    generate = payload.fetch('generate')
+    query_generate = payload.fetch('generate', {})
 
     reserved_identifiers = Prefab.column_names
-    generate.keys.each { |key|
+    query_generate.keys.each { |key|
       # Verify that no identifiers exactly match existing attributes.
       # Re-used identifiers will simply be overwritten, but we need to make
       # sure that attributes like namespace can't be replaced.
@@ -224,6 +224,6 @@ class PrefabQueryGenerate
       end
     }
 
-    @generate = generate
+    @generate = query_generate
   end
 end

@@ -23,6 +23,8 @@ class PrefabsController < ApplicationController
     schema = IndexPrefabsSchema.new(request.params)
     payload = schema.render
     scope = Prefab.all
+    generate = PrefabQueryGenerate.new(payload)
+    scope = generate.apply(scope)
     filtering = FormSubmissionFiltering.new(payload)
     scope = filtering.apply(scope)
     extensions = FormSubmissionExtensions.new(payload)
