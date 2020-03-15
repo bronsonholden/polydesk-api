@@ -12,7 +12,7 @@
 #     data#>>'{address,city}'
 #
 #   Using generator expressions:
-#     data("address.city")
+#     prop("data.address.city")
 #
 # Additionally, things like joins and selects can't be done if raw SQL is
 # simply passed as a query parameter. To do a lookup, for example, you have
