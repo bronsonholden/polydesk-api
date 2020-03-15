@@ -38,6 +38,15 @@ RSpec.describe PrefabQueryGenerate do
     end
 
     describe 'functions' do
+      describe 'prop' do
+        let(:identifier) { 'prop_column' }
+        let(:generator) { "prop('data.string')" }
+
+        it 'applies prop' do
+          expect(generated_scope.first.prop_column).to eq('string')
+        end
+      end
+
       describe 'concat' do
         let(:identifier) { 'concat_column' }
         let(:generator) { "concat(concat('a', 'b'), 1, true)" }
