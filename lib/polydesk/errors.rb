@@ -113,5 +113,11 @@ module Polydesk
         super("Invalid syntax for generator expression: #{generator}")
       end
     end
+
+    class InvalidFilterDimensionIdentifier < Polydesk::Errors::Base
+      def initialize(dimension, reason)
+        super("Invalid filter dimension identifier: #{identifier} (#{reason})")
+      end
+    end
   end
 end
