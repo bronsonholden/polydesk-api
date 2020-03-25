@@ -1,6 +1,6 @@
-# ?filter[namespace]=eq('employees')
-# ?filter[data.title]=or(eq('Janitor'), eq('Custodian'))
-# ?filter[a_generated_column]=neq('John Doe')
+# ?filter[]=eq(prop('namespace'), 'employees')
+# ?filter[]=or(eq(prop('data.title'), 'Janitor'), eq(prop('data.title'), 'Custodian'))
+# ?filter[]=neq(generated('full_name'), 'John Doe')
 
 # This service class applies WHERE clauses to a given scope in order to
 # filter on model attributes.
@@ -15,10 +15,14 @@ class ResourceQueryFilter
   def apply(scope)
     @scope = scope
 
-    filters = validated_filters(scope)
+    filters = payload.fetch('filter', [])
 
-    filters.each { |dimension, filter|
-      scope = evaluate_filter(scope, dimension, filter)
+    if filters.is_a?(String)
+      filters = [filters]
+    end
+
+    filters.each { |filter|
+      scope = evaluate_filter(scope, filter)
     }
 
     scope
@@ -26,73 +30,61 @@ class ResourceQueryFilter
 
   protected
 
-  def arg_from_ast(scope, dimension, ast)
-    case ast
-    when Keisan::AST::Variable
-      if scope.column_names.include?(ast.name)
-        "prefabs.#{ast.name}"
+  def column_name(table_alias, identifier)
+    if identifier.start_with?("data.")
+      path = identifier.split('.')[1..-1]
+      "((#{table_alias}.data)\#>>'{#{path.join(',')}}')"
+    else
+      "(#{table_alias}.#{identifier})"
+    end
+  end
+
+  def apply_ast_function(scope, ast)
+    case ast.name
+    when 'generate'
+      arg = ast.children.first
+      PrefabQueryGenerate.new({}).apply_ast(scope, nil, arg)
+    when 'prop'
+      arg = ast.children.first
+      if !arg.value.match(/^[._a-zA-Z0-9]+$/)
+        raise Polydesk::Errors::InvalidPropertyIdentifier.new(arg.value)
       else
-        '(null)'
+        return scope, "(#{scope.table_name}.#{arg.value})"
       end
-    when Keisan::AST::String
-      "#{ActiveRecord::Base.connection.quote(ast.value)}"
-    when Keisan::AST::Number
-      "#{ast.value}"
-    when Keisan::AST::Boolean
-      "#{ast.value}"
     end
   end
 
-  def apply_ast_function(scope, dimension, ast)
-    comparators = {
-      'eq' => '=',
-      'neq' => '!=',
-      'gt' => '>',
-      'gte' => '>=',
-      'lt' => '<',
-      'lte' => '<='
-    }
-
-    comparator = comparators[ast.name]
-    if comparator.nil?
-      # TODO
-      raise "Unknown comparator function: #{ast.name}"
-    end
-
-    scope.where("#{dimension} #{comparator} #{arg_from_ast(scope, dimension, ast.children.first)}")
-  end
-
-  def apply_ast(scope, dimension, ast)
+  def arg_from_ast(scope, ast)
     case ast
     when Keisan::AST::Function
-      apply_ast_function(scope, dimension, ast)
+      apply_ast_function(scope, ast)
+    when Keisan::AST::String
+      return scope, "#{ActiveRecord::Base.connection.quote(ast.value)}"
+    when Keisan::AST::Number
+      return scope, "#{ast.value}"
+    when Keisan::AST::Boolean
+      return scope, "#{ast.value}"
     end
   end
 
-  def evaluate_filter(scope, dimension, filter)
+  def apply_ast(scope, ast)
+    case ast
+    when Keisan::AST::Function
+      apply_ast_function(scope, ast)
+    when Keisan::AST::LogicalEqual
+      scope, lval = arg_from_ast(scope, ast.children.first)
+      scope, rval = arg_from_ast(scope, ast.children.second)
+      scope.where("(#{lval}) = (#{rval})")
+    when Keisan::AST::LogicalNotEqual
+      scope, lval = arg_from_ast(scope, ast.children.first)
+      scope, rval = arg_from_ast(scope, ast.children.second)
+      scope.where("(#{lval}) != (#{rval})")
+    end
+  end
+
+  def evaluate_filter(scope, filter)
     calculator = Keisan::Calculator.new
     ast = calculator.ast(filter)
-    if ast.is_a?(Keisan::AST::Function)
-      apply_ast(scope, dimension, ast)
-    else
-      scope
-    end
-  end
-
-  def valid_dimension_identifier?(dimension, scope)
-    scope.column_names.include?(dimension)
-  end
-
-  # Validate the requested filters (are they valid columns?)
-  def validated_filters(scope)
-    query_filter = payload.fetch('filter', {})
-
-    query_filter.each { |dimension, filter|
-      if !valid_dimension_identifier?(dimension, scope)
-        raise Polydesk::Errors::InvalidFilterDimensionIdentifier.new(dimension, "must be a valid resource attribute: #{scope.column_names.join(', ')}")
-      end
-    }
-
-    query_filter
+    apply_ast(scope, ast)
   end
 end

@@ -114,9 +114,9 @@ module Polydesk
       end
     end
 
-    class InvalidFilterDimensionIdentifier < Polydesk::Errors::Base
-      def initialize(dimension, reason)
-        super("Invalid filter dimension identifier: #{identifier} (#{reason})")
+    class InvalidPropertyIdentifier < Polydesk::Errors::Base
+      def initialize(identifier)
+        super("Invalid property identifier: #{identifier} (alphanumerics, ., and _ only)")
       end
     end
   end
