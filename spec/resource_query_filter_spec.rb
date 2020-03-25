@@ -15,7 +15,8 @@ RSpec.describe ResourceQueryFilter do
   }
 
   let(:base_scope) { Blueprint.all }
-  let(:applicator) { ResourceQueryFilter.new(payload) }
+  let(:query_class) { ResourceQuery }
+  let(:applicator) { query_class.new(payload) }
   let(:filtered_scope) { applicator.apply(base_scope) }
 
   context "multiple values" do
@@ -33,6 +34,8 @@ RSpec.describe ResourceQueryFilter do
       let(:filter_expression) { "generate(concat(prop('name'), prop('namespace'))) == 'Employeesemployees'"}
 
       it "returns match" do
+        jobs_blueprint
+        employees_blueprint
         expect(filtered_scope.size).to eq(1)
       end
 
@@ -41,6 +44,7 @@ RSpec.describe ResourceQueryFilter do
         let(:job) { create :prefab, blueprint: jobs_blueprint, data: { title: "Teacher" } }
         let(:employee) { create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}" } }
         let(:base_scope) { Prefab.all }
+        let(:query_class) { PrefabQuery }
 
         it "returns match" do
           employee

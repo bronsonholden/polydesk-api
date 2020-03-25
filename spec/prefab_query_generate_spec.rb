@@ -24,7 +24,7 @@ RSpec.describe PrefabQueryGenerate do
 
   # Our generator payload and object
   let(:payload) { { 'generate' => generate } }
-  let(:processor) { PrefabQueryGenerate.new(payload) }
+  let(:processor) { PrefabQuery.new(payload) }
 
   # Scope with generated columns applied
   let(:generated_scope) { processor.apply(scope) }
@@ -233,7 +233,7 @@ RSpec.describe PrefabQueryGenerate do
         let(:generator) { 'data.id' }
 
         it 'raises invalid generate identifier error' do
-          expect { processor }.to raise_error(Polydesk::Errors::InvalidGeneratedColumnIdentifier)
+          expect { processor.apply(scope) }.to raise_error(Polydesk::Errors::InvalidGeneratedColumnIdentifier)
         end
       end
 
@@ -242,7 +242,7 @@ RSpec.describe PrefabQueryGenerate do
         let(:generator) { 'data.number' }
 
         it 'raises invalid generate identifier error' do
-          expect { processor }.to raise_error(Polydesk::Errors::InvalidGeneratedColumnIdentifier)
+          expect { processor.apply(scope) }.to raise_error(Polydesk::Errors::InvalidGeneratedColumnIdentifier)
         end
       end
 
@@ -251,7 +251,7 @@ RSpec.describe PrefabQueryGenerate do
         let(:generator) { 'data.namespace' }
 
         it 'raises restricted generate identifier error' do
-          expect { processor }.to raise_error(Polydesk::Errors::RestrictedGeneratedColumnIdentifier)
+          expect { processor.apply(scope) }.to raise_error(Polydesk::Errors::RestrictedGeneratedColumnIdentifier)
         end
       end
     end

@@ -1,0 +1,1 @@
+module Applicators::Filter; end
