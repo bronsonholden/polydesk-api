@@ -5,7 +5,7 @@ class Account < ApplicationRecord
                          presence: true,
                          length: { minimum: 3, maximum: 20 },
                          format: {
-                           with: /\A[a-z][a-z\-_0-9][a-z0-9]+\z/,
+                           with: /\A[a-z0-9][a-z\-_0-9]+[a-z0-9]\z/,
                            message: 'many only container lowercase letters, numbers, -, and _ and must start and end with a lowercase letter or number.'
                          }
   validates :name, presence: true
