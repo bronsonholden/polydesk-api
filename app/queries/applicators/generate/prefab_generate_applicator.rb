@@ -1,3 +1,10 @@
+# Extends the base applicator to provide functions for lookups using
+# Prefab relationships.
+#
+#    ?generate[job_title]=lookup_s("data.job", "data.title")
+#
+# The above matches a Prefab with the UID stored in the "job" property and
+# returns the value at "job_title" on the matched Prefab (as a string).
 module Applicators::Generate
   class PrefabGenerateApplicator < ResourceGenerateApplicator
     protected
