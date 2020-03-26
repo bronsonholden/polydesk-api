@@ -16,7 +16,10 @@ module Applicators::Generate
       calculator = Keisan::Calculator.new
       ast = calculator.ast(generator)
       scope, sql = apply_ast(scope, identifier, ast)
-      return scope.select_append("(#{sql}) as \"#{identifier}\""), sql
+      if !identifier.nil?
+        scope = scope.select_append("(#{sql}) as \"#{identifier}\"")
+      end
+      return scope, sql
     end
 
     protected

@@ -4,7 +4,6 @@ module Applicators::Filter
 
     def initialize(query)
       @query = query
-      @filter_id = 0
     end
 
     def apply(scope, filter)
@@ -14,11 +13,6 @@ module Applicators::Filter
     end
 
     protected
-
-    def next_filter_id
-      @filter_id += 1
-    end
-
 
     def arg_from_ast(scope, ast)
       case ast
@@ -37,7 +31,7 @@ module Applicators::Filter
       case ast.name
       when 'generate'
         arg = ast.children.first
-        query.generate_applicator.apply(scope, "filter#{next_filter_id}", arg.to_s)
+        query.generate_applicator.apply(scope, nil, arg.to_s)
       when 'prop'
         arg = ast.children.first
         if !arg.value.match(/^[._a-zA-Z0-9]+$/)
