@@ -65,6 +65,7 @@ class ApplicationController < ActionController::API
 
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
+  rescue_from ActiveRecord::StatementInvalid, with: :invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from JSON::Schema::ValidationError, with: :prefab_schema_violation_exception
   rescue_from Polydesk::Errors::AccountIsDisabled, with: :api_exception
