@@ -89,19 +89,6 @@ class Applicators::Generate::ResourceGenerateApplicator
     return scope, col
   end
 
-  def apply_function_sum(scope, cast, identifier, ast)
-    arg = ast.children.first
-    if arg.is_a?(Keisan::AST::String)
-      if !arg.value.match(/^[-_.a-zA-Z0-9]+$/)
-        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
-      end
-      col = column_name('prefabs', arg.value)
-    else
-      scope, col = apply_ast(scope, identifier, arg)
-    end
-    return scope.group(:id), "sum((#{col})::#{cast})"
-  end
-
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, identifier, ast)
@@ -110,8 +97,6 @@ class Applicators::Generate::ResourceGenerateApplicator
       apply_function_concat(scope, identifier, ast)
     when 'prop'
       apply_function_prop(scope, identifier, ast)
-    when 'sum_i'
-      apply_function_sum(scope, 'integer', identifier, ast)
     else
       return scope, 'null'
     end
