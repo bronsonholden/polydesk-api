@@ -1,7 +1,7 @@
 # This class generates custom columns using expressions that are parsed and
 # converted into SQL. These expressions are not directly injected into the
 # query string. The expression is parsed into an AST which, when traversed,
-# will execute joins and/or selects on the given scope. Any literal values
+# will generate and apply appropriate SQL expression(s). Any literal values
 # (which are directly inserted into the query) are scrubbed to prevent SQL
 # injection; functions and operators are inserted as pre-defined SQL analogs,
 # e.g. SQL CONCAT() expressions are generated from the concat() generator
