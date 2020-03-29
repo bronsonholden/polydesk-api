@@ -58,12 +58,14 @@ class Applicators::Generate::ResourceGenerateApplicator
     @lookup_id += 1
   end
 
-  def column_name(table_alias, identifier)
+  def column_name(scope, table_alias, identifier)
     if identifier.start_with?("data.")
       path = identifier.split('.')[1..-1]
       "((#{table_alias}.data)\#>>'{#{path.join(',')}}')"
-    else
+    elsif scope.column_names.include?(identifier)
       "(#{table_alias}.#{identifier})"
+    else
+      raise Polydesk::Errors::InvalidPropertyIdentifier.new(identifier)
     end
   end
 
@@ -82,7 +84,7 @@ class Applicators::Generate::ResourceGenerateApplicator
       if !arg.value.match(/^[-_.a-zA-Z0-9]+$/)
         raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
       end
-      col = column_name(scope.table_name, arg.value)
+      col = column_name(scope, scope.table_name, arg.value)
     else
       scope, col = apply_ast(scope, identifier, arg)
     end

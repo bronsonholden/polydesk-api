@@ -40,7 +40,7 @@ module Applicators::Generate
         SQL
         # and json_extract_path_text(#{remote_table_alias}.data::json, #{remote_table_alias}.namespace, 'inner') = 'prefabs'
       )
-      return scope, column_name(remote_table_alias, remote)
+      return scope, column_name(scope, remote_table_alias, remote)
     end
 
     # Applies a lookup join to the given scope, returning the result converted
@@ -64,7 +64,7 @@ module Applicators::Generate
         if !local_arg.value.match(/^[-_.a-zA-Z0-9]+$/)
           raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
         end
-        local = column_name('prefabs', local_arg.value)
+        local = column_name(scope, 'prefabs', local_arg.value)
         if !local.is_a?(String)
           raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() must be a string")
         end
