@@ -42,18 +42,33 @@ module Applicators::Filter
       end
     end
 
-    def apply_ast(scope, ast)
+    def apply_ast_comparator(scope, ast)
       case ast
-      when Keisan::AST::Function
-        apply_ast_function(scope, ast)
       when Keisan::AST::LogicalEqual
-        scope, lval = arg_from_ast(scope, ast.children.first)
-        scope, rval = arg_from_ast(scope, ast.children.second)
-        scope.where("(#{lval}) = (#{rval})")
+        operator = '='
       when Keisan::AST::LogicalNotEqual
-        scope, lval = arg_from_ast(scope, ast.children.first)
-        scope, rval = arg_from_ast(scope, ast.children.second)
-        scope.where("(#{lval}) != (#{rval})")
+        operator = '!='
+      when Keisan::AST::LogicalGreaterThan
+        operator = '>'
+      when Keisan::AST::LogicalLessThan
+        operator = '<'
+      when Keisan::AST::LogicalGreaterThanOrEqualTo
+        operator = '>='
+      when Keisan::AST::LogicalLessThanOrEqualTo
+        operator = '<='
+      else
+        raise "unknown operator #{ast.class}"
+      end
+      scope, lval = arg_from_ast(scope, ast.children.first)
+      scope, rval = arg_from_ast(scope, ast.children.second)
+      scope.where("(#{lval}) #{operator} (#{rval})")
+    end
+
+    def apply_ast(scope, ast)
+      if ast.is_a?(Keisan::AST::Function)
+        apply_ast_function(scope, ast)
+      elsif ast.is_a?(Keisan::AST::LogicalOperator)
+        apply_ast_comparator(scope, ast)
       end
     end
   end
