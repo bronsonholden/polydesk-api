@@ -22,9 +22,7 @@ class PrefabsController < ApplicationController
   def index
     schema = IndexPrefabsSchema.new(request.params)
     payload = schema.render
-    scope = Prefab.all
-    query = PrefabQuery.new(payload)
-    scope = query.apply(scope)
+    scope = PrefabQuery.new(payload).apply(Prefab.all)
     realizer = PrefabRealizer.new(intent: :index, parameters: payload.except('filter'), headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)

@@ -15,7 +15,8 @@ class BlueprintsController < ApplicationController
   def index
     schema = IndexBlueprintsSchema.new(request.params)
     payload = schema.render
-    realizer = BlueprintRealizer.new(intent: :index, parameters: payload, headers: request.headers)
+    scope = ResourceQuery.new(payload).apply(Blueprint.all)
+    realizer = BlueprintRealizer.new(intent: :index, parameters: payload.except('filter'), headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok

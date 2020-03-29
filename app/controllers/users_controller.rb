@@ -6,7 +6,8 @@ class UsersController < ApplicationController
   def index
     schema = IndexUsersSchema.new(request.params)
     payload = schema.render
-    realizer = UserRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(User))
+    scope = ResourceQuery.new(payload).apply(policy_scope(User))
+    realizer = UserRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok

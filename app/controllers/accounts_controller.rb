@@ -5,7 +5,8 @@ class AccountsController < ApplicationController
   def index
     schema = IndexAccountsSchema.new(request.params)
     payload = schema.render
-    realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: policy_scope(Account))
+    scope = ResourceQuery.new(payload).apply(policy_scope(Account))
+    realizer = AccountRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate)
