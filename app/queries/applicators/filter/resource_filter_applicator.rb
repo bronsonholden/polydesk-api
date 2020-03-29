@@ -27,14 +27,41 @@ module Applicators::Filter
       end
     end
 
+    def apply_function_json(scope, cast, ast)
+      arg = ast.children.first
+      if !arg.is_a?(Keisan::AST::String)
+        raise "must be a string"
+      elsif !arg.value.match(/^([-_a-zA-Z0-9]+\.)*[-_a-zA-Z0-9]+$/)
+        raise "must be a dot-separated JSON path e.g. 'name.first'"
+      else
+        path = arg.value.split('.')
+        prop = path.shift
+        if !prop.match(/^[a-z_]+$/)
+          raise "invalid JSON attribute identifier: alphanumerics and _ only"
+        else
+          return scope, "(((#{scope.table_name}.#{prop})\#>>'{#{path.join(',')}}')::#{cast})"
+        end
+      end
+    end
+
     def apply_ast_function(scope, ast)
       case ast.name
       when 'generate'
         arg = ast.children.first
         query.generate_applicator.apply(scope, nil, arg.to_s)
+      when 'json_s'
+        apply_function_json(scope, 'text', ast)
+      when 'json_i'
+        apply_function_json(scope, 'integer', ast)
+      when 'json_f'
+        apply_function_json(scope, 'float', ast)
+      when 'json_b'
+        apply_function_json(scope, 'boolean', ast)
       when 'prop'
         arg = ast.children.first
-        if !arg.value.match(/^[._a-zA-Z0-9]+$/)
+        if !arg.is_a?(Keisan::AST::String)
+          raise "must be a string"
+        elsif !scope.column_names.include?(arg.value)
           raise Polydesk::Errors::InvalidPropertyIdentifier.new(arg.value)
         else
           return scope, "(#{scope.table_name}.#{arg.value})"

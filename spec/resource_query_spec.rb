@@ -161,6 +161,47 @@ RSpec.describe ResourceQuery do
     end
 
     describe "functions" do
+      describe 'json' do
+        before(:each) do
+          create :prefab, blueprint: employees_blueprint, data: { name: 'John Doe', age: 30, gpa: 3.5, employed: false }
+          create :prefab, blueprint: employees_blueprint, data: { name: 'Jane Roe', age: 20, gpa: 3.3, employed: true }
+        end
+
+        let(:base_scope) { Prefab.all }
+
+        describe 'json_s' do
+          let(:filter_expression) { "json_s('data.name') == 'John Doe'" }
+
+          it 'returns match' do
+            expect(applied_scope.size).to eq(1)
+          end
+        end
+
+        describe 'json_i' do
+          let(:filter_expression) { "json_i('data.age') > 20" }
+
+          it 'returns match' do
+            expect(applied_scope.size).to eq(1)
+          end
+        end
+
+        describe 'json_f' do
+          let(:filter_expression) { "json_f('data.gpa') < 3.5" }
+
+          it 'returns match' do
+            expect(applied_scope.size).to eq(1)
+          end
+        end
+
+        describe 'json_b' do
+          let(:filter_expression) { "json_b('data.employed') == false" }
+
+          it 'returns match' do
+            expect(applied_scope.size).to eq(1)
+          end
+        end
+      end
+
       describe "generate" do
         let(:filter_expression) { "generate(concat(prop('name'), prop('namespace'))) == 'Employeesemployees'"}
 
