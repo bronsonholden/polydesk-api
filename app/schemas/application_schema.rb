@@ -44,7 +44,7 @@ class ApplicationSchema
 
   def filter_schema
     {
-      type: 'object'
+      type: 'array'
     }
   end
 
