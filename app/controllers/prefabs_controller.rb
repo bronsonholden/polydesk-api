@@ -25,7 +25,7 @@ class PrefabsController < ApplicationController
     scope = Prefab.all
     query = PrefabQuery.new(payload)
     scope = query.apply(scope)
-    realizer = PrefabRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: scope)
+    realizer = PrefabRealizer.new(intent: :index, parameters: payload.except('filter'), headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok
