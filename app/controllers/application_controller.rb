@@ -63,6 +63,7 @@ class ApplicationController < ActionController::API
   include Pundit
   include Polydesk
 
+  rescue_from StandardError, with: :server_error
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
   rescue_from ActiveRecord::StatementInvalid, with: :invalid_exception
@@ -161,6 +162,10 @@ class ApplicationController < ActionController::API
   end
 
   private
+
+  def server_error(exception)
+    render json: { errors: [ { detail: exception.to_s }] }, status: :internal_server_error
+  end
 
   def api_exception(exception)
     errors = [{ title: exception.message }]
