@@ -23,7 +23,7 @@ class PrefabsController < ApplicationController
     schema = IndexPrefabsSchema.new(request.params)
     payload = schema.render
     scope = Prefab.all
-    query = ResourceQuery.new(payload)
+    query = PrefabQuery.new(payload)
     scope = query.apply(scope)
     realizer = PrefabRealizer.new(intent: :index, parameters: payload, headers: request.headers, scope: scope)
     authorize realizer.object
