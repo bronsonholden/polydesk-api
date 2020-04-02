@@ -6,7 +6,8 @@ RSpec.describe PrefabQuery do
     {
       prefab: '',
       string: 'string',
-      number: 0,
+      number: 0.5,
+      integer: 1,
       boolean: true
     }
   }
@@ -56,9 +57,23 @@ RSpec.describe PrefabQuery do
       include_examples 'lookup_examples', 'text'
     end
 
-    describe 'lookup_i' do ; end
-    describe 'lookup_f' do ; end
-    describe 'lookup_b' do ; end
+    describe 'lookup_i' do
+      let(:generator) { 'lookup_i("data.prefab", "data.integer")'}
+      let(:expected_value) { 1 }
+      include_examples 'lookup_examples', 'integer'
+    end
+
+    describe 'lookup_f' do
+      let(:generator) { 'lookup_f("data.prefab", "data.number")'}
+      let(:expected_value) { 0.5 }
+      include_examples 'lookup_examples', 'float'
+    end
+
+    describe 'lookup_b' do
+      let(:generator) { 'lookup_b("data.prefab", "data.boolean")'}
+      let(:expected_value) { true }
+      include_examples 'lookup_examples', 'boolean'
+    end
 
     # Chain of references is third -> second -> first
     describe 'lookup chain' do

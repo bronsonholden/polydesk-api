@@ -15,6 +15,10 @@ module Applicators::Generate
         apply_function_lookup(scope, 'text', identifier, ast)
       when 'lookup_i'
         apply_function_lookup(scope, 'integer', identifier, ast)
+      when 'lookup_f'
+        apply_function_lookup(scope, 'float', identifier, ast)
+      when 'lookup_b'
+        apply_function_lookup(scope, 'boolean', identifier, ast)
       else
         super
       end
@@ -40,7 +44,7 @@ module Applicators::Generate
         SQL
         # and json_extract_path_text(#{remote_table_alias}.data::json, #{remote_table_alias}.namespace, 'inner') = 'prefabs'
       )
-      return scope, column_name(scope, remote_table_alias, remote)
+      return scope, "(#{column_name(scope, remote_table_alias, remote)}::#{cast})"
     end
 
     # Applies a lookup join to the given scope, returning the result converted
