@@ -33,6 +33,67 @@ RSpec.describe PrefabQuery do
   # Base scope to use when generating columns
   let(:scope) { Prefab.all }
 
+  describe 'referent aggregates' do
+    let(:employees_blueprint) { create :blueprint, namespace: "employees", name: "Employee" }
+    let(:jobs_blueprint) { create :blueprint, namespace: "jobs", name: "Job" }
+    let(:job) { create :prefab, blueprint: jobs_blueprint, data: { title: "Salesman" } }
+    let(:scope) { Prefab.where(namespace: jobs_blueprint.namespace) }
+    let(:employee_count) { 5 }
+    let(:employee_salary) { 50000 }
+
+    describe "referent_sum" do
+      let(:identifier) { 'ref_sum' }
+      let(:generator) { 'referent_sum("employees", "data.job", "data.salary")'}
+
+      it "returns sum" do
+        employee_count.times do
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary }
+        end
+
+        expect(applied_scope.first.ref_sum).to eq(employee_count * employee_salary)
+      end
+    end
+
+    describe "referent_avg" do
+      let(:identifier) { 'ref_avg' }
+      let(:generator) { 'referent_avg("employees", "data.job", "data.salary")'}
+
+      it "returns avg" do
+        employee_count.times do
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary }
+        end
+
+        expect(applied_scope.first.ref_avg).to eq(employee_salary)
+      end
+    end
+
+    describe "referent_min" do
+      let(:identifier) { 'ref_min' }
+      let(:generator) { 'referent_min("employees", "data.job", "data.salary")'}
+
+      it "returns min" do
+        employee_count.times do |i|
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary + i}
+        end
+
+        expect(applied_scope.first.ref_min).to eq(employee_salary)
+      end
+    end
+
+    describe "referent_max" do
+      let(:identifier) { 'ref_max' }
+      let(:generator) { 'referent_max("employees", "data.job", "data.salary")'}
+
+      it "returns max" do
+        employee_count.times do |i|
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary - i}
+        end
+
+        expect(applied_scope.first.ref_max).to eq(employee_salary)
+      end
+    end
+  end
+
   describe 'lookups' do
     let(:identifier) { 'lookup_column' }
     let(:referent) { create :prefab, blueprint: blueprint, data: data }
