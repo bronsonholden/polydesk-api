@@ -27,9 +27,135 @@ module Applicators::Generate
         apply_function_referent_aggregate(scope, 'numeric', 'min', identifier, ast)
       when 'referent_max'
         apply_function_referent_aggregate(scope, 'numeric', 'max', identifier, ast)
+      when 'referent_count'
+        apply_function_referent_count(scope, identifier, ast)
+      when 'referent_count_distinct'
+        apply_function_referent_count_distinct(scope, identifier, ast)
       else
         super
       end
+    end
+
+    def apply_function_referent_count_distinct(scope, identifier, ast)
+      namespace, referrer, dimension = ast.children
+
+      if namespace.is_a?(Keisan::AST::Literal)
+        if !namespace.value.match(/^[a-z]+$/)
+          raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
+        else
+          namespace = namespace.value
+          if !namespace.is_a?(String)
+            raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() must be a string")
+          end
+        end
+      else
+        scope, namespace = apply_ast(scope, identifier, namespace)
+      end
+
+      if referrer.is_a?(Keisan::AST::Literal)
+        if !referrer.value.match(/^[-_.a-zA-Z0-9]+$/)
+          raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 1 for #{ast.name}() is a literal with disallowed characters")
+        else
+          referrer = referrer.value
+          if !referrer.is_a?(String)
+            raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 1 for #{ast.name}() must be a string")
+          end
+        end
+      else
+        scope, referrer = apply_ast(scope, identifier, referrer)
+      end
+
+      if dimension.is_a?(Keisan::AST::Literal)
+        if !dimension.value.match(/^[-_.a-zA-Z0-9]+$/)
+          raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 2 for #{ast.name}() is a literal with disallowed characters")
+        else
+          dimension = dimension.value
+          if !dimension.is_a?(String)
+            raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 2 for #{ast.name}() must be a string")
+          end
+        end
+      else
+        scope, dimension = apply_ast(scope, identifier, dimension)
+      end
+
+      apply_referent_count_distinct(scope, identifier, namespace, referrer, dimension)
+    end
+
+    def apply_referent_count_distinct(scope, identifier, namespace, referrer, dimension)
+      remote_table_alias = "referent_aggregate#{next_lookup_id}___#{referrer.gsub('.', '__')}"
+      local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.tag)"
+      remote_table_alias_inner = "#{remote_table_alias}___inner"
+      namespace_col = column_name(scope, remote_table_alias_inner, 'namespace')
+      referrer_col = column_name(scope, remote_table_alias_inner, referrer)
+      dimension_col = column_name(scope, remote_table_alias_inner, dimension)
+      scope = scope.joins(
+        <<-SQL
+          left join (
+                      select
+                        count(distinct (#{dimension_col})) as result,
+                        #{referrer_col} as referent
+                      from #{scope.table_name} as #{remote_table_alias_inner}
+                      where #{namespace_col} = '#{namespace}'
+                      group by #{referrer_col}
+                    ) as #{remote_table_alias}
+                    on #{remote_table_alias}.referent = #{local_uid}
+        SQL
+      )
+      return scope, "(coalesce(#{remote_table_alias}.result, 0))"
+    end
+
+    def apply_function_referent_count(scope, identifier, ast)
+      namespace, referrer = ast.children
+
+      if namespace.is_a?(Keisan::AST::Literal)
+        if !namespace.value.match(/^[a-z]+$/)
+          raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
+        else
+          namespace = namespace.value
+          if !namespace.is_a?(String)
+            raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() must be a string")
+          end
+        end
+      else
+        scope, namespace = apply_ast(scope, identifier, namespace)
+      end
+
+      if referrer.is_a?(Keisan::AST::Literal)
+        if !referrer.value.match(/^[-_.a-zA-Z0-9]+$/)
+          raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 1 for #{ast.name}() is a literal with disallowed characters")
+        else
+          referrer = referrer.value
+          if !referrer.is_a?(String)
+            raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 1 for #{ast.name}() must be a string")
+          end
+        end
+      else
+        scope, referrer = apply_ast(scope, identifier, referrer)
+      end
+
+      apply_referent_count(scope, identifier, namespace, referrer)
+    end
+
+    def apply_referent_count(scope, identifier, namespace, referrer)
+      remote_table_alias = "referent_aggregate#{next_lookup_id}___#{referrer.gsub('.', '__')}"
+      local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.tag)"
+      remote_table_alias_inner = "#{remote_table_alias}___inner"
+      namespace_col = column_name(scope, remote_table_alias_inner, 'namespace')
+      referrer_col = column_name(scope, remote_table_alias_inner, referrer)
+      scope = scope.joins(
+        <<-SQL
+          left join (
+                      select
+                        count(#{remote_table_alias_inner}.id) as result,
+                        #{referrer_col} as referent
+                      from #{scope.table_name} as #{remote_table_alias_inner}
+                      where #{namespace_col} = '#{namespace}'
+                      group by #{referrer_col}
+                    ) as #{remote_table_alias}
+                    on #{remote_table_alias}.referent = #{local_uid}
+        SQL
+      )
+      return scope, "(coalesce(#{remote_table_alias}.result, 0))"
     end
 
     def apply_function_referent_aggregate(scope, cast, func, identifier, ast)

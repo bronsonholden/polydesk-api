@@ -33,7 +33,7 @@ RSpec.describe PrefabQuery do
   # Base scope to use when generating columns
   let(:scope) { Prefab.all }
 
-  describe 'referent aggregates' do
+  describe 'referent functions' do
     let(:employees_blueprint) { create :blueprint, namespace: "employees", name: "Employee" }
     let(:jobs_blueprint) { create :blueprint, namespace: "jobs", name: "Job" }
     let(:job) { create :prefab, blueprint: jobs_blueprint, data: { title: "Salesman" } }
@@ -90,6 +90,32 @@ RSpec.describe PrefabQuery do
         end
 
         expect(applied_scope.first.ref_max).to eq(employee_salary)
+      end
+    end
+
+    describe "referent_count" do
+      let(:identifier) { 'ref_count' }
+      let(:generator) { 'referent_count("employees", "data.job")' }
+
+      it "returns count" do
+        employee_count.times do
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary}
+        end
+
+        expect(applied_scope.first.ref_count).to eq(employee_count)
+      end
+    end
+
+    describe "referent_count_distinct" do
+      let(:identifier) { 'ref_count_distinct' }
+      let(:generator) { 'referent_count_distinct("employees", "data.job", "data.salary")' }
+
+      it "returns count" do
+        employee_count.times do
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary}
+        end
+
+        expect(applied_scope.first.ref_count_distinct).to eq(1)
       end
     end
   end
