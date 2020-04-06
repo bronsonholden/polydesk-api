@@ -104,14 +104,22 @@ class Applicators::Generate::ResourceGenerateApplicator
     end
   end
 
+  def apply_ast_binary_operator(scope, identifier, ast, symbol: ast.class.symbol.to_s)
+    sql = ast.children.map { |operand|
+      scope, operand_sql = apply_ast(scope, identifier, operand)
+      operand_sql
+    }.join(symbol)
+    return scope, "(#{sql})"
+  end
+
   def apply_ast(scope, identifier, ast)
     case ast
     when Keisan::AST::ArithmeticOperator
-      sql = ast.children.map { |operand|
-        scope, operand_sql = apply_ast(scope, identifier, operand)
-        operand_sql
-      }.join(ast.class.symbol.to_s)
-      sql = "(#{sql})"
+      scope, sql = apply_ast_binary_operator(scope, identifier, ast)
+    when Keisan::AST::BitwiseXor
+      scope, sql = apply_ast_binary_operator(scope, identifier, ast, symbol: '#')
+    when Keisan::AST::BitwiseOperator
+      scope, sql = apply_ast_binary_operator(scope, identifier, ast)
     when Keisan::AST::UnaryInverse
       scope, operand_sql = apply_ast(scope, identifier, ast.children.first)
       sql = "(1.0 / (#{operand_sql}))"

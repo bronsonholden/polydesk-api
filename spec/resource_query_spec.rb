@@ -147,6 +147,60 @@ RSpec.describe ResourceQuery do
           end
         end
       end
+
+      describe '~' do
+        let(:identifier) { 'bitwise_not' }
+        let(:generator) { '~2' }
+
+        it 'generates column' do
+          expect(applied_scope.first.bitwise_not).to eq(-3)
+        end
+      end
+
+      describe '&' do
+        let(:identifier) { 'bitwise_and' }
+        let(:generator) { '2 & 3' }
+
+        it 'generates column' do
+          expect(applied_scope.first.bitwise_and).to eq(2)
+        end
+      end
+
+      describe '|' do
+        let(:identifier) { 'bitwise_or' }
+        let(:generator) { '2 | 1' }
+
+        it 'generates column' do
+          expect(applied_scope.first.bitwise_or).to eq(3)
+        end
+      end
+
+      describe '>>' do
+        let(:identifier) { 'bitwise_rshift' }
+        let(:generator) { '2 >> 1' }
+
+        it 'generates column' do
+          expect(applied_scope.first.bitwise_rshift).to eq(1)
+        end
+      end
+
+      describe '<<' do
+        let(:identifier) { 'bitwise_lshift' }
+        let(:generator) { '2 << 1' }
+
+        it 'generates column' do
+          expect(applied_scope.first.bitwise_lshift).to eq(4)
+        end
+      end
+
+      describe '^' do
+        let(:identifier) { 'bitwise_xor' }
+        let(:generator) { '3 ^ 1' }
+
+        it 'generates column' do
+          expect(applied_scope.first.bitwise_xor).to eq(2)
+        end
+      end
     end
 
     describe 'identifiers' do
