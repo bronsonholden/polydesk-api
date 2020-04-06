@@ -127,6 +127,26 @@ RSpec.describe ResourceQuery do
           expect(applied_scope.first.quotient).to eq(2.5)
         end
       end
+
+      describe '%' do
+        let(:identifier) { 'remainder' }
+
+        context 'integers' do
+          let(:generator) { '5 % 2' }
+
+          it 'generate column' do
+            expect(applied_scope.first.remainder).to eq(1)
+          end
+        end
+
+        context 'floats' do
+          let(:generator) { '5.3 % 2' }
+
+          it 'generates column' do
+            expect(applied_scope.first.remainder).to eq(1.3)
+          end
+        end
+      end
     end
 
     describe 'identifiers' do
