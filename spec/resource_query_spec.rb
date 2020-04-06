@@ -109,6 +109,24 @@ RSpec.describe ResourceQuery do
           expect(applied_scope.first.difference).to eq(-6.2)
         end
       end
+
+      describe '*' do
+        let(:identifier) { 'product' }
+        let(:generator) { '2 * 3' }
+
+        it 'generate column' do
+          expect(applied_scope.first.product).to eq(6)
+        end
+      end
+
+      describe '/' do
+        let(:identifier) { 'quotient' }
+        let(:generator) { '5.0 / 2.0' }
+
+        it 'generate column' do
+          expect(applied_scope.first.quotient).to eq(2.5)
+        end
+      end
     end
 
     describe 'identifiers' do

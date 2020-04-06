@@ -112,6 +112,9 @@ class Applicators::Generate::ResourceGenerateApplicator
         operand_sql
       }.join(ast.class.symbol.to_s)
       sql = "(#{sql})"
+    when Keisan::AST::UnaryInverse
+      scope, operand_sql = apply_ast(scope, identifier, ast.children.first)
+      sql = "(1.0 / (#{operand_sql}))"
     when Keisan::AST::UnaryOperator
       scope, operand_sql = apply_ast(scope, identifier, ast.children.first)
       sql = "#{ast.class.symbol.to_s}(#{operand_sql})"
