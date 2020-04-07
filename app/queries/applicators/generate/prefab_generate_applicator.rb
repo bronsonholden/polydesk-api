@@ -5,8 +5,21 @@
 #
 # The above matches a Prefab with the UID stored in the "job" property and
 # returns the value at "job_title" on the matched Prefab (as a string).
+#
+# To protect against generators retrieving data that the requester is not
+# allowed to see, this applicator supports an optional inner_scope hash
+# argument. This scope is injected into the query as SQL when performing
+# joins to ensure any matched rows are within that scope, which can already
+# have filters applied based on policies and permission settings.
 module Applicators::Generate
   class PrefabGenerateApplicator < ResourceGenerateApplicator
+    attr_reader :inner_scope
+
+    def initialize(query, inner_scope: Prefab.all)
+      @inner_scope = inner_scope
+      super(query)
+    end
+
     protected
 
     def apply_function(scope, identifier, ast)
@@ -94,7 +107,7 @@ module Applicators::Generate
                       select
                         count(distinct (#{dimension_col})) as result,
                         #{referrer_col} as referent
-                      from #{scope.table_name} as #{remote_table_alias_inner}
+                      from (#{inner_scope.to_sql}) as #{remote_table_alias_inner}
                       where #{namespace_col} = '#{namespace}'
                       group by #{referrer_col}
                     ) as #{remote_table_alias}
@@ -148,7 +161,7 @@ module Applicators::Generate
                       select
                         count(#{remote_table_alias_inner}.id) as result,
                         #{referrer_col} as referent
-                      from #{scope.table_name} as #{remote_table_alias_inner}
+                      from (#{inner_scope.to_sql}) as #{remote_table_alias_inner}
                       where #{namespace_col} = '#{namespace}'
                       group by #{referrer_col}
                     ) as #{remote_table_alias}
@@ -241,7 +254,7 @@ module Applicators::Generate
       remote_uid = "(#{remote_table_alias}.namespace || '/' || #{remote_table_alias}.tag)"
       scope = scope.joins(
         <<-SQL
-          left join prefabs as #{remote_table_alias}
+          left join (#{inner_scope.to_sql}) as #{remote_table_alias}
           on (#{local}::text) = #{remote_uid}
         SQL
         # and json_extract_path_text(#{remote_table_alias}.data::json, #{remote_table_alias}.namespace, 'inner') = 'prefabs'

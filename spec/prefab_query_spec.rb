@@ -25,7 +25,8 @@ RSpec.describe PrefabQuery do
 
   # Our generator payload and object
   let(:payload) { { 'generate' => generate } }
-  let(:query) { PrefabQuery.new(payload) }
+  let(:inner_scope) { Prefab.all }
+  let(:query) { PrefabQuery.new(payload, inner_scope: inner_scope) }
 
   # Scope with generated columns applied
   let(:applied_scope) { query.apply(scope) }
@@ -33,9 +34,29 @@ RSpec.describe PrefabQuery do
   # Base scope to use when generating columns
   let(:scope) { Prefab.all }
 
+  let(:employees_blueprint) { create :blueprint, namespace: "employees", name: "Employee" }
+  let(:jobs_blueprint) { create :blueprint, namespace: "jobs", name: "Job" }
+
+  describe 'inner scope' do
+    let(:fbi_agent) { create :prefab, blueprint: jobs_blueprint, data: { title: 'FBI Agent', clearance: 'Top Secret' } }
+    let(:shoeshine) { create :prefab, blueprint: jobs_blueprint, data: { title: 'Shoeshine' } }
+    let(:bert_macklin) { create :prefab, blueprint: employees_blueprint, data: { name: 'Bert Macklin', job: "jobs/#{fbi_agent.tag}" } }
+    let(:andy_dwyer) { create :prefab, blueprint: employees_blueprint, data: { name: 'Andy Dwyer', job: "jobs/#{shoeshine.tag}" } }
+    let(:inner_scope) { Prefab.where(id: shoeshine.id) }
+    let(:identifier) { 'occupation' }
+    let(:generator) { 'lookup_s("data.job", "data.title")' }
+    let(:scope) { Prefab.where(namespace: "employees") }
+
+    it 'does not return data outside inner scope' do
+      andy_dwyer
+      bert_macklin
+      applied_scope.each { |prefab|
+        expect(prefab.occuption).not_to eq('FBI Agent')
+      }
+    end
+  end
+
   describe 'referent functions' do
-    let(:employees_blueprint) { create :blueprint, namespace: "employees", name: "Employee" }
-    let(:jobs_blueprint) { create :blueprint, namespace: "jobs", name: "Job" }
     let(:job) { create :prefab, blueprint: jobs_blueprint, data: { title: "Salesman" } }
     let(:scope) { Prefab.where(namespace: jobs_blueprint.namespace) }
     let(:employee_count) { 5 }
