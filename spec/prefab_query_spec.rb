@@ -51,7 +51,7 @@ RSpec.describe PrefabQuery do
       andy_dwyer
       bert_macklin
       applied_scope.each { |prefab|
-        expect(prefab.occuption).not_to eq('FBI Agent')
+        expect(prefab.occupation).not_to eq('FBI Agent')
       }
     end
   end
