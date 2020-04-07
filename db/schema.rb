@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_03_12_054014) do
+ActiveRecord::Schema.define(version: 2020_04_07_051513) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -143,6 +143,7 @@ ActiveRecord::Schema.define(version: 2020_03_12_054014) do
     t.jsonb "data", null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.jsonb "flat_data"
     t.index "((((namespace)::text || '/'::text) || tag))", name: "index_prefabs_on_uid"
     t.index ["blueprint_id"], name: "index_prefabs_on_blueprint_id"
     t.index ["namespace", "tag"], name: "index_prefabs_on_namespace_and_tag", unique: true
