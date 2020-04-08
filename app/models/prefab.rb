@@ -7,6 +7,7 @@ class Prefab < ApplicationRecord
   belongs_to :blueprint, optional: true
   validate :check_schema
 
+  before_validation :flatten_data
   before_validation :construction
   # Since namespace can be changed during Blueprint construction, the
   # auto_increment call must come after declaring the construction
@@ -25,5 +26,10 @@ class Prefab < ApplicationRecord
       self.view = self.blueprint.view
       self.namespace = self.blueprint.namespace
     end
+  end
+
+  def flatten_data
+    self.data ||= {}
+    self.flat_data = Smush.smush(data)
   end
 end
