@@ -18,6 +18,8 @@ module Applicators::Filter
       case ast
       when Keisan::AST::Function
         apply_ast_function(scope, ast)
+      when Keisan::AST::LogicalOperator
+        apply_ast_comparator(scope, ast)
       when Keisan::AST::String
         return scope, "#{ActiveRecord::Base.connection.quote(ast.value)}"
       when Keisan::AST::Number
@@ -83,19 +85,26 @@ module Applicators::Filter
         operator = '>='
       when Keisan::AST::LogicalLessThanOrEqualTo
         operator = '<='
+      when Keisan::AST::LogicalOr
+        operator = 'OR'
+      when Keisan::AST::LogicalAnd
+        operator = 'AND'
       else
         raise "unknown operator #{ast.class}"
       end
-      scope, lval = arg_from_ast(scope, ast.children.first)
-      scope, rval = arg_from_ast(scope, ast.children.second)
-      scope.where("(#{lval}) #{operator} (#{rval})")
+      args = ast.children.map { |arg|
+        scope, sql = arg_from_ast(scope, arg)
+        "(#{sql})"
+      }
+      return scope, "(#{args.join(" #{operator} ")})"
     end
 
     def apply_ast(scope, ast)
       if ast.is_a?(Keisan::AST::Function)
         apply_ast_function(scope, ast)
       elsif ast.is_a?(Keisan::AST::LogicalOperator)
-        apply_ast_comparator(scope, ast)
+        scope, sql = apply_ast_comparator(scope, ast)
+        scope.where(sql)
       end
     end
   end

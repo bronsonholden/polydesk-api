@@ -253,6 +253,22 @@ RSpec.describe ResourceQuery do
     end
 
     describe "functions" do
+      describe 'and' do
+        let(:filter_expression) { "prop('name') == 'Employees' && prop('namespace') == 'employees' && prop('id') == #{employees_blueprint.id}" }
+
+        it 'returns match' do
+          expect(applied_scope.size).to eq(1)
+        end
+      end
+
+      describe 'or' do
+        let(:filter_expression) { "prop('name') == 'Employees' || prop('name') == 'Jobs' || prop('id') != #{Blueprint.all.size + 1}" }
+
+        it 'returns match' do
+          expect(applied_scope.size).to eq(2)
+        end
+      end
+
       describe 'json' do
         before(:each) do
           create :prefab, blueprint: employees_blueprint, data: { name: 'John Doe', age: 30, gpa: 3.5, employed: false }
