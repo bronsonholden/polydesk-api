@@ -13,7 +13,8 @@ class Prefab < ApplicationRecord
   # auto_increment call must come after declaring the construction
   # lifecycle callback. This way the tag field is incremented after the
   # namespace has been modified.
-  auto_increment :tag, scope: [:namespace], lock: true, force: true, before: :validation
+  auto_increment :tag, scope: [:namespace], lock: true, force: false, before: :validation
+  attr_readonly :tag
 
   def check_schema
     JSON::Validator.validate!(self.schema, self.data)
