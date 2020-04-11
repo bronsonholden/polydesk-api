@@ -4,7 +4,6 @@ class PrefabSerializer < TenantSerializer
 
   def meta
     virtual_columns = object.attributes.keys - object.class.column_names
-    puts virtual_columns
     if virtual_columns.any?
       meta = {}
       virtual_columns.map(&:to_sym).each { |col|
