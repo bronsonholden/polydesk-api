@@ -15,9 +15,6 @@ module Applicators::Filter
 
     protected
 
-    def arg_from_ast(scope, ast)
-    end
-
     def apply_function_json(scope, cast, ast)
       arg = ast.children.first
       if !arg.is_a?(Keisan::AST::String)
