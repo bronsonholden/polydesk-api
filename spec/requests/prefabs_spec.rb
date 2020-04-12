@@ -59,17 +59,33 @@ RSpec.describe 'Prefabs', type: :request do
     end
 
     context 'constructed' do
+      let(:attributes) { { data: data } }
       let(:params) {
         {
           data: {
             type: 'prefabs',
-            attributes: {
-              data: data
-            },
+            attributes: attributes,
             relationships: relationships
           }
         }
       }
+
+      context 'with tag specified' do
+        let(:attributes) {
+          {
+            tag: 1,
+            data: data,
+            schema: schema,
+            view: view
+          }
+        }
+
+        it 'disallows prefab creation' do
+          blueprint
+          post '/rspec/prefabs', headers: rspec_session, params: params.to_json
+          expect(response).to have_http_status(422)
+        end
+      end
 
       include_examples 'prefab_create_success'
     end
