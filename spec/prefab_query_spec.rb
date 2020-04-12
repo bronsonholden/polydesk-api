@@ -40,7 +40,7 @@ RSpec.describe PrefabQuery do
   describe 'inner scope' do
     let(:fbi_agent) { create :prefab, blueprint: jobs_blueprint, data: { title: 'FBI Agent', clearance: 'Top Secret' } }
     let(:shoeshine) { create :prefab, blueprint: jobs_blueprint, data: { title: 'Shoeshine' } }
-    let(:bert_macklin) { create :prefab, blueprint: employees_blueprint, data: { name: 'Bert Macklin', job: "jobs/#{fbi_agent.tag}" } }
+    let(:burt_macklin) { create :prefab, blueprint: employees_blueprint, data: { name: 'Burt Macklin', job: "jobs/#{fbi_agent.tag}" } }
     let(:andy_dwyer) { create :prefab, blueprint: employees_blueprint, data: { name: 'Andy Dwyer', job: "jobs/#{shoeshine.tag}" } }
     let(:inner_scope) { Prefab.where(id: shoeshine.id) }
     let(:identifier) { 'occupation' }
@@ -49,7 +49,7 @@ RSpec.describe PrefabQuery do
 
     it 'does not return data outside inner scope' do
       andy_dwyer
-      bert_macklin
+      burt_macklin
       applied_scope.each { |prefab|
         expect(prefab.occupation).not_to eq('FBI Agent')
       }
