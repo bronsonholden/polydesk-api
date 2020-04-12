@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe FormsController, type: :routing do
+RSpec.describe FoldersController, type: :routing do
   describe 'routing' do
     it 'routes to #index' do
       expect(get: '/rspec/folders').to route_to('folders#index', identifier: 'rspec')
