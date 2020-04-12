@@ -9,5 +9,11 @@ describe Prefab do
       prefab.update!(data: { foo: 'baz' })
       expect(tag).to eq(prefab.reload.tag)
     end
+
+    it 'does not change when updated' do
+      tag = prefab.tag
+      prefab.update!(tag: tag + 1)
+      expect(tag).to eq(prefab.reload.tag)
+    end
   end
 end
