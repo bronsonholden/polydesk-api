@@ -48,6 +48,39 @@ RSpec.describe ResourceQuery do
           expect(applied_scope.first.concat_column).to eq("ab1true")
         end
       end
+
+      describe 'coalesce' do
+        let(:base_scope) { Prefab.all }
+        let(:identifier) { 'coalesce_column' }
+        let(:generator) { "coalesce(prop('data.primary'), prop('data.secondary'))" }
+        let(:prefab) { create :prefab, blueprint: employees_blueprint, data: data }
+
+        context 'valid primary' do
+          let(:data) {
+            {
+              primary: 'primary'
+            }
+          }
+
+          it 'returns value' do
+            prefab
+            expect(applied_scope.first.coalesce_column).to eq('primary')
+          end
+        end
+
+        context 'invalid primary' do
+          let(:data) {
+            {
+              secondary: 'secondary'
+            }
+          }
+
+          it 'returns value' do
+            prefab
+            expect(applied_scope.first.coalesce_column).to eq('secondary')
+          end
+        end
+      end
     end
 
     # Test generating columns using only literals

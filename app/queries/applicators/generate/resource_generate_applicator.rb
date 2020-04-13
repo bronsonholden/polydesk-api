@@ -78,6 +78,13 @@ class Applicators::Generate::ResourceGenerateApplicator
     return scope, "(concat(#{args.join(',')}))"
   end
 
+  def apply_function_coalesce(scope, identifier, ast)
+    primary, fallback = ast.children
+    scope, primary_sql = apply_ast(scope, identifier, primary)
+    scope, fallback_sql = apply_ast(scope, identifier, fallback)
+    return scope, "coalesce(#{primary_sql}, #{fallback_sql})"
+  end
+
   def apply_function_prop(scope, identifier, ast)
     arg = ast.children.first
     if arg.is_a?(Keisan::AST::String)
@@ -99,6 +106,8 @@ class Applicators::Generate::ResourceGenerateApplicator
       apply_function_concat(scope, identifier, ast)
     when 'prop'
       apply_function_prop(scope, identifier, ast)
+    when 'coalesce'
+      apply_function_coalesce(scope, identifier, ast)
     else
       return scope, 'null'
     end
