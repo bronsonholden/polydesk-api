@@ -66,6 +66,16 @@ class ResourceQuery
     return scope, col
   end
 
+  def apply_function_sqrt(scope, ast)
+    arg = ast.children.first
+    if arg.is_a?(Keisan::AST::Number)
+      sql = "#{arg.value}"
+    else
+      scope, sql = apply_ast(scope, arg)
+    end
+    return scope, "sqrt(#{sql}::numeric)"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, ast)
@@ -76,6 +86,8 @@ class ResourceQuery
       apply_function_prop(scope, ast)
     when 'coalesce'
       apply_function_coalesce(scope, ast)
+    when 'sqrt'
+      apply_function_sqrt(scope, ast)
     else
       return scope, 'null'
     end

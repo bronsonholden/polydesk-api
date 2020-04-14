@@ -81,6 +81,18 @@ RSpec.describe ResourceQuery do
           end
         end
       end
+
+      describe 'sqrt' do
+        let(:base_scope) { Prefab.all }
+        let(:identifier) { 'sqrt_column' }
+        let(:generator) { 'sqrt(prop("data.number"))' }
+        let(:prefab) { create :prefab, blueprint: employees_blueprint, data: { number: 100 } }
+
+        it 'returns value' do
+          prefab
+          expect(applied_scope.first.sqrt_column).to eq(10)
+        end
+      end
     end
 
     # Test generating columns using only literals
