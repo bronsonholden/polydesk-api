@@ -18,6 +18,16 @@ class ResourceQuery
     scope
   end
 
+  private
+
+  def boolean_function?(ast)
+    if ast.is_a?(Keisan::AST::Function)
+      return ast.name == 'and' || ast.name == 'or'
+    else
+      return false
+    end
+  end
+
   protected
 
   def next_lookup_id
@@ -38,6 +48,15 @@ class ResourceQuery
   def apply_expression(scope, expression)
     ast = Keisan::Calculator.new.ast(expression)
     apply_ast(scope, ast)
+  end
+
+  def apply_filter_expression(scope, expression)
+    ast = Keisan::Calculator.new.ast(expression)
+    if ast.is_a?(Keisan::AST::LogicalOperator) || boolean_function?(ast)
+      apply_ast(scope, ast)
+    else
+      raise Polydesk::Errors::InvalidFilterExpression.new
+    end
   end
 
   def apply_function_concat(scope, ast)
@@ -176,7 +195,7 @@ class ResourceQuery
     end
 
     filters.each { |filter|
-      scope, sql = apply_expression(scope, filter)
+      scope, sql = apply_filter_expression(scope, filter)
       scope = scope.where("(#{sql})")
     }
 

@@ -119,5 +119,11 @@ module Polydesk
         super("Invalid property identifier: #{identifier} (alphanumerics, ., and _ only)")
       end
     end
+
+    class InvalidFilterExpression < Polydesk::Errors::Base
+      def initialize
+        super("Invalid filter expression; must be a boolean expression")
+      end
+    end
   end
 end

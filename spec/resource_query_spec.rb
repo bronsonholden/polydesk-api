@@ -309,6 +309,16 @@ RSpec.describe ResourceQuery do
       end
     end
 
+    context 'with invalid expression' do
+      let(:filter_expression) {
+        "prop('name')"
+      }
+
+      it 'raises error' do
+        expect { applied_scope }.to raise_error(Polydesk::Errors::InvalidFilterExpression)
+      end
+    end
+
     describe "functions" do
       describe 'and' do
         let(:filter_expression) { "prop('name') == 'Employees' && prop('namespace') == 'employees' && prop('id') == #{employees_blueprint.id}" }
@@ -359,10 +369,18 @@ RSpec.describe ResourceQuery do
 
     describe "errors" do
       context "invalid prop columnn identifier" do
-        let(:filter_expression) { "prop(\"';--\")" }
+        let(:filter_expression) { "prop(\"';--\") == ''" }
 
         it "raises error" do
           expect { applied_scope }.to raise_error(Polydesk::Errors::InvalidPropertyIdentifier)
+        end
+      end
+
+      context "invalid filter expression" do
+        let(:filter_expression) { "prop('name')" }
+
+        it "raises error" do
+          expect { applied_scope }.to raise_error(Polydesk::Errors::InvalidFilterExpression)
         end
       end
     end
