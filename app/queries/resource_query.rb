@@ -76,6 +76,13 @@ class ResourceQuery
     return scope, "sqrt(#{sql}::numeric)"
   end
 
+  def apply_function_pow(scope, ast)
+    base, exponent = ast.children
+    scope, base = apply_ast(scope, base)
+    scope, exponent = apply_ast(scope, exponent)
+    return scope, "power(#{base}::numeric, #{exponent}::numeric)"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, ast)
@@ -88,6 +95,8 @@ class ResourceQuery
       apply_function_coalesce(scope, ast)
     when 'sqrt'
       apply_function_sqrt(scope, ast)
+    when 'pow'
+      apply_function_pow(scope, ast)
     else
       return scope, 'null'
     end
