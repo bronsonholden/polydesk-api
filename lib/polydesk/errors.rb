@@ -108,12 +108,6 @@ module Polydesk
     class GeneratorFunctionArgumentError < Polydesk::Errors::Base
     end
 
-    class GeneratorSyntaxError < Polydesk::Errors::Base
-      def initialize(generator)
-        super("Invalid syntax for generator expression: #{generator}")
-      end
-    end
-
     class InvalidPropertyIdentifier < Polydesk::Errors::Base
       def initialize(identifier)
         super("Invalid property identifier: #{identifier} (alphanumerics, ., and _ only)")
