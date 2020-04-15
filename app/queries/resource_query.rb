@@ -121,6 +121,13 @@ class ResourceQuery
     end
   end
 
+  def apply_variable(scope, ast)
+    case ast.name
+    when 'PI'
+      return scope, "pi()"
+    end
+  end
+
   def apply_ast_binary_operator(scope, ast, symbol: ast.class.symbol.to_s)
     sql = ast.children.map { |operand|
       scope, operand_sql = apply_ast(scope, operand)
@@ -173,6 +180,8 @@ class ResourceQuery
     when Keisan::AST::UnaryOperator
       scope, operand_sql = apply_ast(scope, ast.children.first)
       sql = "#{ast.class.symbol.to_s}(#{operand_sql})"
+    when Keisan::AST::Variable
+      scope, sql = apply_variable(scope, ast)
     when Keisan::AST::Function
       scope, sql = apply_function(scope, ast)
     when Keisan::AST::String

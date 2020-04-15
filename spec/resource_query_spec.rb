@@ -29,6 +29,17 @@ RSpec.describe ResourceQuery do
       }
     }
 
+    describe 'constants' do
+      describe 'pi' do
+        let(:identifier) { 'pi_column' }
+        let(:generator) { 'PI' }
+
+        it 'returns value' do
+          expect(applied_scope.first.pi_column).to be_within(0.00001).of(Math::PI)
+        end
+      end
+    end
+
     describe 'functions' do
       describe 'prop' do
         let(:base_scope) { Blueprint.where(id: employees_blueprint.id) }
