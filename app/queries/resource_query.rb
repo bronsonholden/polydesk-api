@@ -125,6 +125,8 @@ class ResourceQuery
     case ast.name
     when 'PI'
       return scope, "pi()"
+    when 'E'
+      return scope, "exp(1.0)"
     end
   end
 

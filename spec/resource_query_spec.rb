@@ -38,6 +38,15 @@ RSpec.describe ResourceQuery do
           expect(applied_scope.first.pi_column).to be_within(0.00001).of(Math::PI)
         end
       end
+
+      describe 'e' do
+        let(:identifier) { 'e_column' }
+        let(:generator) { 'E' }
+
+        it 'returns value' do
+          expect(applied_scope.first.e_column).to be_within(0.00001).of(Math::E)
+        end
+      end
     end
 
     describe 'functions' do
