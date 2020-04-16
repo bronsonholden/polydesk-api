@@ -102,6 +102,53 @@ class ResourceQuery
     return scope, "power(#{base}::numeric, #{exponent}::numeric)"
   end
 
+  def apply_function_log(scope, ast)
+    num, base = ast.children
+    scope, num = apply_ast(scope, num)
+    if base.nil?
+      return scope, "log(#{num}::numeric)"
+    else
+      scope, base = apply_ast(scope, base)
+      return scope, "log(#{base}::numeric, #{num}::numeric)"
+    end
+  end
+
+  def apply_function_ln(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "ln(#{num}::numeric)"
+  end
+
+  def apply_function_exp(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "exp(#{num}::numeric)"
+  end
+
+  def apply_function_abs(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "abs(#{num}::numeric)"
+  end
+
+  def apply_function_floor(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "floor(#{num}::numeric)"
+  end
+
+  def apply_function_ceil(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "ceil(#{num}::numeric)"
+  end
+
+  def apply_function_round(scope, ast)
+    num = ast.children.first
+    scope, num = apply_ast(scope, num)
+    return scope, "round(#{num}::numeric)"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, ast)
@@ -116,6 +163,20 @@ class ResourceQuery
       apply_function_sqrt(scope, ast)
     when 'pow'
       apply_function_pow(scope, ast)
+    when 'log'
+      apply_function_log(scope, ast)
+    when 'ln'
+      apply_function_ln(scope, ast)
+    when 'exp'
+      apply_function_exp(scope, ast)
+    when 'abs'
+      apply_function_abs(scope, ast)
+    when 'round'
+      apply_function_round(scope, ast)
+    when 'floor'
+      apply_function_floor(scope, ast)
+    when 'ceil'
+      apply_function_ceil(scope, ast)
     else
       return scope, 'null'
     end

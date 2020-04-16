@@ -125,6 +125,95 @@ RSpec.describe ResourceQuery do
           expect(applied_scope.first.sqrt_column).to eq(100)
         end
       end
+
+      describe 'log' do
+        let(:identifier) { 'log_column' }
+        let(:generator) { 'log(100)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.log_column).to eq(2)
+        end
+
+        context 'with custom base' do
+          let(:generator) { 'log(64, 2)' }
+
+          it 'returns value' do
+            expect(applied_scope.first.log_column).to eq(6)
+          end
+        end
+      end
+
+      describe 'ln' do
+        let(:identifier) { 'ln_column' }
+        let(:generator) { 'ln(2.718)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.ln_column).to be_within(0.001).of(1)
+        end
+      end
+
+      describe 'exp' do
+        let(:identifier) { 'exp_column' }
+        let(:generator) { 'exp(1)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.exp_column).to be_within(0.001).of(Math::E)
+        end
+      end
+
+      describe 'abs' do
+        let(:identifier) { 'abs_column' }
+        let(:generator) { 'abs(-10)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.abs_column).to eq(10)
+        end
+      end
+
+      describe 'floor' do
+        let(:identifier) { 'floor_column' }
+        let(:generator) { 'floor(5.2)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.floor_column).to eq(5)
+        end
+      end
+
+      describe 'ceil' do
+        let(:identifier) { 'ceil_column' }
+        let(:generator) { 'ceil(5.2)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.ceil_column).to eq(6)
+        end
+      end
+
+      describe 'round' do
+        let(:identifier) { 'round_column' }
+        let(:generator) { 'round(4.5)' }
+
+        it 'returns value' do
+          expect(applied_scope.first.round_column).to eq(5)
+        end
+
+        context 'remainder less than 0.5' do
+          let(:generator) { 'round(4.4)' }
+
+          it 'returns value' do
+            expect(applied_scope.first.round_column).to eq(4)
+          end
+        end
+
+        context 'remainder greater than 0.5' do
+          let(:generator) { 'round(4.6)' }
+
+          it 'returns value' do
+            expect(applied_scope.first.round_column).to eq(5)
+          end
+        end
+      end
+
+
     end
 
     # Test generating columns using only literals
