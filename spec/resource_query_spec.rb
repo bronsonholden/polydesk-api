@@ -112,12 +112,11 @@ RSpec.describe ResourceQuery do
       end
 
       describe 'upper' do
-        let(:base_scope) { Blueprint.where(id: employees_blueprint) }
         let(:identifier) { 'upper_column' }
-        let(:generator) { 'upper(prop("namespace"))' }
+        let(:generator) { 'upper("string")' }
 
         it 'returns value' do
-          expect(applied_scope.first.upper_column).to eq('EMPLOYEES')
+          expect(applied_scope.first.upper_column).to eq('STRING')
         end
       end
 
