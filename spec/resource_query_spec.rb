@@ -8,13 +8,6 @@ RSpec.describe ResourceQuery do
   let!(:employees_blueprint) { create :blueprint, name: 'Employees', namespace: 'employees', schema: schema, view: view }
   let!(:jobs_blueprint) { create :blueprint, name: 'Jobs', namespace: 'jobs', schema: schema, view: view }
 
-  let(:employee_data) {
-    {
-      name: 'John Doe',
-      age: 30
-    }
-  }
-
   let(:base_scope) { Blueprint.all }
   let(:query_class) { ResourceQuery }
   let(:query) { query_class.new(payload) }
