@@ -75,6 +75,16 @@ class ResourceQuery
     return scope, "coalesce(#{primary_sql}, #{fallback_sql})"
   end
 
+  def apply_function_lower(scope, ast)
+    scope, str = apply_ast(scope, ast.children.first)
+    return scope, "lower(#{str})"
+  end
+
+  def apply_function_upper(scope, ast)
+    scope, str = apply_ast(scope, ast.children.first)
+    return scope, "upper(#{str})"
+  end
+
   def apply_function_prop(scope, ast)
     arg = ast.children.first
     if arg.is_a?(Keisan::AST::String)
@@ -155,6 +165,10 @@ class ResourceQuery
     case ast.name
     when 'concat'
       apply_function_concat(scope, ast)
+    when 'lower'
+      apply_function_lower(scope, ast)
+    when 'upper'
+      apply_function_upper(scope, ast)
     when 'prop'
       apply_function_prop(scope, ast)
     when 'coalesce'

@@ -102,6 +102,25 @@ RSpec.describe ResourceQuery do
         end
       end
 
+      describe 'lower' do
+        let(:identifier) { 'lower_column' }
+        let(:generator) { 'lower("STRING")' }
+
+        it 'returns value' do
+          expect(applied_scope.first.lower_column).to eq('string')
+        end
+      end
+
+      describe 'upper' do
+        let(:base_scope) { Blueprint.where(id: employees_blueprint) }
+        let(:identifier) { 'upper_column' }
+        let(:generator) { 'upper(prop("namespace"))' }
+
+        it 'returns value' do
+          expect(applied_scope.first.upper_column).to eq('EMPLOYEES')
+        end
+      end
+
       describe 'sqrt' do
         let(:base_scope) { Prefab.all }
         let(:identifier) { 'sqrt_column' }
