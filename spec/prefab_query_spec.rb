@@ -258,5 +258,53 @@ RSpec.describe PrefabQuery do
         end
       end
     end
+
+    describe 'lookup via' do
+      let(:identifier) { 'lookup_column' }
+      let(:through_blueprint) {
+        create :blueprint,
+          name: 'Through',
+          namespace: 'through',
+          view: { stub: true },
+          schema: { type: 'object' }
+      }
+      let(:first) { create :prefab, blueprint: blueprint, data: { empty: true } }
+      let(:second) {
+        create :prefab, blueprint: blueprint, data: {
+          property: 'property_second'
+        }
+      }
+      let(:third) {
+        create :prefab, blueprint: blueprint, data: {
+          property: 'property_third'
+        }
+      }
+      let(:through1) {
+        create :prefab, blueprint: through_blueprint, data: {
+          left: "#{first.namespace}/#{first.tag}",
+          right: "#{second.namespace}/#{second.tag}"
+        }
+      }
+      let(:through2) {
+        create :prefab, blueprint: through_blueprint, data: {
+          left: "#{first.namespace}/#{first.tag}",
+          right: "#{third.namespace}/#{third.tag}"
+        }
+      }
+      let(:scope) { Prefab.where(namespace: blueprint.namespace) }
+
+      describe 'lookup_via_s' do
+        let(:generator) { "lookup_via_s('through', 'data.left', 'data.right', 'data.property')" }
+
+        it 'returns property' do
+          first
+          second
+          third
+          through1
+          through2
+          expect(applied_scope.first.lookup_column).to contain_exactly('property_second', 'property_third')
+        end
+      end
+    end
   end
 end

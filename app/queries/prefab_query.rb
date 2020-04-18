@@ -18,6 +18,8 @@ class PrefabQuery < ResourceQuery
       apply_function_lookup(scope, 'float', ast)
     when 'lookup_b'
       apply_function_lookup(scope, 'boolean', ast)
+    when 'lookup_via_s'
+      apply_function_lookup_via(scope, 'text', ast)
     when 'referent_sum'
       apply_function_referent_aggregate(scope, 'numeric', 'sum', ast)
     when 'referent_avg'
@@ -286,5 +288,90 @@ class PrefabQuery < ResourceQuery
     end
 
     apply_lookup(scope, cast, local, remote)
+  end
+
+  def apply_lookup_via(scope, cast, namespace, local, remote, property)
+    lookup_alias = "lookup#{next_lookup_id}___#{namespace.gsub('.', '__')}"
+    relationship_table_alias = "relationship#{next_lookup_id}___#{remote.gsub('.', '__')}"
+    remote_table_alias = "remote#{next_lookup_id}___#{remote.gsub('.', '__')}"
+    remote_uid = "(prefabs.namespace || '/' || prefabs.tag)"
+    scope = scope.joins(
+      <<-SQL
+        left join (
+          select
+            #{relationship_table_alias}.local as local,
+            #{relationship_table_alias}.property as property
+          from (
+            select
+              #{column_name(scope, 'inner_through', local)} as local,
+              array_agg(#{column_name(scope, 'inner_prefabs', property)}::#{cast}) as property
+            from
+              (#{inner_scope.to_sql}) as inner_through
+              left join
+                (#{inner_scope.to_sql}) as inner_prefabs
+              on (inner_prefabs.namespace || '/' || inner_prefabs.tag) = #{column_name(scope, 'inner_through', remote)}
+            where inner_through.namespace = '#{namespace}'
+            group by
+              #{column_name(scope, 'inner_through', local)}
+          ) as #{relationship_table_alias}
+        ) as #{lookup_alias}
+        on (#{lookup_alias}.local::text) = #{remote_uid}
+      SQL
+    )
+    return scope, "(#{lookup_alias}.property)"
+  end
+
+  def apply_function_lookup_via(scope, cast, ast)
+    namespace_arg, local_arg, remote_arg, property_arg = ast.children
+
+    if !namespace_arg.is_a?(Keisan::AST::Literal)
+      scope, namespace = apply_ast(scope, namespace_arg)
+    else
+      if !namespace_arg.value.match(/^[-_.a-zA-Z0-9]+$/)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
+      end
+      namespace = namespace_arg.value
+      if !namespace.is_a?(String)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() must be a string")
+      end
+    end
+
+    if !local_arg.is_a?(Keisan::AST::Literal)
+      scope, local = apply_ast(scope, local_arg)
+    else
+      if !local_arg.value.match(/^[-_.a-zA-Z0-9]+$/)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 1 for #{ast.name}() is a literal with disallowed characters")
+      end
+      local = local_arg.value
+      if !local.is_a?(String)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 1 for #{ast.name}() must be a string")
+      end
+    end
+
+    if !remote_arg.is_a?(Keisan::AST::Literal)
+      scope, remote = apply_ast(scope, remote_arg)
+    else
+      if !remote_arg.value.match(/^[-_.a-zA-Z0-9]+$/)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 2 for #{ast.name}() is a literal with disallowed characters")
+      end
+      remote = remote_arg.value
+      if !remote.is_a?(String)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 2 for #{ast.name}() must be a string")
+      end
+    end
+
+    if !property_arg.is_a?(Keisan::AST::Literal)
+      scope, property = apply_ast(scope, property_arg)
+    else
+      if !property_arg.value.match(/^[-_.a-zA-Z0-9]+$/)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 3 for #{ast.name}() is a literal with disallowed characters")
+      end
+      property = property_arg.value
+      if !property.is_a?(String)
+        raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 3 for #{ast.name}() must be a string")
+      end
+    end
+
+    apply_lookup_via(scope, cast, namespace, local, remote, property)
   end
 end
