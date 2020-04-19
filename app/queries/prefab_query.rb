@@ -20,6 +20,12 @@ class PrefabQuery < ResourceQuery
       apply_function_lookup(scope, 'boolean', ast)
     when 'lookup_via_s'
       apply_function_lookup_via(scope, 'text', ast)
+    when 'lookup_via_i'
+      apply_function_lookup_via(scope, 'integer', ast)
+    when 'lookup_via_f'
+      apply_function_lookup_via(scope, 'float', ast)
+    when 'lookup_via_b'
+      apply_function_lookup_via(scope, 'boolean', ast)
     when 'referent_sum'
       apply_function_referent_aggregate(scope, 'numeric', 'sum', ast)
     when 'referent_avg'
@@ -304,7 +310,7 @@ class PrefabQuery < ResourceQuery
           from (
             select
               #{column_name(scope, 'inner_through', local)} as local,
-              array_agg(#{column_name(scope, 'inner_prefabs', property)}::#{cast}) as property
+              array_agg(#{column_name(scope, 'inner_prefabs', property)})::#{cast}[] as property
             from
               (#{inner_scope.to_sql}) as inner_through
               left join

@@ -271,12 +271,12 @@ RSpec.describe PrefabQuery do
       let(:first) { create :prefab, blueprint: blueprint, data: { empty: true } }
       let(:second) {
         create :prefab, blueprint: blueprint, data: {
-          property: 'property_second'
+          property: property_second
         }
       }
       let(:third) {
         create :prefab, blueprint: blueprint, data: {
-          property: 'property_third'
+          property: property_third
         }
       }
       let(:through1) {
@@ -292,18 +292,45 @@ RSpec.describe PrefabQuery do
         }
       }
       let(:scope) { Prefab.where(namespace: blueprint.namespace) }
+      let(:generator) { "#{generator_function}('through', 'data.left', 'data.right', 'data.property')" }
 
-      describe 'lookup_via_s' do
-        let(:generator) { "lookup_via_s('through', 'data.left', 'data.right', 'data.property')" }
-
+      shared_examples 'lookup_via_success' do
         it 'returns property' do
           first
           second
           third
           through1
           through2
-          expect(applied_scope.first.lookup_column).to contain_exactly('property_second', 'property_third')
+          expect(applied_scope.first.lookup_column).to contain_exactly(property_second, property_third)
         end
+      end
+
+      describe 'lookup_via_s' do
+        let(:property_second) { 'string1' }
+        let(:property_third) { 'string2' }
+        let(:generator_function) { 'lookup_via_s' }
+        include_examples 'lookup_via_success'
+      end
+
+      describe 'lookup_via_i' do
+        let(:property_second) { 1 }
+        let(:property_third) { 2 }
+        let(:generator_function) { 'lookup_via_i' }
+        include_examples 'lookup_via_success'
+      end
+
+      describe 'lookup_via_f' do
+        let(:property_second) { 0.5 }
+        let(:property_third) { -2.3 }
+        let(:generator_function) { 'lookup_via_f' }
+        include_examples 'lookup_via_success'
+      end
+
+      describe 'lookup_via_b' do
+        let(:property_second) { true }
+        let(:property_third) { false }
+        let(:generator_function) { 'lookup_via_b' }
+        include_examples 'lookup_via_success'
       end
     end
   end
