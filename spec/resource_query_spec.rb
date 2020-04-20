@@ -224,7 +224,25 @@ RSpec.describe ResourceQuery do
         end
       end
 
+      describe 'current_date' do
+        let(:identifier) { 'current_date_column' }
+        let(:generator) { "current_date('#{Time.now.zone}')" }
 
+        it 'returns value' do
+          expect(applied_scope.first.current_date_column).to eq(Date.today)
+        end
+
+        context 'tz as property' do
+          # Not a representative use case, but qualifies
+          let(:blueprint) { create :blueprint, name: Time.now.zone, namespace: Time.now.zone.downcase }
+          let(:base_scope) { Blueprint.where(id: blueprint.id) }
+          let(:generator) { 'current_date(prop("name"))' }
+
+          it 'returns value' do
+            expect(applied_scope.first.current_date_column).to eq(Date.today)
+          end
+        end
+      end
     end
 
     # Test generating columns using only literals

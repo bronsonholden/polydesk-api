@@ -159,6 +159,11 @@ class ResourceQuery
     return scope, "round(#{num}::numeric)"
   end
 
+  def apply_function_current_date(scope, ast)
+    scope, tz = apply_ast(scope, ast.children.first)
+    return scope, "(current_date at time zone #{tz})::date"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, ast)
@@ -191,6 +196,8 @@ class ResourceQuery
       apply_function_floor(scope, ast)
     when 'ceil'
       apply_function_ceil(scope, ast)
+    when 'current_date'
+      apply_function_current_date(scope, ast)
     else
       return scope, 'null'
     end
