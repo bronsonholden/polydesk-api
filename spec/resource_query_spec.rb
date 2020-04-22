@@ -243,6 +243,15 @@ RSpec.describe ResourceQuery do
           end
         end
       end
+
+      describe 'current_timestamp' do
+        let(:identifier) { 'current_timestamp_column' }
+        let(:generator) { "current_timestamp()" }
+
+        it 'returns value' do
+          expect(applied_scope.first.current_timestamp_column).to be_within(1.second).of(Time.now)
+        end
+      end
     end
 
     # Test generating columns using only literals
