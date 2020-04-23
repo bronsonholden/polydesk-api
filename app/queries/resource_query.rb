@@ -168,6 +168,12 @@ class ResourceQuery
     return scope, "(current_timestamp)"
   end
 
+  def apply_function_interval(scope, ast)
+    scope, amount = apply_ast(scope, ast.children.first)
+    scope, unit = apply_ast(scope, ast.children.second)
+    return scope, "(concat(#{amount}, ' ', #{unit})::interval)"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, ast)
@@ -204,6 +210,8 @@ class ResourceQuery
       apply_function_current_date(scope, ast)
     when 'current_timestamp'
       apply_function_current_timestamp(scope, ast)
+    when 'interval'
+      apply_function_interval(scope, ast)
     else
       return scope, 'null'
     end

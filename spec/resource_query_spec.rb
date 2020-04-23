@@ -252,6 +252,32 @@ RSpec.describe ResourceQuery do
           expect(applied_scope.first.current_timestamp_column).to be_within(1.second).of(Time.now)
         end
       end
+
+      describe 'interval' do
+        let(:identifier) { 'interval_column' }
+        let(:generator) { "current_timestamp() + interval(#{amount}, '#{unit}')" }
+
+        shared_examples 'interval_success' do
+          it 'returns value' do
+            expect(applied_scope.first.interval_column).to be_within(1.second).of(expected_time)
+          end
+        end
+
+        describe 'days' do
+          let(:amount) { 1 }
+          let(:expected_time) { Time.now + 1.day }
+
+          context 'days' do
+            let(:unit) { 'days' }
+            include_examples 'interval_success'
+          end
+
+          context 'day' do
+            let(:unit) { 'day' }
+            include_examples 'interval_success'
+          end
+        end
+      end
     end
 
     # Test generating columns using only literals
