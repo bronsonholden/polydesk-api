@@ -226,10 +226,10 @@ RSpec.describe ResourceQuery do
 
       describe 'current_date' do
         let(:identifier) { 'current_date_column' }
-        let(:generator) { "current_date('#{Time.now.zone}')" }
+        let(:generator) { "current_date('UTC')" }
 
         it 'returns value' do
-          expect(applied_scope.first.current_date_column).to eq(Date.today)
+          expect(applied_scope.first.current_date_column).to eq(Date.today.in_time_zone('UTC'))
         end
 
         context 'tz as property' do
@@ -256,6 +256,8 @@ RSpec.describe ResourceQuery do
       describe 'interval' do
         let(:identifier) { 'interval_column' }
         let(:generator) { "current_timestamp() + interval(#{amount}, '#{unit}')" }
+        let(:base_time) { Time.now }
+        let(:expected_time) { base_time + amount.send(unit.to_s) }
 
         shared_examples 'interval_success' do
           it 'returns value' do
@@ -263,9 +265,50 @@ RSpec.describe ResourceQuery do
           end
         end
 
+        describe 'years' do
+          let(:amount) { 5 }
+
+          context 'years' do
+            let(:unit) { 'years' }
+            include_examples 'interval_success'
+          end
+
+          context 'year' do
+            let(:unit) { 'year' }
+            include_examples 'interval_success'
+          end
+        end
+
+        describe 'months' do
+          let(:amount) { 5 }
+
+          context 'months' do
+            let(:unit) { 'months' }
+            include_examples 'interval_success'
+          end
+
+          context 'month' do
+            let(:unit) { 'month' }
+            include_examples 'interval_success'
+          end
+        end
+
+        describe 'weeks' do
+          let(:amount) { 5 }
+
+          context 'weeks' do
+            let(:unit) { 'weeks' }
+            include_examples 'interval_success'
+          end
+
+          context 'week' do
+            let(:unit) { 'week' }
+            include_examples 'interval_success'
+          end
+        end
+
         describe 'days' do
           let(:amount) { 1 }
-          let(:expected_time) { Time.now + 1.day }
 
           context 'days' do
             let(:unit) { 'days' }
@@ -274,6 +317,48 @@ RSpec.describe ResourceQuery do
 
           context 'day' do
             let(:unit) { 'day' }
+            include_examples 'interval_success'
+          end
+        end
+
+        describe 'hours' do
+          let(:amount) { 5 }
+
+          context 'hours' do
+            let(:unit) { 'hours' }
+            include_examples 'interval_success'
+          end
+
+          context 'hour' do
+            let(:unit) { 'hour' }
+            include_examples 'interval_success'
+          end
+        end
+
+        describe 'minutes' do
+          let(:amount) { 5 }
+
+          context 'minutes' do
+            let(:unit) { 'minutes' }
+            include_examples 'interval_success'
+          end
+
+          context 'minute' do
+            let(:unit) { 'minute' }
+            include_examples 'interval_success'
+          end
+        end
+
+        describe 'seconds' do
+          let(:amount) { 5 }
+
+          context 'seconds' do
+            let(:unit) { 'seconds' }
+            include_examples 'interval_success'
+          end
+
+          context 'second' do
+            let(:unit) { 'second' }
             include_examples 'interval_success'
           end
         end
