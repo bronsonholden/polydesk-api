@@ -161,10 +161,10 @@ class ResourceQuery
 
   def apply_function_current_date(scope, ast)
     if ast.children.empty?
-      return scope, "(current_date at time zone 'UTC')"
+      return scope, "date(current_date at time zone 'UTC')"
     else
       scope, tz = apply_ast(scope, ast.children.first)
-      return scope, "date(current_timestamp at time zone #{tz})"
+      return scope, "date(current_date at time zone #{tz})"
     end
   end
 

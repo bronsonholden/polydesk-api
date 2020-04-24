@@ -229,7 +229,7 @@ RSpec.describe ResourceQuery do
         let(:generator) { "current_date('UTC')" }
 
         it 'returns value' do
-          expect(applied_scope.first.current_date_column).to eq(Date.today.in_time_zone('UTC'))
+          expect(applied_scope.first.current_date_column).to eq(Time.now.in_time_zone('UTC').to_date)
         end
 
         context 'tz as property' do
