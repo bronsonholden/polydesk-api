@@ -363,6 +363,87 @@ RSpec.describe ResourceQuery do
           end
         end
       end
+
+      describe 'date parts' do
+        let(:identifier) { 'date_part_column' }
+        let(:generator) { "#{part}(current_timestamp())" }
+        let(:current_time) { Time.now.in_time_zone('UTC') }
+        let(:current_date) { current_time.to_date }
+        let(:wiggle_room) { 1.second }
+
+        shared_examples 'date_part_success' do
+          it 'returns value' do
+            expect(applied_scope.first.date_part_column).to be_within(wiggle_room).of(expected_part_value)
+          end
+        end
+
+        describe 'second' do
+          let(:part) { 'second' }
+          let(:expected_part_value) { current_time.sec }
+          include_examples 'date_part_success'
+        end
+
+        describe 'minute' do
+          let(:part) { 'minute' }
+          let(:expected_part_value) { current_time.min }
+          include_examples 'date_part_success'
+        end
+
+        describe 'hour' do
+          let(:part) { 'hour' }
+          let(:expected_part_value) { current_time.hour }
+          include_examples 'date_part_success'
+        end
+
+        describe 'day' do
+          let(:part) { 'day' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { current_date.day }
+          include_examples 'date_part_success'
+        end
+
+        describe 'day_of_week' do
+          let(:part) { 'day_of_week' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { current_date.wday }
+          include_examples 'date_part_success'
+        end
+
+        describe 'day_of_year' do
+          let(:part) { 'day_of_year' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { current_date.yday }
+          include_examples 'date_part_success'
+        end
+
+        describe 'week_of_year' do
+          let(:part) { 'week_of_year' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { current_date.cweek }
+          include_examples 'date_part_success'
+        end
+
+        describe 'month' do
+          let(:part) { 'month' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { current_date.month }
+          include_examples 'date_part_success'
+        end
+
+        describe 'quarter' do
+          let(:part) { 'quarter' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { (current_date.month / 3.0).ceil }
+          include_examples 'date_part_success'
+        end
+
+        describe 'year' do
+          let(:part) { 'year' }
+          let(:current_date) { Time.now.in_time_zone('UTC').to_date }
+          let(:expected_part_value) { current_date.year }
+          include_examples 'date_part_success'
+        end
+      end
     end
 
     # Test generating columns using only literals

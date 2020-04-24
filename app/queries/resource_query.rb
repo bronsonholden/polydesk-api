@@ -178,6 +178,56 @@ class ResourceQuery
     return scope, "(concat(#{amount}, ' ', #{unit})::interval)"
   end
 
+  def apply_function_second(scope, ast)
+    scope, timestamp = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('second', #{timestamp})::integer)"
+  end
+
+  def apply_function_minute(scope, ast)
+    scope, timestamp = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('minute', #{timestamp})::integer)"
+  end
+
+  def apply_function_hour(scope, ast)
+    scope, timestamp = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('hour', #{timestamp})::integer)"
+  end
+
+  def apply_function_day(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('day', #{date})::integer)"
+  end
+
+  def apply_function_day_of_week(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('dow', #{date})::integer)"
+  end
+
+  def apply_function_day_of_year(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('doy', #{date})::integer)"
+  end
+
+  def apply_function_week_of_year(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('week', #{date})::integer)"
+  end
+
+  def apply_function_month(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('month', #{date})::integer)"
+  end
+
+  def apply_function_quarter(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('quarter', #{date})::integer)"
+  end
+
+  def apply_function_year(scope, ast)
+    scope, date = apply_ast(scope, ast.children.first)
+    return scope, "(date_part('year', #{date})::integer)"
+  end
+
   # Generate a SQL expression for the function specified in the given AST.
   # If applicable, updates and returns the given scope.
   def apply_function(scope, ast)
@@ -216,6 +266,26 @@ class ResourceQuery
       apply_function_current_timestamp(scope, ast)
     when 'interval'
       apply_function_interval(scope, ast)
+    when 'second'
+      apply_function_second(scope, ast)
+    when 'minute'
+      apply_function_minute(scope, ast)
+    when 'hour'
+      apply_function_hour(scope, ast)
+    when 'day'
+      apply_function_day(scope, ast)
+    when 'day_of_week'
+      apply_function_day_of_week(scope, ast)
+    when 'day_of_year'
+      apply_function_day_of_year(scope, ast)
+    when 'week_of_year'
+      apply_function_week_of_year(scope, ast)
+    when 'month'
+      apply_function_month(scope, ast)
+    when 'quarter'
+      apply_function_quarter(scope, ast)
+    when 'year'
+      apply_function_year(scope, ast)
     else
       return scope, 'null'
     end
