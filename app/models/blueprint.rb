@@ -5,7 +5,7 @@ class Blueprint < ApplicationRecord
   validates :view, presence: true
   validate :check_schema
 
-  before_save :create_prefabs_partition
+  before_create :create_prefabs_partition
 
   def check_schema
     validate_subschema(schema)
