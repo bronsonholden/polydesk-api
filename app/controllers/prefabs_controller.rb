@@ -14,7 +14,8 @@ class PrefabsController < ApplicationController
   def show
     schema = ShowPrefabSchema.new(request.params)
     payload = schema.render
-    realizer = PrefabRealizer.new(intent: :show, parameters: payload, headers: request.headers)
+    scope = Prefab.partition_key_eq(payload["namespace"])
+    realizer = PrefabRealizer.new(intent: :show, parameters: payload, headers: request.headers, scope: scope)
     authorize realizer.object
     render json: JSONAPI::Serializer.serialize(realizer.object), status: :ok
   end

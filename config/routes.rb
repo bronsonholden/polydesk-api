@@ -22,8 +22,15 @@ Rails.application.routes.draw do
     resources :options
     resources :account_users, path: 'users'
     resources :blueprints
-    resources :prefabs
     resources :groups
+
+    scope 'prefabs/:namespace' do
+      get '/', to: 'prefabs#index'
+      get '/:id', to: 'prefabs#show'
+      post '/', to: 'prefabs#create'
+      delete '/', to: 'prefabs#destroy'
+      patch ':id', to: 'prefabs#update'
+    end
 
     post '/documents/upload', to: 'documents#upload_new'
     post '/folders/:id/upload', to: 'folders#upload_document'

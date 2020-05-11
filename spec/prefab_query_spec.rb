@@ -40,8 +40,8 @@ RSpec.describe PrefabQuery do
   describe 'inner scope' do
     let(:fbi_agent) { create :prefab, blueprint: jobs_blueprint, data: { title: 'FBI Agent', clearance: 'Top Secret' } }
     let(:shoeshine) { create :prefab, blueprint: jobs_blueprint, data: { title: 'Shoeshine' } }
-    let(:burt_macklin) { create :prefab, blueprint: employees_blueprint, data: { name: 'Burt Macklin', job: "jobs/#{fbi_agent.tag}" } }
-    let(:andy_dwyer) { create :prefab, blueprint: employees_blueprint, data: { name: 'Andy Dwyer', job: "jobs/#{shoeshine.tag}" } }
+    let(:burt_macklin) { create :prefab, blueprint: employees_blueprint, data: { name: 'Burt Macklin', job: "jobs/#{fbi_agent.id}" } }
+    let(:andy_dwyer) { create :prefab, blueprint: employees_blueprint, data: { name: 'Andy Dwyer', job: "jobs/#{shoeshine.id}" } }
     let(:inner_scope) { Prefab.where(id: shoeshine.id) }
     let(:identifier) { 'occupation' }
     let(:generator) { 'lookup_s("data.job", "data.title")' }
@@ -68,7 +68,7 @@ RSpec.describe PrefabQuery do
 
       it "returns sum" do
         employee_count.times do
-          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary }
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.id}", salary: employee_salary }
         end
 
         expect(applied_scope.first.ref_sum).to eq(employee_count * employee_salary)
@@ -81,7 +81,7 @@ RSpec.describe PrefabQuery do
 
       it "returns avg" do
         employee_count.times do
-          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary }
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.id}", salary: employee_salary }
         end
 
         expect(applied_scope.first.ref_avg).to eq(employee_salary)
@@ -94,7 +94,7 @@ RSpec.describe PrefabQuery do
 
       it "returns min" do
         employee_count.times do |i|
-          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary + i}
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.id}", salary: employee_salary + i}
         end
 
         expect(applied_scope.first.ref_min).to eq(employee_salary)
@@ -107,7 +107,7 @@ RSpec.describe PrefabQuery do
 
       it "returns max" do
         employee_count.times do |i|
-          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary - i}
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.id}", salary: employee_salary - i}
         end
 
         expect(applied_scope.first.ref_max).to eq(employee_salary)
@@ -120,7 +120,7 @@ RSpec.describe PrefabQuery do
 
       it "returns count" do
         employee_count.times do
-          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary}
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.id}", salary: employee_salary}
         end
 
         expect(applied_scope.first.ref_count).to eq(employee_count)
@@ -133,7 +133,7 @@ RSpec.describe PrefabQuery do
 
       it "returns count" do
         employee_count.times do
-          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.tag}", salary: employee_salary}
+          create :prefab, blueprint: employees_blueprint, data: { job: "#{job.namespace}/#{job.id}", salary: employee_salary}
         end
 
         expect(applied_scope.first.ref_count_distinct).to eq(1)
@@ -146,7 +146,7 @@ RSpec.describe PrefabQuery do
     let(:referent) { create :prefab, blueprint: blueprint, data: data }
     let(:referrer) {
       create :prefab, blueprint: blueprint, data: {
-        prefab: "#{referent.namespace}/#{referent.tag}"
+        prefab: "#{referent.namespace}/#{referent.id}"
       }
     }
     let(:scope) { Prefab.where(id: referrer.id) }
@@ -185,8 +185,8 @@ RSpec.describe PrefabQuery do
 
     # Chain of references is third -> second -> first
     describe 'lookup chain' do
-      let(:third_to_second_uid) { "#{second.namespace}/#{second.tag}" }
-      let(:second_to_first_uid) { "#{first.namespace}/#{first.tag}" }
+      let(:third_to_second_uid) { "#{second.namespace}/#{second.id}" }
+      let(:second_to_first_uid) { "#{first.namespace}/#{first.id}" }
       let(:expected_value) { 'string' }
       let(:first) {
         create :prefab, blueprint: blueprint, data: {
@@ -281,14 +281,14 @@ RSpec.describe PrefabQuery do
       }
       let(:through1) {
         create :prefab, blueprint: through_blueprint, data: {
-          left: "#{first.namespace}/#{first.tag}",
-          right: "#{second.namespace}/#{second.tag}"
+          left: "#{first.namespace}/#{first.id}",
+          right: "#{second.namespace}/#{second.id}"
         }
       }
       let(:through2) {
         create :prefab, blueprint: through_blueprint, data: {
-          left: "#{first.namespace}/#{first.tag}",
-          right: "#{third.namespace}/#{third.tag}"
+          left: "#{first.namespace}/#{first.id}",
+          right: "#{third.namespace}/#{third.id}"
         }
       }
       let(:scope) { Prefab.where(namespace: blueprint.namespace) }

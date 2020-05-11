@@ -4,4 +4,5 @@ Apartment.configure do |config|
   # when the root user is confirmed and the account is linked as its default.
   # Use that to get a list of tenants
   config.tenant_names = lambda { Account.pluck(:identifier) }
+  config.use_sql = true
 end

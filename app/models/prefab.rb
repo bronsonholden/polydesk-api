@@ -1,7 +1,9 @@
 class Prefab < ApplicationRecord
+  self.primary_key = 'id'
+  list_partition_by :namespace
   validates :data, presence: true
   validates :namespace, presence: true
-  validates :tag, uniqueness: { scope: [:namespace] }, presence: true
+  validates :id, uniqueness: { scope: [:namespace] }, presence: true
   validates :schema, presence: true
   validates :view, presence: true
   belongs_to :blueprint, optional: true
@@ -13,8 +15,8 @@ class Prefab < ApplicationRecord
   # auto_increment call must come after declaring the construction
   # lifecycle callback. This way the tag field is incremented after the
   # namespace has been modified.
-  auto_increment :tag, scope: [:namespace], lock: true, force: false, before: :validation
-  attr_readonly :tag
+  auto_increment :id, scope: [:namespace], lock: true, force: false, before: :validation
+  attr_readonly :id
 
   def check_schema
     JSON::Validator.validate!(self.schema, self.data)
@@ -33,4 +35,9 @@ class Prefab < ApplicationRecord
     self.data ||= {}
     self.flat_data = Smush.smush(data)
   end
+
+  def self.partition_name(namespace)
+    "prefabs_#{namespace}_partition"
+  end
+
 end

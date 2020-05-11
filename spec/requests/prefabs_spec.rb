@@ -42,8 +42,7 @@ RSpec.describe 'Prefabs', type: :request do
   describe 'creation' do
     shared_examples 'prefab_create_success' do
       it 'creates prefab' do
-        blueprint # Create the blueprint so the relationship can be created
-        post '/rspec/prefabs', headers: rspec_session,
+        post "/rspec/prefabs/#{blueprint.namespace}", headers: rspec_session,
                                params: params.to_json
         expect(response).to have_http_status(201)
       end
@@ -51,8 +50,7 @@ RSpec.describe 'Prefabs', type: :request do
 
     shared_examples 'prefab_create_failure' do
       it 'fails to create prefab' do
-        blueprint # Create the blueprint so the relationship can be created
-        post '/rspec/prefabs', headers: rspec_session,
+        post "/rspec/prefabs/#{blueprint.namespace}", headers: rspec_session,
                                params: params.to_json
         expect(response).to have_http_status(422)
       end
@@ -81,8 +79,7 @@ RSpec.describe 'Prefabs', type: :request do
         }
 
         it 'disallows prefab creation' do
-          blueprint
-          post '/rspec/prefabs', headers: rspec_session, params: params.to_json
+          post "/rspec/prefabs/#{blueprint.namespace}", headers: rspec_session, params: params.to_json
           expect(response).to have_http_status(422)
         end
       end
@@ -118,18 +115,18 @@ RSpec.describe 'Prefabs', type: :request do
     end
   end
 
-  let(:prefab) { create :prefab }
+  let(:prefab) { create :prefab, blueprint: blueprint }
 
   describe 'GET /rspec/prefabs' do
     it 'lists all prefabs' do
-      get '/rspec/prefabs', headers: rspec_session
+      get "/rspec/prefabs/#{blueprint.namespace}", headers: rspec_session
       expect(response).to have_http_status(200)
     end
   end
 
   describe 'GET /rspec/prefabs/:id' do
     it 'shows prefab' do
-      get "/rspec/prefabs/#{prefab.id}", headers: rspec_session
+      get "/rspec/prefabs/#{blueprint.namespace}/#{prefab.id}", headers: rspec_session
       expect(response).to have_http_status(200)
     end
   end

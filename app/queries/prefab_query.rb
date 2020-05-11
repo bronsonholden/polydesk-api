@@ -90,7 +90,7 @@ class PrefabQuery < ResourceQuery
 
   def apply_referent_count_distinct(scope, namespace, referrer, dimension)
     remote_table_alias = "referent_aggregate#{next_lookup_id}___#{referrer.gsub('.', '__')}"
-    local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.tag)"
+    local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.id)"
     remote_table_alias_inner = "#{remote_table_alias}___inner"
     namespace_col = column_name(scope, remote_table_alias_inner, 'namespace')
     referrer_col = column_name(scope, remote_table_alias_inner, referrer)
@@ -145,7 +145,7 @@ class PrefabQuery < ResourceQuery
 
   def apply_referent_count(scope, namespace, referrer)
     remote_table_alias = "referent_aggregate#{next_lookup_id}___#{referrer.gsub('.', '__')}"
-    local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.tag)"
+    local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.id)"
     remote_table_alias_inner = "#{remote_table_alias}___inner"
     namespace_col = column_name(scope, remote_table_alias_inner, 'namespace')
     referrer_col = column_name(scope, remote_table_alias_inner, referrer)
@@ -212,7 +212,7 @@ class PrefabQuery < ResourceQuery
 
   def apply_referent_aggregate(scope, cast, func, namespace, referrer, dimension)
     remote_table_alias = "referent_aggregate#{next_lookup_id}___#{referrer.gsub('.', '__')}"
-    local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.tag)"
+    local_uid = "(#{scope.table_name}.namespace || '/' || #{scope.table_name}.id)"
     remote_table_alias_inner = "#{remote_table_alias}___inner"
     namespace_col = column_name(scope, remote_table_alias_inner, 'namespace')
     referrer_col = column_name(scope, remote_table_alias_inner, referrer)
@@ -243,7 +243,7 @@ class PrefabQuery < ResourceQuery
   # Returns the modified scope and generated SQL
   def apply_lookup(scope, cast, local, remote)
     remote_table_alias = "lookup#{next_lookup_id}___#{remote.gsub('.', '__')}"
-    remote_uid = "(#{remote_table_alias}.namespace || '/' || #{remote_table_alias}.tag)"
+    remote_uid = "(#{remote_table_alias}.namespace || '/' || #{remote_table_alias}.id)"
     scope = scope.joins(
       <<-SQL
         left join (#{inner_scope.to_sql}) as #{remote_table_alias}
@@ -300,7 +300,7 @@ class PrefabQuery < ResourceQuery
     lookup_alias = "lookup#{next_lookup_id}___#{namespace.gsub('.', '__')}"
     relationship_table_alias = "relationship#{next_lookup_id}___#{remote.gsub('.', '__')}"
     remote_table_alias = "remote#{next_lookup_id}___#{remote.gsub('.', '__')}"
-    remote_uid = "(prefabs.namespace || '/' || prefabs.tag)"
+    remote_uid = "(prefabs.namespace || '/' || prefabs.id)"
     scope = scope.joins(
       <<-SQL
         left join (
@@ -315,7 +315,7 @@ class PrefabQuery < ResourceQuery
               (#{inner_scope.to_sql}) as inner_through
               left join
                 (#{inner_scope.to_sql}) as inner_prefabs
-              on (inner_prefabs.namespace || '/' || inner_prefabs.tag) = #{column_name(scope, 'inner_through', remote)}
+              on (inner_prefabs.namespace || '/' || inner_prefabs.id) = #{column_name(scope, 'inner_through', remote)}
             where inner_through.namespace = '#{namespace}'
             group by
               #{column_name(scope, 'inner_through', local)}

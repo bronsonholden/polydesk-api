@@ -5,6 +5,8 @@ class Blueprint < ApplicationRecord
   validates :view, presence: true
   validate :check_schema
 
+  before_save :create_prefabs_partition
+
   def check_schema
     validate_subschema(schema)
   end
@@ -31,5 +33,11 @@ class Blueprint < ApplicationRecord
     if !prefab.nil?
       # validate_prefab_schema
     end
+  end
+
+  # Create a Prefabs partition table for the Blueprint's namespace
+  def create_prefabs_partition
+    name = Prefab.partition_name(namespace)
+    Prefab.create_partition values: namespace, primary_key: :id, name: name
   end
 end
