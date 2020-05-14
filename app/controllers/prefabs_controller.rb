@@ -23,8 +23,8 @@ class PrefabsController < ApplicationController
   def index
     schema = IndexPrefabsSchema.new(request.params)
     payload = schema.render
-    scope = PrefabQuery.new(payload).apply(Prefab.all)
-    realizer = PrefabRealizer.new(intent: :index, parameters: payload.except('filter'), headers: request.headers, scope: scope)
+    scope = PrefabQuery.new(payload).apply(Prefab.partition_key_eq(payload['namespace']))
+    realizer = PrefabRealizer.new(intent: :index, parameters: payload.except('filter', 'sort'), headers: request.headers, scope: scope)
     authorize realizer.object
     pagination_props = PaginationProperties.new(page_offset, page_limit, realizer.total_count)
     render json: JSONAPI::Serializer.serialize(realizer.object, is_collection: true, meta: pagination_props.generate), status: :ok

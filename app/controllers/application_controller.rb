@@ -66,7 +66,7 @@ class ApplicationController < ActionController::API
   rescue_from StandardError, with: :server_error
   rescue_from ActiveRecord::RecordNotFound, with: :not_found_exception
   rescue_from ActiveRecord::RecordInvalid, with: :invalid_exception
-  rescue_from ActiveRecord::StatementInvalid, with: :invalid_exception
+  rescue_from ActiveRecord::StatementInvalid, with: :statement_invalid_exception
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   rescue_from JSON::Schema::ValidationError, with: :prefab_schema_violation_exception
   rescue_from Polydesk::Errors::AccountIsDisabled, with: :api_exception
@@ -183,6 +183,10 @@ class ApplicationController < ActionController::API
 
   def invalid_exception(exception)
     render_exception_for exception.record, status_code: :unprocessable_entity
+  end
+
+  def statement_invalid_exception(exception)
+    render json: { errors: [] }, status: :unprocessable_entity
   end
 
   def not_found_exception(exception)

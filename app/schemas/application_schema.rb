@@ -31,8 +31,7 @@ class ApplicationSchema
 
   def sort_schema
     {
-      type: 'string',
-      minLength: 1
+      type: 'array'
     }
   end
 

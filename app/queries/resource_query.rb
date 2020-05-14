@@ -15,6 +15,7 @@ class ResourceQuery
   def apply(scope)
     scope = apply_generators(scope)
     scope = apply_filters(scope)
+    scope = apply_sorts(scope)
     scope
   end
 
@@ -51,6 +52,15 @@ class ResourceQuery
   def apply_expression(scope, expression)
     ast = Keisan::Calculator.new.ast(expression)
     apply_ast(scope, ast)
+  end
+
+  def apply_sort_expression(scope, expression)
+    ast = Keisan::Calculator.new.ast(expression)
+    if !ast.is_a?(Keisan::AST::Function) || !%w(asc desc).include?(ast.name)
+      raise Polydesk::Errors::InvalidSortExpression.new
+    end
+    scope, sql = apply_ast(scope, ast.children.first)
+    return scope, "#{sql} #{ast.name}"
   end
 
   # Apply a filter expresison to the given scope
@@ -460,6 +470,21 @@ class ResourceQuery
       sql = 'null'
     end
     return scope, sql
+  end
+
+  def apply_sorts(scope)
+    sorts = payload.fetch('sort', [])
+
+    if sorts.is_a?(String)
+      sorts = [sorts]
+    end
+
+    sorts.each { |sort|
+      scope, sql = apply_sort_expression(scope, sort)
+      scope = scope.order(Arel.sql("#{sql}"))
+    }
+
+    return scope
   end
 
   def apply_filters(scope)

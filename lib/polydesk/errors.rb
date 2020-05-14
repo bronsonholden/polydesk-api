@@ -119,5 +119,11 @@ module Polydesk
         super("Invalid filter expression; must be a boolean expression")
       end
     end
+
+    class InvalidSortExpression < Polydesk::Errors::Base
+      def initialize
+        super("Sort expression must be enclosed by asc() or desc()")
+      end
+    end
   end
 end
