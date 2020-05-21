@@ -1,9 +1,17 @@
 class PrefabQuery < ResourceQuery
   attr_reader :inner_scope
 
-  def initialize(payload, inner_scope: Prefab.all)
+  def initialize(payload, inner_scope: nil)
     super(payload)
     @inner_scope = inner_scope
+  end
+
+  def apply(scope)
+    if inner_scope.nil?
+      @inner_scope = scope
+    end
+
+    super
   end
 
   protected
