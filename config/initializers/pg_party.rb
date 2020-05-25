@@ -7,16 +7,14 @@ require 'pg_party/model_decorator'
 module PgParty
   ModelDecorator.class_eval do
     def partitions
-      PgParty.cache.fetch_partitions(cache_key) do
-        connection.select_values(<<-SQL)
-          SELECT pg_inherits.inhrelid::regclass::text
-          FROM pg_tables
-          INNER JOIN pg_inherits
-            ON pg_tables.tablename::regclass = pg_inherits.inhparent::regclass
-          WHERE pg_tables.tablename = #{connection.quote(table_name)}
-            AND pg_tables.schemaname = #{connection.quote(Apartment::Tenant.current)}
-        SQL
-      end
+      ActiveRecord::Base.connection.select_values(<<-SQL)
+        SELECT pg_inherits.inhrelid::regclass::text
+        FROM pg_tables
+        INNER JOIN pg_inherits
+          ON pg_tables.tablename::regclass = pg_inherits.inhparent::regclass
+        WHERE pg_tables.tablename = #{connection.quote(table_name)}
+          AND pg_tables.schemaname = #{connection.quote(Apartment::Tenant.current)}
+      SQL
     rescue
       []
     end
