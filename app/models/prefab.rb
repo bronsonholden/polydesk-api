@@ -2,7 +2,10 @@ class Prefab < ApplicationRecord
   self.primary_key = 'id'
   list_partition_by :namespace
   validates :data, presence: true
-  validates :namespace, presence: true
+  validates :namespace, presence: true, format: {
+    with: /\A[a-z\-_0-9]+\z/,
+    message: 'many only container lowercase letters, numbers, -, and _.'
+  }
   validates :id, uniqueness: { scope: [:namespace] }, presence: true
   validates :schema, presence: true
   validates :view, presence: true

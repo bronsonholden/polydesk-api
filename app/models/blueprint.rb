@@ -1,6 +1,9 @@
 class Blueprint < ApplicationRecord
   validates :name, presence: true, uniqueness: true
-  validates :namespace, presence: true, uniqueness: true
+  validates :namespace, presence: true, uniqueness: true, format: {
+    with: /\A[a-z\-_0-9]+\z/,
+    message: 'many only container lowercase letters, numbers, -, and _.'
+  }
   validates :schema, presence: true
   validates :view, presence: true
   validate :check_schema

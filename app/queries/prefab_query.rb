@@ -55,7 +55,7 @@ class PrefabQuery < ResourceQuery
     namespace, referrer, dimension = ast.children
 
     if namespace.is_a?(Keisan::AST::Literal)
-      if !namespace.value.match(/^[a-z]+$/)
+      if !namespace.value.match(/^[a-z\-_0-9]+$/)
         raise Polydesk::Errors::GeneratorFunctionArgumentError.new("Argument at index 0 for #{ast.name}() is a literal with disallowed characters")
       else
         namespace = namespace.value

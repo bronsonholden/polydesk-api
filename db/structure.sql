@@ -104,7 +104,8 @@ CREATE TABLE public.blueprints (
     updated_at timestamp without time zone NOT NULL,
     view json NOT NULL,
     construction_view json,
-    list_view json
+    list_view json,
+    CONSTRAINT check_blueprints_on_namespace CHECK (((namespace)::text ~* '^[a-z\-_0-9]+$'::text))
 );
 
 
@@ -362,7 +363,8 @@ CREATE TABLE public.prefabs_template (
     data jsonb NOT NULL,
     flat_data jsonb NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    CONSTRAINT check_prefabs_template_on_namespace CHECK (((namespace)::text ~* '^[a-z\-_0-9]+$'::text))
 );
 
 
@@ -992,6 +994,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200407051513'),
 ('20200407060222'),
 ('20200412045542'),
-('20200505041315');
+('20200505041315'),
+('20200525071102');
 
 
