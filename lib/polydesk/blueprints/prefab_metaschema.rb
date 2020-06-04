@@ -24,8 +24,11 @@ class PrefabMetaschema
         namespace: {
           type: 'string'
         },
-        condition: {
-          type: 'object'
+        conditions: {
+          type: 'array',
+          items: {
+            type: 'string'
+          }
         }
       }
     }
