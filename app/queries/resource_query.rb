@@ -125,6 +125,16 @@ class ResourceQuery
     return scope, col
   end
 
+  def apply_function_to_i(scope, ast)
+    scope, sql = apply_ast(scope, ast.children.first)
+    return scope, "(#{sql}::integer)"
+  end
+
+  def apply_function_to_f(scope, ast)
+    scope, sql = apply_ast(scope, ast.children.first)
+    return scope, "(#{sql}::float)"
+  end
+
   # Query expression function: sqrt
   # Return the square-root of a number
   # sqrt(5)
@@ -343,6 +353,10 @@ class ResourceQuery
       apply_function_upper(scope, ast)
     when 'prop'
       apply_function_prop(scope, ast)
+    when 'to_i'
+      apply_function_to_i(scope, ast)
+    when 'to_f'
+      apply_function_to_f(scope, ast)
     when 'coalesce'
       apply_function_coalesce(scope, ast)
     when 'sqrt'

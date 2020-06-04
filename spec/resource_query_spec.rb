@@ -53,6 +53,24 @@ RSpec.describe ResourceQuery do
         end
       end
 
+      describe 'to_i' do
+        let(:identifier) { 'to_i_column' }
+        let(:generator) { "to_i('1')" }
+
+        it 'casts to integer' do
+          expect(applied_scope.first.to_i_column).to be_a(Integer)
+        end
+      end
+
+      describe 'to_f' do
+        let(:identifier) { 'to_f_column' }
+        let(:generator) { "to_f('1.5')" }
+
+        it 'casts to float' do
+          expect(applied_scope.first.to_f_column).to be_a(Float)
+        end
+      end
+
       describe 'concat' do
         let(:identifier) { 'concat_column' }
         let(:generator) { "concat(concat('a', 'b'), 1, true)" }
