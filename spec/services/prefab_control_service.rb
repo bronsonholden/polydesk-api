@@ -21,6 +21,9 @@ RSpec.describe PrefabControlService do
     let(:employees_deny) { create :access_control, group: group, namespace: 'employees', mode: 0 }
     let(:employee_prefab) { create :prefab, blueprint: employees_blueprint, data: { name: 'John Doe' } }
     let(:client_prefab) { create :prefab, blueprint: clients_blueprint, data: { name: 'ACME, Inc' } }
+    # This secondary group & access is a sanity check to ensure that Prefabs
+    # aren't duplicated in the result when there are multiple controls that
+    # apply to them.
     let(:secondary_group) {
       g = create :group, name: 'Secondary Group'
       account_user.groups << g
@@ -53,6 +56,7 @@ RSpec.describe PrefabControlService do
 
     context 'with overriding deny access' do
       it 'returns prefab in only whitelisted namespace' do
+        secondary_access
         # Even though an "Allow" access control is in place for the
         # "employees" namespace, the "Deny" control that is applied overrides
         # it, providing access only to the "clients" namespace
