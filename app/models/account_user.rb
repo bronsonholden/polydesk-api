@@ -4,6 +4,8 @@ class AccountUser < ApplicationRecord
   belongs_to :user
   belongs_to :account
   has_many :permissions
+  has_many :account_user_groups
+  has_many :groups, through: :account_user_groups, dependent: :destroy
 
   enum role: [
     :guest,

@@ -14,6 +14,71 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: access_controls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.access_controls (
+    id bigint NOT NULL,
+    group_id bigint,
+    namespace character varying NOT NULL,
+    mode smallint,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: access_controls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.access_controls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: access_controls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.access_controls_id_seq OWNED BY public.access_controls.id;
+
+
+--
+-- Name: account_user_groups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.account_user_groups (
+    id bigint NOT NULL,
+    account_user_id bigint,
+    group_id bigint,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: account_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.account_user_groups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: account_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.account_user_groups_id_seq OWNED BY public.account_user_groups.id;
+
+
+--
 -- Name: account_users; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -496,6 +561,20 @@ ALTER SEQUENCE public.versions_id_seq OWNED BY public.versions.id;
 
 
 --
+-- Name: access_controls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.access_controls ALTER COLUMN id SET DEFAULT nextval('public.access_controls_id_seq'::regclass);
+
+
+--
+-- Name: account_user_groups id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.account_user_groups ALTER COLUMN id SET DEFAULT nextval('public.account_user_groups_id_seq'::regclass);
+
+
+--
 -- Name: account_users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -577,6 +656,22 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.versions ALTER COLUMN id SET DEFAULT nextval('public.versions_id_seq'::regclass);
+
+
+--
+-- Name: access_controls access_controls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.access_controls
+    ADD CONSTRAINT access_controls_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: account_user_groups account_user_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.account_user_groups
+    ADD CONSTRAINT account_user_groups_pkey PRIMARY KEY (id);
 
 
 --
@@ -697,6 +792,34 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.versions
     ADD CONSTRAINT versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_access_controls_on_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_access_controls_on_group_id ON public.access_controls USING btree (group_id);
+
+
+--
+-- Name: index_access_controls_on_group_id_and_namespace_and_mode; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_access_controls_on_group_id_and_namespace_and_mode ON public.access_controls USING btree (group_id, namespace, mode);
+
+
+--
+-- Name: index_account_user_groups_on_account_user_id_and_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_account_user_groups_on_account_user_id_and_group_id ON public.account_user_groups USING btree (account_user_id, group_id);
+
+
+--
+-- Name: index_account_user_groups_on_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_account_user_groups_on_group_id ON public.account_user_groups USING btree (group_id);
 
 
 --
@@ -882,6 +1005,14 @@ CREATE INDEX prefabs_template_blueprint_id_idx ON public.prefabs_template USING 
 
 
 --
+-- Name: access_controls fk_rails_009e83fdfa; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.access_controls
+    ADD CONSTRAINT fk_rails_009e83fdfa FOREIGN KEY (group_id) REFERENCES public.groups(id);
+
+
+--
 -- Name: old_prefabs fk_rails_0909d3a820; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -919,6 +1050,14 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.account_users
     ADD CONSTRAINT fk_rails_c96445f213 FOREIGN KEY (account_id) REFERENCES public.accounts(id);
+
+
+--
+-- Name: account_user_groups fk_rails_ce21b5b188; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.account_user_groups
+    ADD CONSTRAINT fk_rails_ce21b5b188 FOREIGN KEY (group_id) REFERENCES public.groups(id);
 
 
 --
@@ -995,6 +1134,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200407060222'),
 ('20200412045542'),
 ('20200505041315'),
-('20200525071102');
+('20200525071102'),
+('20200606040322'),
+('20200606041049');
 
 
