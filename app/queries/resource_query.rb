@@ -119,7 +119,7 @@ class ResourceQuery
     arg = ast.children.first
     if arg.is_a?(Keisan::AST::String)
       col = column_name(scope, scope.table_name, arg.value)
-    else
+    else # TODO: Fix - this ignores outer prop and simply evals inner arg
       scope, col = apply_ast(scope, arg)
     end
     return scope, col
