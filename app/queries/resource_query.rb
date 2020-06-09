@@ -245,7 +245,7 @@ class ResourceQuery
   # Retrieve the current timestamp
   # current_timestamp()
   def apply_function_current_timestamp(scope, ast)
-    return scope, "(current_timestamp)"
+    return scope, "(current_timestamp at time zone 'UTC')"
   end
 
   # Query expression function: interval

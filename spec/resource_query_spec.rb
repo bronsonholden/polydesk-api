@@ -274,8 +274,8 @@ RSpec.describe ResourceQuery do
       describe 'interval' do
         let(:identifier) { 'interval_column' }
         let(:generator) { "current_timestamp() + interval(#{amount}, '#{unit}')" }
-        let(:base_time) { Time.now }
-        let(:expected_time) { base_time + amount.send(unit.to_s) }
+        let(:base_time) { Time.now.utc }
+        let(:expected_time) { (base_time + amount.send(unit.to_sym)) }
 
         shared_examples 'interval_success' do
           it 'returns value' do
