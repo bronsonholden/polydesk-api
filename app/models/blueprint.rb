@@ -21,7 +21,7 @@ class Blueprint < ApplicationRecord
       if !props.nil?
         props.each { |prop, prop_schema|
           subpath = [path, prop].join('.')
-          if prop.match(/\A[-_a-zA-Z0-9]+\z/).nil?
+          if prop.match(/\A[a-zA-Z_]([a-zA-Z_0-9])*\z/).nil?
             raise Polydesk::Errors::InvalidBlueprintSchema.new("'#{subpath}' contains invalid characters; may only contain alphanumerics, -, or _")
           end
           validate_subschema(prop_schema, subpath)

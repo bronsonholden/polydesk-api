@@ -76,7 +76,7 @@ RSpec.describe 'Blueprints', type: :request do
       end
 
       context 'with valid characters' do
-        let(:key) { "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_" }
+        let(:key) { "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" }
         it 'does not raise error' do
           expect { blueprint }.not_to raise_error
         end
