@@ -3,4 +3,5 @@ class Group < ApplicationRecord
   has_many :account_user_groups
   has_many :account_users, through: :account_user_groups, dependent: :destroy
   has_many :access_controls
+  has_many :data_controls
 end

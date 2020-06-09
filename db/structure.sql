@@ -194,6 +194,42 @@ ALTER SEQUENCE public.blueprints_id_seq OWNED BY public.blueprints.id;
 
 
 --
+-- Name: data_controls; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.data_controls (
+    id bigint NOT NULL,
+    group_id bigint,
+    key character varying NOT NULL,
+    value jsonb NOT NULL,
+    operator character varying NOT NULL,
+    namespace character varying NOT NULL,
+    mode smallint,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: data_controls_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.data_controls_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: data_controls_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.data_controls_id_seq OWNED BY public.data_controls.id;
+
+
+--
 -- Name: documents; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -596,6 +632,13 @@ ALTER TABLE ONLY public.blueprints ALTER COLUMN id SET DEFAULT nextval('public.b
 
 
 --
+-- Name: data_controls id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.data_controls ALTER COLUMN id SET DEFAULT nextval('public.data_controls_id_seq'::regclass);
+
+
+--
 -- Name: documents id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -704,6 +747,14 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 ALTER TABLE ONLY public.blueprints
     ADD CONSTRAINT blueprints_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: data_controls data_controls_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.data_controls
+    ADD CONSTRAINT data_controls_pkey PRIMARY KEY (id);
 
 
 --
@@ -862,6 +913,20 @@ CREATE UNIQUE INDEX index_blueprints_on_name ON public.blueprints USING btree (n
 --
 
 CREATE UNIQUE INDEX index_blueprints_on_namespace ON public.blueprints USING btree (namespace);
+
+
+--
+-- Name: index_data_controls; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_data_controls ON public.data_controls USING btree (group_id, namespace, key, value, operator, mode);
+
+
+--
+-- Name: index_data_controls_on_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_data_controls_on_group_id ON public.data_controls USING btree (group_id);
 
 
 --
@@ -1061,6 +1126,14 @@ ALTER TABLE ONLY public.account_user_groups
 
 
 --
+-- Name: data_controls fk_rails_d7dd9e6055; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.data_controls
+    ADD CONSTRAINT fk_rails_d7dd9e6055 FOREIGN KEY (group_id) REFERENCES public.groups(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1136,6 +1209,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200505041315'),
 ('20200525071102'),
 ('20200606040322'),
-('20200606041049');
+('20200606041049'),
+('20200608034418');
 
 
