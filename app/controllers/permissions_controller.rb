@@ -8,7 +8,7 @@ class PermissionsController < ApplicationController
   def create
     authorize Permission, :create?
     @permission = Permission.find_by_code(params[:code]) || Permission.create!(permission_params)
-    render json: PermissionSerializer.new(@permission).serialized_json, status: :created
+    render json: JSONAPI::Serializer.serialize(@permission), status: :created
   end
 
   def destroy
@@ -22,7 +22,7 @@ class PermissionsController < ApplicationController
   def index
     authorize Permission, :index?
     @permissions = Permission.where(account_user_id: @account_user.user_id).order('id')
-    render json: PermissionSerializer.new(@permissions).serialized_json, status: :ok
+    render json: JSONAPI::Serializer.serialize(@permission), status: :ok
   end
 
   private
