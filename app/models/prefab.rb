@@ -21,6 +21,10 @@ class Prefab < ApplicationRecord
   auto_increment :id, scope: [:namespace], lock: true, force: false, before: :validation
   attr_readonly :id
 
+  def uid
+    "#{namespace}/#{id}"
+  end
+
   def check_schema
     JSON::Validator.validate!(self.schema, self.data)
   end
