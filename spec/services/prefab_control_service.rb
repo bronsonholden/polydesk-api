@@ -16,20 +16,22 @@ RSpec.describe PrefabControlService do
   describe 'data control' do
     let(:data) {
       {
-        view: 'Allow',
+        mode: 'mode',
         string: 'string',
         integer: 1,
         float: 1.5,
         boolean: true
       }
     }
+
+    let(:base_mode) { 1 }
     let(:employees_blueprint) { create :blueprint, name: 'Employees', namespace: 'employees', schema: schema, view: view }
     # Control that allows view
-    let(:base_data_control) { create :data_control, namespace: 'employees', key: 'view', value: 'Allow', mode: 1, group: group }
+    let(:base_data_control) { create :data_control, namespace: 'employees', key: 'mode', value: 'mode', mode: base_mode, group: group }
     # Unrestricted Prefab has only the "view" key, so it is unaffected by any
     # other data controls being tested.
-    let(:unrestricted_employee) { create :prefab, blueprint: employees_blueprint, data: { view: 'Allow' } }
-    let(:active_data_control) { create :data_control, namespace: 'employees', key: key, value: value, operator: operator, mode: mode, group: group }
+    let(:unrestricted_employee) { create :prefab, blueprint: employees_blueprint, data: { mode: 'mode' } }
+    let(:active_data_control) { create :data_control, namespace: 'employees', key: key, value: value, operator: operator, mode: control_mode, group: group }
     let(:restricted_employee) { create :prefab, blueprint: employees_blueprint, data: data }
     let(:blah_employee) { create :prefab, blueprint: employees_blueprint, data: { leaveme: 'alone' } }
 
@@ -40,15 +42,41 @@ RSpec.describe PrefabControlService do
       unrestricted_employee
     end
 
-    shared_examples 'data_control_without_restricted_prefab' do
-      it 'does not include restricted prefab' do
-        expect(resolved_scope.to_a.size).to eq(1)
-      end
-    end
+    shared_examples 'data_control_examples' do
+      context 'whitelist over no access' do
+        let(:base_mode) { 0 }
+        let(:control_mode) { 1 }
 
-    shared_examples 'data_control_with_restricted_prefab' do
-      it 'includes restricted prefab' do
-        expect(resolved_scope.to_a.size).to eq(2)
+        it 'provides access to restricted prefab' do
+          expect(resolved_scope.to_a.map(&:uid)).to all(eq(restricted_employee.uid))
+        end
+      end
+
+      context 'whitelist over access' do
+        let(:base_mode) { 1 }
+        let(:control_mode) { 1 }
+
+        it 'provides access to both prefabs' do
+          expect(resolved_scope.to_a.map(&:uid)).to include(restricted_employee.uid, unrestricted_employee.uid)
+        end
+      end
+
+      context 'blacklist over no access' do
+        let(:base_mode) { 0 }
+        let(:control_mode) { 0 }
+
+        it 'provides access to no prefabs' do
+          expect(resolved_scope.size).to eq(0)
+        end
+      end
+
+      context 'blacklist over access' do
+        let(:base_mode) { 1 }
+        let(:control_mode) { 0 }
+
+        it 'provides access to unrestricted prefab' do
+          expect(resolved_scope.to_a.map(&:uid)).to all(eq(unrestricted_employee.uid))
+        end
       end
     end
 
@@ -56,88 +84,41 @@ RSpec.describe PrefabControlService do
       let(:operator) { 'eq' }
       let(:key) { 'string'}
       let(:value) { 'string' }
-      let(:mode) { 0 }
-      include_examples 'data_control_without_restricted_prefab'
+      include_examples 'data_control_examples'
     end
 
     describe 'neq' do
       let(:operator) { 'neq' }
       let(:key) { 'string' }
-      let(:mode) { 0 }
-
-      context 'restricted matching' do
-        let(:value) { 'not string' }
-        include_examples 'data_control_without_restricted_prefab'
-      end
-
-      context 'restricted not matching' do
-        let(:value) { 'string' }
-        include_examples 'data_control_with_restricted_prefab'
-      end
+      let(:value) { 'notstring' }
+      include_examples 'data_control_examples'
     end
 
     describe 'lt' do
       let(:operator) { 'lt' }
       let(:key) { 'integer' }
-      let(:mode) { 0 }
-
-      context 'restricted matching' do
-        let(:value) { 2 }
-        include_examples 'data_control_without_restricted_prefab'
-      end
-
-      context 'restricted not matching' do
-        let(:value) { 0 }
-        include_examples 'data_control_with_restricted_prefab'
-      end
+      let(:value) { 2 }
     end
 
     describe 'lte' do
       let(:operator) { 'lte' }
       let(:key) { 'integer' }
-      let(:mode) { 0 }
-
-      context 'restricted matching' do
-        let(:value) { 1 }
-        include_examples 'data_control_without_restricted_prefab'
-      end
-
-      context 'restricted not matching' do
-        let(:value) { 0 }
-        include_examples 'data_control_with_restricted_prefab'
-      end
+      let(:value) { 5 }
+      include_examples 'data_control_examples'
     end
 
     describe 'gt' do
       let(:operator) { 'gt' }
       let(:key) { 'integer' }
-      let(:mode) { 0 }
-
-      context 'restricted matching' do
-        let(:value) { 0 }
-        include_examples 'data_control_without_restricted_prefab'
-      end
-
-      context 'restricted not matching' do
-        let(:value) { 2 }
-        include_examples 'data_control_with_restricted_prefab'
-      end
+      let(:value) { 0 }
+      include_examples 'data_control_examples'
     end
 
     describe 'gte' do
       let(:operator) { 'gte' }
       let(:key) { 'integer' }
-      let(:mode) { 0 }
-
-      context 'restricted matching' do
-        let(:value) { 1 }
-        include_examples 'data_control_without_restricted_prefab'
-      end
-
-      context 'restricted not matching' do
-        let(:value) { 2 }
-        include_examples 'data_control_with_restricted_prefab'
-      end
+      let(:value) { 0 }
+      include_examples 'data_control_examples'
     end
   end
 
