@@ -42,7 +42,7 @@ RSpec.describe PrefabControlService do
       unrestricted_employee
     end
 
-    shared_examples 'data_control_examples' do
+    shared_examples 'data_control_match_examples' do
       context 'whitelist over no access' do
         let(:base_mode) { 0 }
         let(:control_mode) { 1 }
@@ -80,45 +80,132 @@ RSpec.describe PrefabControlService do
       end
     end
 
+    shared_examples 'data_control_mismatch_examples' do
+      context 'whitelist over no access' do
+        let(:base_mode) { 0 }
+        let(:control_mode) { 1 }
+
+        it 'provides access to no prefabs' do
+          expect(resolved_scope.size).to eq(0)
+        end
+      end
+
+      context 'whitelist over access' do
+        let(:base_mode) { 1 }
+        let(:control_mode) { 1 }
+
+        it 'provides access to both prefabs' do
+          expect(resolved_scope.to_a.map(&:uid)).to include(restricted_employee.uid, unrestricted_employee.uid)
+        end
+      end
+
+      context 'blacklist over no access' do
+        let(:base_mode) { 0 }
+        let(:control_mode) { 0 }
+
+        it 'provides access to no prefabs' do
+          expect(resolved_scope.size).to eq(0)
+        end
+      end
+
+      context 'blacklist over access' do
+        let(:base_mode) { 1 }
+        let(:control_mode) { 0 }
+
+        it 'provides access to both prefabs' do
+          expect(resolved_scope.to_a.map(&:uid)).to include(restricted_employee.uid, unrestricted_employee.uid)
+        end
+      end
+    end
+
     describe 'eq' do
       let(:operator) { 'eq' }
       let(:key) { 'string'}
-      let(:value) { 'string' }
-      include_examples 'data_control_examples'
+
+      context 'matching' do
+        let(:value) { 'string' }
+        include_examples 'data_control_match_examples'
+      end
+
+      context 'not matching' do
+        let(:value) { 'notstring' }
+        include_examples 'data_control_mismatch_examples'
+      end
     end
 
     describe 'neq' do
       let(:operator) { 'neq' }
       let(:key) { 'string' }
-      let(:value) { 'notstring' }
-      include_examples 'data_control_examples'
+
+      context 'matching' do
+        let(:value) { 'notstring' }
+        include_examples 'data_control_match_examples'
+      end
+
+      context 'not matching' do
+        let(:value) { 'string' }
+        include_examples 'data_control_mismatch_examples'
+      end
     end
 
     describe 'lt' do
       let(:operator) { 'lt' }
       let(:key) { 'integer' }
-      let(:value) { 2 }
+
+      context 'matching' do
+        let(:value) { 2 }
+        include_examples 'data_control_match_examples'
+      end
+
+      context 'not matching' do
+        let(:value) { 0 }
+        include_examples 'data_control_mismatch_examples'
+      end
     end
 
     describe 'lte' do
       let(:operator) { 'lte' }
       let(:key) { 'integer' }
-      let(:value) { 5 }
-      include_examples 'data_control_examples'
+
+      context 'matching' do
+        let(:value) { 5 }
+        include_examples 'data_control_match_examples'
+      end
+
+      context 'not matching' do
+        let(:value) { 0 }
+        include_examples 'data_control_mismatch_examples'
+      end
     end
 
     describe 'gt' do
       let(:operator) { 'gt' }
       let(:key) { 'integer' }
-      let(:value) { 0 }
-      include_examples 'data_control_examples'
+
+      context 'matching' do
+        let(:value) { 0 }
+        include_examples 'data_control_match_examples'
+      end
+
+      context 'not matching' do
+        let(:value) { 5 }
+        include_examples 'data_control_mismatch_examples'
+      end
     end
 
     describe 'gte' do
       let(:operator) { 'gte' }
       let(:key) { 'integer' }
-      let(:value) { 0 }
-      include_examples 'data_control_examples'
+
+      context 'matching' do
+        let(:value) { 0 }
+        include_examples 'data_control_match_examples'
+      end
+
+      context 'not matching' do
+        let(:value) { 5 }
+        include_examples 'data_control_mismatch_examples'
+      end
     end
   end
 
