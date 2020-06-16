@@ -54,4 +54,22 @@ RSpec.describe 'Pagination', type: :request do
     let(:params) { nil }
     include_examples 'paginated_results'
   end
+
+  context 'with no offset param' do
+    let(:params) {
+      {
+        'page[limit]' => limit.to_s
+      }
+    }
+    include_examples 'paginated_results'
+  end
+
+  context 'with no limit param' do
+    let(:params) {
+      {
+        'page[offset]' => offset.to_s
+      }
+    }
+    include_examples 'paginated_results'
+  end
 end
