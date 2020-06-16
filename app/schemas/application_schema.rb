@@ -13,9 +13,21 @@ class ApplicationSchema
     if !validate
       # TODO: return validation errors as part of response...
       raise Polydesk::Errors::MalformedRequest.new
-    else
-      data
     end
+
+    # TODO: Apply default pagination in a more appropriate place
+    res = data
+    if !res.key?('page')
+      res['page'] = {
+        'limit' => '25',
+        'offset' => '0'
+      }
+    else
+      page = res.fetch('page')
+      page['limit'] = '25' if !page.key?('limit')
+      page['offset'] = '0' if !page.key?('offset')
+    end
+    res
   end
 
   def schema
