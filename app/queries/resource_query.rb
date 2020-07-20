@@ -494,6 +494,7 @@ class ResourceQuery
     end
 
     sorts.each { |sort|
+      sort = URI.decode(sort)
       scope, sql = apply_sort_expression(scope, sort)
       scope = scope.order(Arel.sql("#{sql}"))
     }
@@ -509,6 +510,7 @@ class ResourceQuery
     end
 
     filters.each { |filter|
+      filter = URI.decode(filter)
       scope, sql = apply_filter_expression(scope, filter)
       scope = scope.where("(#{sql})")
     }
@@ -536,6 +538,7 @@ class ResourceQuery
     }
 
     generate.each { |identifier, generator|
+      generator = URI.decode(generator)
       scope, sql = apply_expression(scope, generator)
       scope = scope.select_append("(#{sql}) as \"#{identifier}\"")
     }
