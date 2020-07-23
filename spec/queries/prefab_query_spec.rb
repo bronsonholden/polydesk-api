@@ -144,16 +144,18 @@ RSpec.describe PrefabQuery do
   describe 'lookups' do
     let(:identifier) { 'lookup_column' }
     let(:referent) { create :prefab, blueprint: blueprint, data: data }
+    let(:referrer_blueprint) { create :blueprint, name: 'Referrer Blueprint', namespace: 'referrer', schema: { type: 'object' } }
     let(:referrer) {
-      create :prefab, blueprint: blueprint, data: {
+      create :prefab, blueprint: referrer_blueprint, data: {
         prefab: "#{referent.namespace}/#{referent.id}"
       }
     }
-    let(:scope) { Prefab.where(id: referrer.id) }
+    let(:scope) { Prefab.partition_key_eq('referrer').where(id: referrer.id) }
 
     shared_examples 'lookup_examples' do |lookup_type|
       describe 'simple lookup' do
         it 'applies lookup' do
+          # puts applied_scope.explain
           expect(applied_scope.first.lookup_column).to eq(expected_value)
         end
       end
