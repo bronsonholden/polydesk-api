@@ -165,6 +165,7 @@ class ApplicationController < ActionController::API
   private
 
   def server_error(exception)
+    puts exception.inspect
     render json: { errors: [ { detail: exception.to_s }] }, status: :internal_server_error
   end
 
